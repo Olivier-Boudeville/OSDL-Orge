@@ -34,10 +34,13 @@ coins_to_credits(GoldCoinCount,SilverCoinCount,CopperCoinCount) ->
 
 
 credits_to_coins(Credits) ->
+
 	GoldCoins        = Credits div ?gold_factor,
 	RemainingCredits = Credits rem ?gold_factor,
+	
 	SilverCoins = RemainingCredits div ?silver_factor,
 	LastCredits = RemainingCredits rem ?silver_factor,
+	
 	CopperCoins = LastCredits div ?copper_factor,
 	{GoldCoins,SilverCoins,CopperCoins}.
 	

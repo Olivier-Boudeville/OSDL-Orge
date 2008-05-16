@@ -1,3 +1,6 @@
+% The Orge server in itself: this class is to be used to spawn new server
+% instances.
+% This top-level module will manage all others.
 -module(class_OrgeServer).
 
 
