@@ -3,19 +3,18 @@
 
 
 % Determines what are the mother classes of this class (if any):
--define(wooper_superclasses,[class_Actor]).
+-define(wooper_superclasses,[class_Actor,class_Describable,class_Locatable]).
 
 
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters,CreatureName,Location).
+-define(wooper_construct_parameters,CreatureName,Description,Location).
 
 % Life-cycle related exported operators:
--define(wooper_construct_export,new/2,new_link/2,
-	synchronous_new/2,synchronous_new_link/2,construct/3,delete/1).
+-define(wooper_construct_export,new/3,new_link/3,
+	synchronous_new/3,synchronous_new_link/3,construct/4,delete/1).
 
 % Method declarations.
--define(wooper_method_export,act/1,getAge/1,setAge/2,
-	getLocation/1,getAbscissa/1).
+-define(wooper_method_export,act/1,getAge/1,setAge/2).
 
 
 
@@ -37,18 +36,21 @@
 	
 % Constructs a new creature:
 %  - CreatureName, the name of the creature
-%  - Location, a record in-world location 
+%  - Location, a 'location' record designating an in-world location 
 % Creature starts at age 0.
 construct(State,?wooper_construct_parameters) ->
 
 	% First the direct mother classes, then this class-specific actions:
 	ActorState = class_Actor:construct( State, CreatureName ),
+	DescribableState = class_Describable:construct(ActorState,Description),
+	LocatableState = class_Locatable:construct( DescribableState, Location ),
 
-	?send_info([ ActorState, io_lib:format( 
-		"Creating a new creature whose name is ~s and whose location is ~s.",
-		[ CreatureName, space:location_to_string(Location) ] ) ]),
+	?send_info([ LocatableState, io_lib:format( 
+		"Creating a new creature whose name is ~s, whose description is ~w "
+		"and whose location is ~s.",
+		[ CreatureName, Description, space:location_to_string(Location) ] ) ]),
 	
-	?setAttributes( ActorState, [ {age,0}, {location,Location},
+	?setAttributes( LocatableState, [ {age,0},
 		{trace_categorization,?TraceEmitterCategorization} ] ).
 	
 	
@@ -84,22 +86,7 @@ setAge(State,NewAge) ->
 	?wooper_return_state_only( ?setAttribute(State,age,NewAge) ).
 	
 	
-
-% Returns the in-world location of this creature.
-% (request)
-getLocation(State) ->
-	?wooper_return_state_result( State, ?getAttr(location) ).
 	
-	
-% Returns the in-world abscissa of this creature.
-% (request)
-getAbscissa(State) ->
-	Location = ?getAttr(location),
-	?wooper_return_state_result( State, Location#location.x ).
-	
-	
-	
-
 
 % Management section of the actor.
 			
