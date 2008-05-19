@@ -22,7 +22,8 @@ run() ->
 	
 	MyLocation = #location{ x = 1, y = 2, z = 3 },
 		
-	MyCreature = class_Creature:new( "Test creature", MyLocation ),		
+	MyCreature = class_Creature:new( "Test creature", 
+		"I am a very ugly creature", MyLocation ),		
 	
 	MyCreature ! delete,
 
