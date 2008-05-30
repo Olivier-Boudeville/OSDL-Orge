@@ -1,7 +1,10 @@
 % Functional module defined for test purposes.
 % Allows to have functional services separated from various server 
 % implementations, such as raw-tcp and al.
--module(test_functional_module).
+% This version has a voluntary bug in the 'fail_on_purpose' function.
+% Made to be replaced during execution by a fixed module,
+% correct_test_functional_module.
+-module(faulty_test_functional_module).
 
 
 % This functional API:
@@ -11,26 +14,26 @@
 
 
 % For trace sending from tests:
--include("test_constructs.hrl").
+-include("traces.hrl").
 
 
 init() ->
-	?test_info([ "Functional module initialized." ]),
+	?emit_info([ "Functional module initialized." ]),
 	#functional_state{an_info = functionally_initialized}.
 	
 
 % handle/2 must return {Answer,NewFunctionalState}:
 	
 handle( get_info, FunctionalState ) ->
-	?test_info([ "get_info called." ]),
+	?emit_info([ "get_info called." ]),
 	{FunctionalState#functional_state.an_info,FunctionalState} ;
 	
 handle( {set_info,NewInfo}, FunctionalState ) ->
-	?test_info([ "set_info called." ]),
+	?emit_info([ "set_info called." ]),
 	{ok,FunctionalState#functional_state{an_info=NewInfo}};
 	
 handle( fail_on_purpose, FunctionalState ) ->
-	?test_info([ "fail_on_purpose called." ]),
+	?emit_info([ "fail_on_purpose called." ]),
 	FunctionalState = cannot_be_matched,
 	{ok,FunctionalState}.
 	
