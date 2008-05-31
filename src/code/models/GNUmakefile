@@ -1,4 +1,4 @@
-ORGE_TOP = ..
+ORGE_TOP = ../../..
 
 
 MODULES_DIRS = creatures objects
