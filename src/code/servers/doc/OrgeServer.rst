@@ -1,5 +1,3 @@
-.. _Orge server:
-.. _Orge servers:
 
 
 .. role:: raw-html(raw)
@@ -7,6 +5,16 @@
    
 .. role:: raw-latex(raw)
    :format: latex
+
+
+.. _tcp_server.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/raw-tcp/tcp_server.hrl?view=markup
+
+.. _tcp_server.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/raw-tcp/tcp_server.erl?view=markup
+
+
+
+.. _Orge server:
+.. _Orge servers:
 
 
 Orge Servers
@@ -74,3 +82,23 @@ Furthermore each server can be based on:
 	- reuse of OTP behaviours (ex: ``gen_server``, ``gen_fsm``, etc.)	
 	
 	
+Managing An Orge Server Instance
+................................
+
+
+Firewall Issues
+_______________
+
+
+With the basic default configuration, an Orge server has to open various ports:
+
+ - a main TCP listening port (default: `9512`, see tcp_server.hrl_), to handle incoming client connections, which will result in a per-client TCP socket, dedicated to administration (ex: client authentification) and data streaming  
+
+ - all these per-client TCP sockets are in a range (default: `51000-51999`, see tcp_server.hrl_). Thus by default up to `51999-51000+1 = 1000` connected TCP clients are allowed at a time. Note however that many more clients can interact with the simulated world, as nominal communications (not administration, not streaming) are performed over UDP ports, with no specific upper bound in client number set
+ 
+ 
+ 
+ 
+ 
+ 
+ 
