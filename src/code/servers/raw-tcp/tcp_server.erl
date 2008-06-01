@@ -1,10 +1,11 @@
 % Custom-made TCP/IP server.
 % Features:
 %  - functional behaviour uncoupled from server implementation
+%  - multiple parallel sessions can be handled
 %  - transaction semantics
 %  - hot code update
 %  - simple state management
-%  - based on Pid rather than on registered names
+%  - based on PID rather than on registered names
 -module(tcp_server).
 
 
@@ -27,13 +28,32 @@
 % client requests, and to send them updates.
 
 
--record( server_state, {server_name} ).
+% For server defaults:
+-include("tcp_server.hrl").
+
+
+% For emit_*:
+-include("traces.hrl").
+
+
+% Records that stores the current state of a TCP server:
+-record( server_state, {
+	server_name = undefined,
+	host = undefined,
+	starting_time = undefined,
+	code_update_count = 0,
+	last_code_update = undefined,
+	listening_socket = undefined,
+	listening_port = undefined,
+	current_connections = [],
+	past_connections = []
+} ).
 
 
 % Exported API section.
 
 -export([start/3,start_link/3,send_request/2,send_request_by_name/2,
-	update_functional_code/2]).
+	update_functional_code/2,state_to_string/1]).
 
 
 % Starts a new TCP server.
@@ -45,9 +65,9 @@
 % Returns the PID of the launched server.
 % (static)
 start(ServerName,RegistrationType,FunctionalModule) ->
-	ServerPid = spawn( fun() ->
-		loop( #server_state{ server_name = ServerName }, 
-			FunctionalModule, FunctionalModule:init() ) end ),
+	?emit_trace([ io_lib:format( "Starting a TCP server named ~s.",
+		[ ServerName ] ) ]),
+	ServerPid = spawn( fun() ->	init( ServerName, FunctionalModule ) end ),
 	ok = utils:register_as( ServerPid, ServerName, RegistrationType ),
 	ServerPid.
 
@@ -61,12 +81,54 @@ start(ServerName,RegistrationType,FunctionalModule) ->
 % Returns the PID of the launched server.
 % (static)
 start_link(ServerName,RegistrationType,FunctionalModule) ->
-	ServerPid = spawn_link( fun() ->
-		loop( #server_state{ server_name = ServerName },
-			FunctionalModule, FunctionalModule:init() ) end ),
+	?emit_trace([ io_lib:format( "Starting a linked TCP server named ~s.",
+		[ ServerName ] ) ]),
+	ServerPid = spawn_link( 
+		fun() -> init( ServerName, FunctionalModule ) end ),
 	ok = utils:register_as( ServerPid, ServerName,RegistrationType ),
 	ServerPid.
 
+
+% Initializes the TCP server with specified name and functional module, and
+% enter its main loop.
+% A default TCP port is used here.
+init( ServerName, FunctionalModule ) ->
+	init( ServerName, FunctionalModule, ?default_listening_tcp_server_port ).
+
+
+% Initializes the TCP server with specified name, functional module and TCP
+% port, and enter its main loop.
+init( ServerName, FunctionalModule, ListeningTCPPort ) ->
+
+	?emit_debug([ io_lib:format( "Server will listen to TCP port ~B.", 
+		[ListeningTCPPort] ) ]),
+		
+	% All network interfaces listen to, 32-bit header:
+	{ok,ListenSocket} = gen_tcp:listen( ListeningTCPPort, [
+		binary, {packet,4}, {backlog,?default_backlog}, 
+		{reuseaddr,true}, {active,true} ] ),
+
+	?emit_debug([ "Server waiting for incoming connections." ]),
+		
+	% Will block until a connection happens:
+	{ok,ClientSocket} = gen_tcp:accept(ListenSocket),
+	
+	?emit_debug([ "Connection accepted." ]),
+		
+	ServerState = #server_state{
+		server_name = ServerName,
+	    host = net_adm:localhost(),
+	    starting_time = utils:get_timestamp(),
+	    code_update_count = 0,
+	    last_code_update = undefined,
+		listening_socket = ListenSocket,
+	    listening_port = ListeningTCPPort,
+	    current_connections = [ClientSocket],
+	    past_connections = []
+	},
+	FunctionalState = FunctionalModule:init(),
+	loop( ServerState, FunctionalModule, FunctionalState ).
+	
 
 % Sends specified request to specified PID or name registered locally.
 send_request( ServerPid, Request ) when is_pid(ServerPid) ->
@@ -77,7 +139,7 @@ send_request( ServerPid, Request ) when is_pid(ServerPid) ->
 			Answer;
 
 		{ServerPid,request_failed,Message} ->
-			exit( {request_failed,Message} )		
+			{request_failed,Message}		
 	
 	end.
 
@@ -88,8 +150,8 @@ send_request_by_name( ServerName, Request ) ->
 
 % Replaces, for specified server, current version of functional code by
 % specified one.
-update_functional_code(ServerName,NewFunctionalModule) ->
-	send_request( ServerName, {update_functional_code,NewFunctionalModule} ).
+update_functional_code(ServerPid,NewFunctionalModule) ->
+	send_request( ServerPid, {update_functional_code,NewFunctionalModule} ).
 
 
 
@@ -104,11 +166,31 @@ update_functional_code(ServerName,NewFunctionalModule) ->
 % and the pushed updates
 %  - FunctionalState the state of the functional server 
 loop( ServerState, FunctionalModule, FunctionalState ) ->
+	?emit_debug([ io_lib:format( "~s~n", [ state_to_string(ServerState) ] ) ]),
 	receive
 	
+		{tcp,ClientSocket,BinMessage} ->
+			?emit_debug([ io_lib:format( "Server received binary ~p.~n",
+				[BinMessage] ) ]),
+			gen_tcp:send( ClientSocket, term_to_binary(packet_received) ),
+			?emit_debug([ "Server answered.~n" ]),
+			loop( ServerState, FunctionalModule, FunctionalState );
+
+		{tcp_closed,_ClientSocket} ->
+			?emit_trace([ "Client closed its socket.~n" ]);
+		
 		{From,{update_functional_code,NewFunctionalModule}} ->
 			From ! {self(),functional_code_swapped},
-			loop( ServerState, NewFunctionalModule, FunctionalState );
+			loop( ServerState#server_state{
+					code_update_count =
+						ServerState#server_state.code_update_count + 1,
+					last_code_update = utils:get_timestamp() 
+				},
+				NewFunctionalModule, FunctionalState );
+
+		{From,get_server_state} ->
+			From ! {self(),state_to_string(ServerState)},
+			loop( ServerState, FunctionalModule, FunctionalState );
 	
 		{From,Request} ->
 			try FunctionalModule:handle( Request, FunctionalState ) of
@@ -120,9 +202,10 @@ loop( ServerState, FunctionalModule, FunctionalState ) ->
 			catch
 			
 				_:Why ->
-					io:format( "Server whose state is ~w failed "
+					?emit_error([ io_lib:format(
+						"Server whose state is ~w failed "
 						"while executing request ~w for ~w: ~w.",
-						[ServerState,Request,From,Why] ),
+						[ServerState,Request,From,Why] ) ]),
 						
 					% Notify the client:	
 					From ! {self(),request_failed,Why},
@@ -134,3 +217,45 @@ loop( ServerState, FunctionalModule, FunctionalState ) ->
 	
 	end.
 
+
+
+
+% Returns a textual description of the specified server state.
+state_to_string(ServerState) ->
+	io_lib:format( "State of TCP server named ~s:~n"
+		"  + started on ~s at ~s~n"
+		"  + listening to TCP port ~w~n"
+		"  + ~s~n"
+		"  + current connections: ~w~n"
+		"  + past connections: ~w~n",
+		[ 
+			ServerState#server_state.server_name,
+			ServerState#server_state.host,
+			utils:get_textual_timestamp(
+				ServerState#server_state.starting_time), 
+			ServerState#server_state.listening_port, 
+			code_updates_to_string(ServerState),
+			ServerState#server_state.current_connections,
+			ServerState#server_state.past_connections
+		] ).	
+
+
+
+% Returns a textual description of past code updates.
+code_updates_to_string(ServerState) ->
+
+	case ServerState#server_state.last_code_update of 
+		
+		undefined ->
+			"no functional code update performed yet" ;
+			
+		TimeStampPair ->
+			io_lib:format( "~B functional code update(s) performed, "
+				"last one was at ~s",
+				[ 
+					ServerState#server_state.code_update_count,
+					utils:get_textual_timestamp(TimeStampPair) 
+				] )
+				
+	end.
+	
