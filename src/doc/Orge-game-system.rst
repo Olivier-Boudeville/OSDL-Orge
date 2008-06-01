@@ -189,7 +189,7 @@ The task includes:
  - evaluating the state and behaviour of all game elements besides the ones controlled by the players
 
 
-The GM task can be described also as an interactive simulator operating on game elements chosen, defined and arranged by the SW, based on the modelling provided by the SD. Thus the vocabulary of simulation is often used in this document.
+The GM task can be described also as an interactive simulator operating on game elements chosen, defined and arranged by the SW, based on the modelling provided by the SD. Thus the vocabulary of simulation is often used in this document. Games are just a specific kind of simulation indeed.
 
 .. Note:: Although there are presumably only a few CRPG (actually we do not know  any of such games) that offer to a human player the technical possibility of being the GM instead of controlling a character, this possibility could be interesting and thus could be supported in the future by the Orge implementation.  
 
@@ -951,7 +951,10 @@ References & Sources
  - `Hirinkaël document about modifier management <../../../club/game/numericBook/ThresholdSimulationSystem.pdf>`_ (in French)
 
  - An exciting series of articles of Matt Barton, `The History of Computer Role-Playing Games <http://www.gamasutra.com/features/20070223a/barton_01.shtml>`_
+
+
  
+:raw-latex:`\pagebreak`
 
 Appendices
 ==========
@@ -961,7 +964,7 @@ Appendices
 
 :raw-latex:`\pagebreak`
 
-.. include:: Orge-manual.rst
+.. include:: Orge-technical-manual.rst
 
 
 :raw-latex:`\pagebreak`
