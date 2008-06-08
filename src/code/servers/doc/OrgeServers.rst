@@ -396,7 +396,7 @@ _______________________
 
 
 Domain Name
-...........
+***********
 
 
 One key point of running a persistent server on the Internet is to have it respond to a name rather than an IP, to provide an additional indirection level (changing ISP should be transparent for the clients) and so that humans can share more easily the way of accessing to the Orge server (its URL).
@@ -406,7 +406,7 @@ The first thing is thus to register a domain name. As they are inexpensive (abou
 
 
 DNS Registering
-...............
+***************
 
 
 Once one bought a domain name, he must associate DNS informations to it, so that the various Internet traffic (web, mail, etc.) is routed to the desired IP address. 
@@ -525,7 +525,37 @@ Apart the administration tasks already mentioned (network configuration, system 
 
 For managibility as well as security reasons, creating user and group that are Orge-specific is strongly recommended.
 
- 
+This can be done that way::
+
+	> adduser --system --group orge
+	Adding system user `orge' (UID 107) ...
+	Adding new group `orge' (GID 107) ...
+	Adding new user `orge' (UID 107) with group `orge' ...
+	Creating home directory `/home/orge' ...                                    
+
+
+Some checkings can be made::
+	
+	> id orge
+	uid=107(orge) gid=107(orge) groups=107(orge)
+
+	> grep orge /etc/passwd
+	orge:x:107:107::/home/orge:/bin/false
+    
+	> grep orge /etc/shadow
+	orge:!:14031:0:99999:7:::
+
+	> tree /home/orge/
+	/home/orge/
+
+	0 directories, 0 files
+
+
+This setting forbids login with the ``orge`` user and access to a shell by using ``su``. 
+
+As nevertheless it may be convenient to be logged as ``orge``, one can issue ``chsh orge`` to specify a real shell or use directly ``adduser`` with the ``--shell``. This way, root (only) can switch, once logged, to the ``orge`` user.
+
+
 
 
 Firewall
@@ -534,7 +564,8 @@ ________
 
 We are using the `Netfilter <http://www.netfilter.org/>`_ firewall, also known as ``iptables``.
 
-We provide a complete and fully commented iptable configuration script, customized for the hosting of Orge servers, `iptables.rules-Gateway.sh <http://ceylan.svn.sourceforge.net/viewvc/ceylan/Ceylan/trunk/src/code/scripts/shell/iptables.rules-Gateway.sh?view=markup>`_. We did our best to create the most secure rules, any feedback would be appreciated.
+We provide a complete and fully commented iptable configuration script, customized for the hosting of Orge servers, `iptables.rules-Gateway.sh <http://ceylan.svn.sourceforge.net/viewvc/ceylan/Ceylan/trunk/src/code/scripts/shell/iptables.rules-Gateway.sh?view=markup>`_. We did our best to create the most secure rules, any feedback would be appreciated. Of course, depending on the configuration and the services that run on your server, this script should be customized accordingly (ex: regarding the name of the network interfaces).
+
 
 With the basic default configuration, an Orge server has to open various ports, listed below. 
 
@@ -546,17 +577,44 @@ It handles incoming client connections, which will result in the creation of a s
 
 This main TCP listening port is set by default to ``9512``, see tcp_server.hrl_.
 
+It is autorized by the firewall thanks to::
+
+	# For the listening socket of TCP Orge server:
+	iptables -A INPUT -p tcp --dport 9512 -m state --state NEW -j ACCEPT
+
 
 
 Per-client TCP ports
 ********************
 
+Once the previous listening TCP socket accepted a new connection, a socket dedicated to exchanges with this client is opened by the server.
+
+All these per-client TCP sockets are in a port range (default: ``51000-51999``, see tcp_server.hrl_)::
+
+	# For client TCP Orge server sockets:
+	iptables -A INPUT -p tcp --dport 51000:51999 -m state --state NEW -j ACCEPT
+
+Thus by default up to ``51999-51000+1 = 1000`` connected TCP clients are allowed at a time. Note however that many more clients can interact with the simulated world, as nominal communications (not administration, not streaming) are performed over UDP ports, with no specific upper bound set in the client number.
 
 
- - all these per-client TCP sockets are in a port range (default: ``51000-51999``, see tcp_server.hrl_). Thus by default up to ``51999-51000+1 = 1000`` connected TCP clients are allowed at a time. Note however that many more clients can interact with the simulated world, as nominal communications (not administration, not streaming) are performed over UDP ports, with no specific upper bound set in the client number 
- 
- - a main UDP port, used by the server to interact with all clients, sending them world updates, and receiving from them newer commands issued
- 
+
+Main UDP port
+*************
+
+It is used by the server to interact with all clients, sending them world updates, and receiving from them newer commands issued. 
+
+It implies the following rule:;
+
+	# For main UDP Orge server sockets:
+	iptables -A INPUT -p udp --dport 9512 -m state --state NEW -j ACCEPT
+
+
+The same port number can be used both for the TCP listening socket and for the main UDP port, as TCP and UDP port numbers are completely independent.
+
+
+netstat
+
+
 
 Tool Versions
 _____________
