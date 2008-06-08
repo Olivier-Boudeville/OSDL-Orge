@@ -20,3 +20,23 @@
 
 % Default TCP client range is hence 51999-51000+1 = 1000 TCP clients
 
+
+% Internal record that stores the current state of a TCP server:
+-record( server_state, {
+	server_name = undefined,
+	host = undefined,
+	starting_time = undefined,
+	current_client_module = undefined,
+	client_code_update_count = 0,
+	last_client_code_update = undefined,
+	listening_socket = undefined,
+	listening_port = undefined,
+	accepted_connections = [],
+	closed_connections = []
+} ).
+
+
+
+% Shortcut macro, for convenience: 
+-define(getState,ServerState#server_state).
+
