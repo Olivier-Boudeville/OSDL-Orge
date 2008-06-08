@@ -17,15 +17,15 @@
 % Not using OTP gen_server, to learn how to do it and, maybe, to improve 
 % performances, ease of integration or adequation to the Orge specific needs
 % (ex: contrary to the usual client/server approach, the Orge server has to
-% "push" (send to the clients) simulation updates without waiting for a specific
-% request to do so).
+% "push", i.e. send to the clients, simulation updates without waiting for a
+% specific request to do so).
 % Inspired from the various servers described in 'Programming Erlang',
 % by Joe Armstrong (chapter 16).
 % WOOPER has been avoided here to presumably speedup the processings, and 
 % as no need for inheritance is expected.
 
-% The role of a server is simply to break incoming data stream into appropriate
-% client requests, and to send them updates.
+% The role of these servers is simply to break incoming data stream into
+% appropriate client requests, and to send them updates.
 
 
 % For server defaults:
@@ -36,7 +36,7 @@
 -include("traces.hrl").
 
 
-% Records that stores the current state of a TCP server:
+% Record that stores the current state of a TCP server:
 -record( server_state, {
 	server_name = undefined,
 	host = undefined,
