@@ -28,22 +28,21 @@ run() ->
 	?test_start,
 	
 	?test_info([ "Creating a new tcp_server." ]),
-	
 	ServerPid = tcp_server:create_link( ?test_server_name, local_only, 
 		client_manager ),
-		
-	?test_info([ "Requesting server informations." ]),
-	ServerPid ! {self(),get_info},	
-	receive
 	
-		{server_info,StateString} ->
-			?test_info([ io_lib:format( "Current server state is: ~s.",
-				[StateString] ) ]) 
-			
-	end,
+	?test_info([ "Registering a new user." ]),
+	ServerPid ! {register,?test_login,?test_password},
 	
-	?test_info([ "Requesting the server to stop." ]),
-	ServerPid ! close,
-	 	
+	?test_info([ "Creating a new tcp_client." ]),	
+	ClientPid = tcp_client:start_link( ?test_client_name, localhost),
+
+	?test_info([ "Requesting the client to log in." ]),	
+	ClientPid ! {setUserLogin,?test_login,?test_password},
+	
+	ClientPid ! {login,?test_login,?test_password},
+
+	ClientPid ! {getUserProfile,self()},
+	
 	?test_stop.
 

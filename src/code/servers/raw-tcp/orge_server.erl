@@ -199,13 +199,8 @@ loop( ServerState ) ->
 		{AClientManagerPid,closed} ->
 			loop( on_client_disconnection( ServerState, AClientManagerPid ) );
 		
-		{SenderPid,get_info} ->
-			SenderPid ! {server_info,state_to_string(ServerState)},
-			loop( ServerState );
-			
-		close ->
-			on_close_request(ServerState),
-			?emit_trace([ "Server stopped." ])
+		{_SenderPid,get_info} ->
+			ok
 									
 	end.
 
@@ -307,11 +302,3 @@ past_connections_to_string( [], Acc ) ->
 past_connections_to_string( [H|T], Acc ) ->
 	past_connections_to_string( T, [ io_lib:format( "  + ~w~n", [H] ) | Acc ] ).
 	
-
-
-% Closes all current connections.
-on_close_request(ServerState) ->
-	?emit_trace([ io_lib:format( 
-		"Server shutdown requested, whereas state is: ~s~n", 
-		[ state_to_string(ServerState) ] ) ]),
-	[ ok = gen_tcp:close(X) || X <- ?getState.accepted_connections ].	
