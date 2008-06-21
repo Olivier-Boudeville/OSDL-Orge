@@ -15,14 +15,14 @@ CEYLAN_ERLANG_TOP := $(CEYLAN_TRUNK)/src/code/scripts/erlang
 OSDL_ROOT := $(ORGE_TOP)/../..
 
 
-ORGE_DEV_TOP := $(ORGE_TOP)/
+ORGE_DEV_TOP := $(ORGE_TOP)/src/code/
 
 # Directory section.
 
-CLIENTS_BASE_DIR := $(ORGE_TOP)/clients
-MODELS_BASE_DIR  := $(ORGE_TOP)/models
-RULESET_BASE_DIR := $(ORGE_TOP)/ruleset
-SERVERS_BASE_DIR := $(ORGE_TOP)/servers
+CLIENTS_BASE_DIR := $(ORGE_DEV_TOP)/clients
+MODELS_BASE_DIR  := $(ORGE_DEV_TOP)/models
+RULESET_BASE_DIR := $(ORGE_DEV_TOP)/ruleset
+SERVERS_BASE_DIR := $(ORGE_DEV_TOP)/servers
 
 TCP_CLIENTS_BASE_DIR := $(CLIENTS_BASE_DIR)/raw-tcp
 UDP_CLIENTS_BASE_DIR := $(CLIENTS_BASE_DIR)/raw-udp
