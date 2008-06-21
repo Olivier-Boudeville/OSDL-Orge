@@ -1,4 +1,4 @@
-% Custom-made TCP/IP client, mainly for server testing purpose.
+% Custom-made test TCP/IP client.
 % See tcp_server.erl and tcp_server_test.erl.
 -module(tcp_client).
 
