@@ -10,11 +10,12 @@
 -define(wooper_construct_parameters,Description,Size,Weight,BaseCreditValue).
 
 % Life-cycle related exported operators:
--define(wooper_construct_export,new/3,new_link/3,
-	synchronous_new/3,synchronous_new_link/3,construct/4,delete/1).
+-define(wooper_construct_export,new/4,new_link/4,
+	synchronous_new/4,synchronous_new_link/4,construct/5,delete/1).
 
 % Method declarations.
--define(wooper_method_export,getSize/1,setSize/2,getWeight/1,setWeight/2).
+-define(wooper_method_export,getSize/1,setSize/2,getWeight/1,setWeight/2,
+	getBaseCreditValue/1,setBaseCreditValue/2,toString/1).
 
 
 
@@ -26,116 +27,124 @@
 -define(TraceEmitterCategorization,"Orge.Object").
 
 % Allows to use macros for trace sending:
--include("class_Describable.hrl").
+-include("class_TraceEmitter.hrl").
 
+
+
+% Implementation notes:
+%
+% getDescription/1, setDescription/2 inherited from class_Describable.erl.
 
 	
 % Constructs a new object instance:
 %  - Description is a textual description of this object
 %  - Size is the volume of this object, expressed notably in terms of volume
-% (unit: dm^3, i.e. litres)
-%  - Weight is the weight of this object, expressed in kilograms (kg)
-%  - BaseCreditValue: the base value, in credits, of this object
-% (if applicable)
+% (unit: dm^3, i.e. litres), with a floating-point number
+%  - Weight is the weight of this object, expressed in kilograms (kg), with a
+% floating-point number
+%  - BaseCreditValue: the base value, in credits, of this object, if 
+% applicable (expressed with an integer); otherwise: undefined.
 construct(State,?wooper_construct_parameters) ->
 
 	% First the direct mother classes, then this class-specific actions:
-	TraceState = class_TraceEmitter:construct( State, "An object" ),
-	DescribableState = class_Describable:construct( TraceState, Description ),
+	DescribableState = class_Describable:construct( State, Description ),
+	TraceState = class_TraceEmitter:construct( DescribableState, "An object" ),
 	
-	ReadyState = ?setAttributes( DescribableState, [ 
+	ReadyState = ?setAttributes( TraceState, [ 
 		{size,Size}, {weight,Weight},
-		{trace_categorization,?TraceEmitterCategorization} ] ).
+		{base_credit_value,BaseCreditValue},
+		{trace_categorization,?TraceEmitterCategorization} ] ),
 
-	?send_info([ DescribableState, io_lib:format( 
-		"Creating a new locatable whose location is ~s.",
-		[ space:location_to_string(Location) ] ) ]),
+	?send_info([ ReadyState, io_lib:format( "Creating a new object: ~s.",
+		[ state_to_string(ReadyState) ] ) ]),
+		
+	ReadyState.
 	
 	
 	
 	
 % Overriden destructor.
-% Unsubscribing for TimeManager supposed already done, thanks to a termination
-% message. 
 delete(State) ->
 	% Class-specific actions:
-	?info([ "Deleting locatable." ]),
-	% erlang:unlink() not used, as done manager-side. 
+	?info([ "Deleting object." ]),
 
 	?debug([ "Object deleted." ]),
-
 	% Then call the direct mother class counterparts and allow chaining:
-	class_Describable:delete(State).
+	TraceState = class_TraceEmitter:delete(State),
+	class_Describable:delete(TraceState).
 	
 	
 	
 
 % Methods section.
 
+
+
+% Returns the size of this object, as a floating-point number of litres.
+% (const request)
+getSize(State) ->
+	?wooper_return_state_result( State,?getAttr(size) ).
+
 	
-
-% Returns the in-world location of this locatable.
-% (request)
-getLocation(State) ->
-	?wooper_return_state_result( State, ?getAttr(location) ).
-
-
-% Sets the in-world location of this locatable.
+% Sets the description of this object.	
 % (oneway)
-setLocation(State,NewLocation) ->
-	?wooper_return_state_only( ?setAttribute( State, location, NewLocation) ).
+setSize(State,NewSize) ->
+	?wooper_return_state_only( ?setAttribute(State,size,NewSize) ).
 	
 	
 	
-% Returns the in-world abscissa of this locatable.
-% (request)
-getAbscissa(State) ->
-	Location = ?getAttr(location),
-	?wooper_return_state_result( State, Location#location.x ).
+% Returns the weight of this object, as a floating-point number of kilograms.
+% (const request)
+getWeight(State) ->
+	?wooper_return_state_result( State,?getAttr(weight) ).
 
-	
-% Sets the in-world abscissa of this locatable.
+
+% Sets the weight of this object, as a floating-point number of kilograms.	
 % (oneway)
-setAbscissa(State,NewX) ->
-	Location = ?getAttr(location),
-	?wooper_return_state_only( ?setAttribute( State, location,
-		Location#location{x=NewX} ) ).
-
+setWeight(State,NewWeight) ->	
+	?wooper_return_state_only( ?setAttribute(State,weight,NewWeight) ).
+	
 	
 
-% Returns the in-world ordinate of this locatable.
-% (request)
-getOrdinate(State) ->
-	Location = ?getAttr(location),
-	?wooper_return_state_result( State, Location#location.y ).
-	
-	
-% Sets the in-world ordinate of this locatable.
+% Returns the base value of this object, as an integer number of credits.
+% (const request)
+getBaseCreditValue(State) ->
+	?wooper_return_state_result( State,?getAttr(base_credit_value) ).
+
+
+% Sets the base value of this object, as an integer number of credits.
 % (oneway)
-setOrdinate(State,NewY) ->
-	Location = ?getAttr(location),
-	?wooper_return_state_only( ?setAttribute( State, location,
-		Location#location{y=NewY} ) ).
+setBaseCreditValue(State,NewValue) ->	
+	?wooper_return_state_only( 
+		?setAttribute(State,base_credit_value,NewValue) ).
 	
 	
+	
+% Returns a textual description of the state of this object.
+% (const request)
+toString(State) ->
+	?wooper_return_state_result( State, state_to_string(State) ).
 
-% Returns the in-world altitude of this locatable.
-% (request)
-getAltitude(State) ->
-	Location = ?getAttr(location),
-	?wooper_return_state_result( State, Location#location.y ).
-	
-	
-% Sets the in-world altitude of this locatable.
-% (oneway)
-setAltitude(State,NewZ) ->
-	Location = ?getAttr(location),
-	?wooper_return_state_only( ?setAttribute( State, location,
-		Location#location{z=NewZ} ) ).
-	
 
-	
-	
+
 % Section for helper functions (not methods).
 
+
+% Returns a textual description of the state of this object.
+state_to_string(State) ->
+
+	ValueMsg = case ?getAttr(base_credit_value) of 
 	
+		undefined ->
+			"not defined";
+			
+		Amount ->
+			io_lib:format( "~s credits", [utils:integer_to_string(Amount)] )
+			
+	end,			
+		
+	io_lib:format( "Object whose description is: '~s', "
+		"whose size is ~f litres, whose weight is ~f kilograms, "
+		"whose base value is ~s",
+		[ ?getAttr(description), ?getAttr(size), ?getAttr(weight), ValueMsg ] ).
+		
