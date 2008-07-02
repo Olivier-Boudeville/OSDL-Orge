@@ -26,20 +26,24 @@ init(ServerPid,ListenSocket) ->
 		"Client manager ~w waiting for next connection.", [self()] ) ]),
 			
 	% This process will be the one controlling the client socket once created:	
-	{ok,ClientSocket} = gen_tcp:accept(ListenSocket),
+	case gen_tcp:accept(ListenSocket) of
 	
-	?emit_debug([ "Connection accepted." ]),
+		{ok,ClientSocket} ->
+			?emit_debug([ "Connection accepted." ]),
+			ServerPid ! {self(),accepted},
+			ManagerState = #manager_state{
+			    starting_time = utils:get_timestamp(),
+				client_socket = ClientSocket,
+				server_pid = ServerPid
+			},
+			control_access( ManagerState );
+			
+		{error,closed} ->
+			?emit_trace([ "Unable to accept a connection on "
+				"listening socket, server must have shut it down, "
+				"stopping this client manager." ])
 	
-	
-	
-	ServerPid ! {self(),accepted},
-	
-	ManagerState = #manager_state{
-	    starting_time = utils:get_timestamp(),
-		client_socket = ClientSocket,
-		server_pid = ServerPid
-	},
-	control_access( ManagerState ).
+	end.			
 	
 	
 		
@@ -104,9 +108,13 @@ control_access( ManagerState ) ->
 	% Milliseconds:
 	after 5000 ->
 	
-		?emit_warning([ "Time-out while waiting for the client identification."
+		?emit_warning([ "Time-out while waiting for the client identification, "
+			"notifying the client and the server, and "
+			"stopping this client manager."
 			]),
-		gen_tcp:send(ClientSocket,<<?timed_out>>) 
+		gen_tcp:send(ClientSocket,<<?timed_out>>), 
+		?getState.server_pid ! { self(),closed,?getState.client_login, 
+				{?getState.starting_time,utils:get_timestamp()} }
 		% No loop here.
 			
 	end.
@@ -153,6 +161,4 @@ check_identifiers(Login,Password) ->
 	?emit_trace([ io_lib:format( "Login '~s' and password '~s' accepted.",
 		[Login,Password] ) ]),
 	access_granted.
-	
-	
 	
