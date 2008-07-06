@@ -130,7 +130,12 @@ iff
 N/A
 	It means ``Non Applicable``. 
 
-
+Party
+	A group of characters, often complementary, working as a team.
+	
+Singleton
+	A character who does not belong to a party, adventuring on its own.
+		
 
 Units & Orders of Magnitude
 ___________________________
@@ -207,17 +212,45 @@ Orge is a game system primarily dedicated to video games.
 However it can be used as well for table-top games, since most computations remain simple thanks to the  abacuses (simplified precomputations to be used graphically).
 
 
+Turn-Based versus Real Time
+---------------------------
+
+Real tactical combat is usually turn-based, each player having as much time as needed to choose its options. Other actions (ex: exploration) are most of the time in real-time.
+
+Life itself is in real-time, and the turn-based approach raises issues in a multiplayer context: while some characters would experience slow-passing time during turn-based combats, others could be able to explore the world as full speed. What if they were to interact with characters fighting in their time bubble ?
+
+At the very least, each turn should be bounded in strict time limits, so that combat time do not drift too much from the game time.
+
+For example, all the players involved in a combat would decide privately and concurrently of their actions, which would be triggered automatically by Orge only at the end of the turn. If a player takes too much time to decide his actions, the game automatically skips to the next turn.
+ 
+Orge uses this kind of "relaxed" real-time system. Beware to bathroom breaks!
+
+
 Place of Random
 ---------------
 
 We chose to introduce some randomness when resolving actions, as it creates a kind of "dramatic tension". It forces oneself to evaluate every possible outcome and to ponder them painfully.
 
+Regarding game content, having it generated based on randomness might be a bit hazardous: roaming through endless self-similar dungeons is not deemed fun enough. Better have a few well-crafted dungeons, authored by real-life designers, rather than infinite dull ones.
+
+Same reasoning applies to random-generated quests, too many "fetch the orb from evil Wizard X" quests would kill most of the fun. 
+
+One relevant area for randomness in game content is the terrain generation: well chosen fractal algorithms lead to realistic landscapes, on which human-generated content can be settled down for the better of both worlds.
+
+Another interesting use of randomness is for the spawning of creatures: even if respawn areas should better be built by hand, they are then populated automatically. Otherwise monster populations would not be replenished, or too much manual tweaking would be necessary. See also: `Respawn`_.
+
+A right balance between random encounters and pre-scripted confrontations must be found, both are needed.
+
+
 
 Realistic versus Epic Setting
 -----------------------------
+
 Depending on the interactive story to be told, some actions might be totally impossible or, only, very unlikely (this is a difference of nature). The more unlikely outcomes may happen, the most epic the story will be.
 
 With Orge we prefer to keep a certain level of "epicness", should such word exist. Thus extraordinary actions are always possible (notably thanks to the modifier system we use), even if they are very unlikely.
+
+Too much realism would as well hinder the entertainment, thus relatively uninteresting facts of life (ex: the need to go regularly to toilets) have been abstracted out. See also: `Character Needs For Survival and Well-Being`_.
 
 
 Tragedy versus Comedy
@@ -228,9 +261,65 @@ We preferred letting the game system be, as much as possible, tone-agnostic: the
 
 Medieval, Contemporary, Futuristic, etc.
 ----------------------------------------
-The majority of popular MMORPGs are based on traditional fantasy themes, often occurring in an in-game universe comparable to that of Dungeons & Dragons
+The majority of popular MMORPGs are based on traditional fantasy themes, often occurring in an in-game universe comparable to that of Dungeons & Dragons.
 
 Some employ hybrid themes that either merge or substitute fantasy elements with those of science fiction, sword and sorcery, or crime fiction.
+
+Orge aims for the moment more specifically to fantasy settings. Later science-fiction themes could be explored. Contemporary stories are maybe a little less attractive.
+
+
+Party & Singleton
+-----------------
+
+In some games the player identifies to a single hero (a singleton), whereas on others he controls a team of adventurers, i.e. multiple characters (a party). It is a completely separate concern from the single player/multiplayer design issue.
+
+For the moment Orge focuses on singleton-based games, although team management can be interesting too, when building with long term planification each character so that it complements the others.
+
+
+Role-play
+---------
+
+It is a corner stone of a successful online RPG. 
+
+To help the development of roleplay, players are encouraged to customize their characters, notably thanks to a textual description.
+
+Role-play should not be confused with social interactions, since there is a difference between immersive games and instant messengers. We want here to promote contextual exchanges, based mostly on in-game events.
+
+Some game facilities are provided for that:
+
+  - real-time IRC-like internal chat system, for interlocutors able to speak directly (in hearing range)
+  
+  - bulletin board systems, post, for asynchronous unreliable long-distance communication (couriers are expensive, and can be intercepted or dishonest)
+
+  - a guild system, to structure the social exchanges
+ 
+  - a stage direction system, allowing the player to specify attitudes and actions that cannot be expressed by the game system, a bit like e-motes. For instance: *Gurg leans on the bar, exhausted*.
+  
+An additional way of promoting roleplay is to delegate it, at least partially, to a real-life game master, whose role is to better adapt the game's reactions to the acting effort of players, for instance by awarding experience bonuses for good roleplay or by improving the NPC behaviours in the face of dialogs. 
+
+This requires the Orge system to support, beyond the player role, the game master role, and to provide specific tools for it, like the ability for a game master to take control of one or more creatures (NPC, monsters, etc.). 
+
+Other measures can be taken to further enhance the roleplay, like making mandatory the formation of groups of players, in the face of adversity, either because the opponents are too strong or because the challenges require specialized complementary skills (ex: detector, tank, damage dealer, healer, buffer, etc.). Group spells (ex: team buffs) help there too.
+  
+
+Ending
+------
+
+Single player and multiplayer non-persistent games should have at least one successful ending, and more probably numerous ones, with various levels of success and failure, some depending on goals preferred by the player during game.
+
+Multiplayer games in a persistent world should have a far increased lifespan, less related to specific stories reaching completion. However all simulated worlds, including MMORPG, will have an actual termination in real life, and it should be preferably brought by a scenarized in-game final fireworks for a memorable ending.
+
+Unethical endings may or may not be discouraged by the game system.
+
+
+
+Passage of time
+---------------
+
+This is another major game element, directly linked to the `Place of Death`_ and to `Aging`_. The time cannot be stopped and flows quite fast.
+
+The game world is persistant, but most beings are relatively short-lived, and a trade-off must be found between youth and experience.
+
 
 
 Place of Death
@@ -248,6 +337,7 @@ Thus in Orge we favour permadeath. Note that it tends to make a character's heal
 
 
 
+
 Aging
 -----
 
@@ -259,7 +349,8 @@ Life Expectancy
 
 Should no brutal death occur, any creature will die when its life expectancy has been reached. The creature lifespan is determined at its creation, and is generally only known by the game system. 
 
-Life expectancy is computed that way: to the average lifespan corresponding to the race of the creature, following modifiers are added:
+Life expectancy is computed the following way. To the average lifespan corresponding to the race of the creature, modifiers are added:
+
  - the constitution modifier of that creature
  - a 8% bonus if it is a female creature, otherwise a 8% malus
  - a random modifier in the -10% to 10% range
@@ -339,7 +430,39 @@ Cadet/
 
 Example: 'Arthur, Young Human, Untrained Soldier' might become 'Arthur, '
 
-Hierarchy: age, rank (Lieutenant, Captain, etc.), level of expertise (Untrained, SwordMaster, etc.)
+
+Ranks
+-----
+
+ 
+ 
+Military
+........
+
+ - Lieutenant
+ - Captain
+
+ 
+Religious
+.........
+
+ - Novice
+ - 
+ 
+ 
+Levels of Expertise
+...................
+
+ - Untrained
+ - SwordMaster
+ - Grand Master
+
+
+Age
+...
+
+See `Textual Translation of Age`_.
+
 
 
 
@@ -365,46 +488,292 @@ Not depending on a creature being a humanoid, a sentient being, a NPC, a monster
 Traits
 ------
 
+Alignment
+---------
+
+Good ?Evil ? 
+
++-------------+-------------------------------------------+-------------------+
+| Creature    | Description                               |         |
+| Alignment   |                                           |                   |
++=============+===========================================+===================+
+| Lawful      |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Neutral     |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Chaotic     |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+
+Good and evil characters cannot join the same party.
+
+
 Races
 -----
+
+
++-------------+-------------------------------------------+-------------------+
+| Creature    | Description                               |         |
+| Races       |                                           |                   |
++=============+===========================================+===================+
+| Human       |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Elf         |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Dwarf       |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Gnome       |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Hobbit      |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+|       |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+
 
 Table of race statistics
 
 Life base expectancy, in years
 
-Classes
--------
-direct characterization ny archetypal characters
+
+Base Classes
+------------
+
+direct characterization by archetypal characters
 stereotyping 
+
++-------------+-------------------------------------------+-------------------+
+| Name of the | Description                               | Subclasses        |
+| Base Class  |                                           |                   |
++=============+===========================================+===================+
+| Fighter     |       |  Barbarian        |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Cleric      |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Wizard      |       | Mage, Sorcerer, Necromancer         |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Thief       |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Rogue       |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Bard        |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+|    |        |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+
+
+Sub-classes
+-----------
+
++-------------+-------------------------------------------+-------------------+
+| Name of the | Description                               |     |
+| Base Class  |                                           |    |
++=============+===========================================+===================+
+| Barbarian   | Berseker      |          |
+|             |                          |                   |
+
+
+Multi-classing
+--------------
+
+Some hybrids of the base classes are built-in: 
+
++-------------+-------------------------------------------+-------------------+
+| Name of the | Description                               | Hybrid Of         |
+| Hybrid Class|                                           |                   |
++=============+===========================================+===================+
+| Bishop      |       | Priest/Wizard         |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Samurai     |       | Fighter/Wizard         |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| WarLord     |       | Fighter/Priest        |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+| Ninja       | Fighter that shuns weapons and excels at critical strikes, ex:  Monk   | Fighter/Thief         |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+
+
+Classes & Alignment
+-------------------
+
+Regarding classes, some alignment restrictions apply: 
+
+	- a Rogue cannot be good
+	- a Bishop cannot be neutral
+	- a Samurai cannot be evil
+	- a Warlord must be good
+	- a Ninja must be evil
+
 
 
 Characteristics & Attributes
 ----------------------------
 
-lifespan
+The potential of a creature is described by following attributes:
+
++-------------+-------------------------------------------+-------------------+
+| Name of the | Meaning and Use [#]_                      | Usual Synonyms    |
+| Attribute   |                                           | and Close Terms   |
++=============+===========================================+===================+
+| Strength    | Physical force, vigor, power              |                   |
++-------------+-------------------------------------------+-------------------+
+| Agility     | Power of moving the limbs quickly and     | Dexterity         |
+|             | easily; nimbleness                        |                   |
++-------------+-------------------------------------------+-------------------+
+| Constitution| Ability to withstand fatigue, disease,    | Endurance,        |
+|             | deprivation, etc., and continue working   | hardiness,        |
+|             |                                           | stamina           | 
++-------------+-------------------------------------------+-------------------+
+| Charisma    | Personal attractiveness that enables      |                   | 
+|             | to influence others                       |                   |
++-------------+-------------------------------------------+-------------------+
+| Wisdom      | Knowledge, and the capacity to make due   | Discernment,      |
+|             | of it                                     | judgment          |
++-------------+-------------------------------------------+-------------------+
+| Intelligence| Readiness of comprehension                | I.Q.              | 
++-------------+-------------------------------------------+-------------------+
+| Willpower   | Power of the mind by which we decide to do| Will, self-control|
+|             | or not to do                              |                   |
++-------------+-------------------------------------------+-------------------+
+| Longevity   | Length of life                            |                   |
++-------------+-------------------------------------------+-------------------+
+|     |           |                   |
++-------------+-------------------------------------------+-------------------+
+|     |           |                   |
++-------------+-------------------------------------------+-------------------+
+|     |           |                   |
++-------------+-------------------------------------------+-------------------+
+
+.. [#] Most definitions are taken from various dictionaries, like the Webster.
+
+
+The player may be given a total number of points to distribute across the character attributes.
+
+These attributes are intrinsic, characteristic of a character, and should not increase during its life (experience applies to skills only). The attributes can however decrease in some cases, for example when a character suffers from permanent wounds.
+
+
+Other attributes that were not retained are:
+
++-------------+-------------------------------------------+
+| Name of the | Rejection Reason                          |
+| Attribute   |                                           |
++=============+===========================================+
+| Piety       | Should be roleplayed                      |
++-------------+-------------------------------------------+
+| Vitality    | Too close to stamina                      |
++-------------+-------------------------------------------+
+| Luck        | Does not exist as such                    |
++-------------+-------------------------------------------+
+| Cunning     | Should be roleplayed                      |
++-------------+-------------------------------------------+
+| Valour      | Not relevant                              |
++-------------+-------------------------------------------+
+
+
+
 current age
  
 tree
+
+
+Some characters are able to perform specific actions due to their nature. This includes for instance telepathy, or the ability of destroying armor by mere contact. This corresponds to *abilities*. 
+
+Abilities
+---------
+
++----------------------------+-----------------------------------------------+
+| Name of the                |Description                                    |
+| Ability                    |                                               |
++============================+===============================================+
+| Armor Decomposition        | When the creature touches a piece of          |
+|                            | armor, the armor is permanently weaken [#]_   |
++----------------------------+-----------------------------------------------+
+| Empathy                    | The creature may be able to feel an           |
+|                            | emotion of close creatures                    |
++----------------------------+-----------------------------------------------+
+| Telepathy                  | The creature may be able to project           |
+|                            | intentionally emotions to close creatures     |
++----------------------------+-----------------------------------------------+
+
+.. [#] See for example "gelatinous cubes" in some games.
 
  
 Skills
 ------ 
 
+
+Skill Definition
+................
+
+A skill defines the capacity of a character to perform a specific kind of action, regarding the technic, the know-how. 
+
+For example, for a successful horse-riding, following needs can be identified:
+  
+  - the player must be strong and agile enough
+  - he should be concentrated enough on his task
+  - he should have enough practise
+  
+The first two points are dictated by the character attributes only (ex: strength, agility, willpower), whereas the last one corresponds to a know-how, the horse-riding skill. 
+
+Only the know-how that cannot be expressed by roleplay should be captured by skills. That is the case of pratical knowledge like horse-riding, or non-translatable one like mastery of oral Orc language. Conversely, philosophy or debating should not be skills, as they depend more on the player than on his character: if a player were a good debater and its character a poor one according to its attributes, the overall result would be still that the character . 
+
+A corollary is that even if the game system ensures that all characters are initally equal statistics-wise, due to the players this will not be true in-game.
+
+
+Skill Progression
+.................
+
+An action generally leads to a slight increase in the associated skill(s), whether the action succeeds or not. However the gain is four times smaller if the action failed.
+
+This models the fact that, for most actions, the more one practises, the better at it one becomes, knowing that even failures teach lessons.
+
+Thus skills, unlike experience which is threshold-based, follows a continuous, almost invisible, progression.
+
+
 Skill Tree
+..........
+
+Skills are sorted hierarchically, in the *Skill Tree*. The reasons for that sorting is that most skills can be refined again and again in more specialized skills.
+
+For instance, if a player has a strong horse-riding skill, then he should be quite good at warhorse-riding, but nevertheless weaker than the same character who would have invested all his efforts directly in warhorse-riding. On the other hand, the first one should be able to ride more effectively all kinds of horses than the second one.
+
+Orge skill tree is the following:
+
+ - horse-riding
+ - taming
+ - martial arts
+ 
+
 
 Progression System 
 ------------------
 
 A powerful motivation for RPG players is to make their character progress. The usual scheme implies that the player is rewarded by a permanent increase in the abilities of his character after enough successful actions, which will be detailed in `Causes of Experience Gains`_.
 
-
 Usually a character starts a game unexperienced, young, at least partially untrained. Generally the lower the better, since it increases the character room for progression and, therefore, the game lifespan and the player pleasure (often more or less proportional to his character development).
 
-Thus many CRPG are based on a training stage/tutorial involving a butchery of rats (in the best cases for the player).
+Thus many CRPG are based on a training stage/tutorial involving (in the best cases for the player) a butchery of rats.
 
 For long-lived games, such as MMORPG, the character progression is ideally never-ending, otherwise players grow tired of the game.
 
-Therefore a crucial point is to find the subtle balance between frustation (if too little reward is granted) and too quick progression (too easy and leading to too powerful characters).
+Therefore a crucial point is to find the subtle balance between frustation (if too little reward is granted) and too quick progression (too easy and leading to too powerful unbalanced characters).
 
 
 
@@ -438,6 +807,7 @@ With Orge we chose:
   - to define fixed amounts of experience gain in case of success in specific actions, whereas the experience needed to level up increases quickly with the target level
 
   - not to limit the maximum level of a character
+
 
 
 This is done according to following formula:
@@ -487,10 +857,13 @@ Target Level Experience Points Needed to reach that level
 Causes of Experience Gains
 ..........................
 
-The convention here is that experience can only increase over time, except some very rare story events.
+The convention here is that experience can only increase over time, except some very rare story events. 
+
+Generally speaking, experience is here to reward good roleplay by the player, by increasing the abilities of his character.
 
 Following actions results in an experience increase:
 
+ #. increasing skills
  #. fulfilling quests
  #. slaughtering monsters
  #. finding rare objects
@@ -498,15 +871,49 @@ Following actions results in an experience increase:
 
 The model we chose is that associated with each of these events, a experience bonus is defined (its value is to be chosen by the Scenario Writer). 
 
+Regarding the experience gained after a success in combat in a multi-character context, to avoid that only the character striking the deathblow gets  experience points from the battle (which may lead to a severely unbalanced party), each character will receive experience proportionnaly to the amount of loss of life it inflicted, albeit the deathblow dealer will have a small bonus (20% of the total).
+
+So if the victory over a given opponent is to be rewarded by N experience points, they will dispatched that way:
+
+ - the deathblow dealer will receive a rounded ``0.2*N`` experience bonus
+ - an attacker (including deathblow dealer) who inflicted a percentage P in [0..1] of the actual damage will receive ``P*0.8*N``
+
+The damage are taken into account accross the full lifespan of the killed creature, and experience points assigned to attackers being dead between their strike and the death of the creature will be lost.
+  
+
 
 Consequences of Experience Gains
 ........................
 
 
+Character Needs For Survival and Well-Being
+-------------------------------------------
+
+A character would suffer from the lack of:
+
+ - food
+ - water
+ - oxygen
+ - sleep
+ - light
+
+If fun and demanding at first, micro-managing all these resources might become tedious. A way of introducing them initially while in the long term freeing the successful player from their management is to offer more expensive but less cumbersome replacements for them.
+
+This can be done for example by ensuring that the loot of most high-ranked monsters includes rich food (ex: dragon steacks), that advanced dungeons levels have a minimal density of drinkable fountains, and that, instead of torches to be bought, transported and replaced, either sustainable oil lamps or lanterns or relatively cheap spells of light are available.
+
 
 Health, Wounds and Death
 ------------------------
 
+
+Fatigue
+-------
+
+Orge offers a real-time fatigue system. Physical and psychological exhaustion are internally managed. 
+
+The current state of fatigue and stress of the main character is reported to the player only by the audio feedback of a heart beating quicker and quicker - until fainting (and likely becoming monster meat). Thus the player has to discriminate himself between the two kinds of fatigue.
+
+Taking damage or moving too quickly will cause the heart to pulse rapidly, as ambushes and horrific sights will do.
 
 
 Loot & Possessions
@@ -532,6 +939,9 @@ These respawn locations should be used with care, since they are often abused by
 
 Perception & Senses
 -------------------
+
+
+
 
 Resolving Actions
 =================
@@ -722,17 +1132,130 @@ One concern: to avoid that experienced characters based on fighting skills (barb
 Solutions: battle disciplines/maneuvers
 
 
+Weapons 
+-------
+
+A weapon can be hand-to-hand and/or ranged.
+
+All weapons - even hand-to-hand - have an attack range. For example an halberd allows for a larger range than a dagger.
+
+Most weapons can be used different ways, to throw, stab, bash, slash, etc, called *attack style*.
+
+This impacts notably on:
+
+	- the rate of attacks
+	- the probability to hit 
+	- the probability to defend (block/dodge/parry)
+	- the inflicted damages
+	- the wear of the attacker weapon
+	- the wear of the defender armor
+	
+All weapons, depending on the attack style, inflict a special kind of damage, in :
+
+
+Damage Type
+
+Punctual/Repeated (damage over time)
+
+ - arcane
+ - blade
+ - cold
+ - fire
+ - impact
+ 
+ - piercing
+ - slashing
+ - crushing (bludgeoning, blunt)
+magical, elemental, poison,
+Chopping and Bashing
+Energy, heat, electrical/Lightning
+acid
+
+drain
+
+Armor
+-----
+
+armor types
+
+
+Defense
+
+Resitance : modifiers depending on the damage type
+
+
+Terrain modifiers
+
 
 Magic
 =====
 
-common: spell, mana
+Some spells (named also incantations) are directly combat-related, they are called *Battle Arcanes* (ex: lightning bolt).
 
-Wizzard/mage
+Other spells are *Summoning Contacts*, whose role is to notify some very specific creatures to come to appear and, hopefully, to obey their summoner, as he is unable to control them directly.
+
+Spells useful in various ways are called *Ascendant Incantations* (ex : teleportation).
+
+Each spell, to be casted, requires a conscious caster, able to perform magic and having enough mana points, and having performed the right incantation (correct spell keys in the correct order). 
+
+The player manual lists some basic keys and spells.
+Lost mana points can be regained:
+
+ - at a low pace, when enough time has elapsed, with significant bonuses obtained when resting or, still more, when meditating
+ 
+ - in special places filled with magic (ex: some temples)
+ 
+ - with specific elixirs or spells targeted by other magical users
+ 
+
+The casting then may fail or succeed, on the emitter side, depending notably of the capacities of its caster.
+  
+Once successfully casted, a spell may fail or succeed, depending on the context (notably: target resistance). In all cases the mana is spent.
+
+
+Spell Failure
+-------------
+
+Should a spell fail, on most cases nothing special will happen, spell will just fizzle.
+
+On other cases, it may backfire, and deal damages, especially on the caster.
+
+On rare cases, with some spells, the failure might result in various unwanted effects, immediately apparent or not.
+  
+
+Wizzard/Mage
 ------------
 
-Cleric
-------
+Cleric/Priest
+-------------
+
+
+Spell List
+----------
+
+
++------------+------------------------------+--------------+----------+--------+
+| Spell      | Spell Description            | Spell        | Header 3 |        |
+| Name		 |                              | Target       |		  |        |
++============+==============================+==============+==========+========+
+| Little     | As long as the spell lasts,  | None (caster)| Header 3 |        |
+| Thumb [#]_ | the caster will drop small   | 		       |		  | 	   |
+|            | arcane peebles (one every    | 		       |		  | 	   |
+|            | ten seconds). Each one will  | 		       |		  | 	   |
+|            | disappear around one hour    | 		       |		  | 	   |
+|            | after it has been dropped.   | 		       |		  | 	   |
+|            | It is a convenient way of    | 		       |		  | 	   |
+|            | marking one's route, although| 		       |		  | 	   |
+|            | some creatures tend to move, |		       |		  | 	   |
+|            | collect or eat them [#]_.    | 		       |		  | 	   |
++------------+------------------------------+--------------+----------+--------+
+
+
+.. [#] Inspired from the literary fairy tale of Charles Perrault, *Le Petit Poucet*.
+
+.. [#] Any elemental eating arcane reification will be considerably strengthen.
+
+
 
 Bestiary
 ========
@@ -742,14 +1265,38 @@ The bestiary depends heavily on the scenario setting. Orge comes with the follow
 .. [#] The SW can of course add any other creatures of his own. 
 
 
-Bat
-Giant
-Goblin
-Halfling
-Human
-Lich
-Orc
-Troll
+ - Bat
+ - Giant
+ - Goblin
+ - Halfling
+ - Human
+ - Lich
+ - Orc
+ - Troll
+
+
+Creature Behaviours
+-------------------
+
+Seducing
+........
+
+In Orge a creature can attempt to seduce another creature of the same species but of the opposite gender, thanks to non-verbal communication. In case of success, the seduced creature cannot attack the seducing one.
+
+
+
+Stealing
+........
+
+Some creatures may tend to steal the possessions of other creatures.
+There are all-purpose kleptomaniacs (they will try to rob all kinds of objects) and specialized ones (ex: only foods interest them).
+
+
+Pets
+----
+
+Some species tend to be tamable.
+
 
 
 Character Roles
@@ -759,6 +1306,8 @@ Character Roles
  - Guard, Sentinel
 
 
+
+
 Object Repository
 =================
 
@@ -766,9 +1315,26 @@ Each object is determined by:
 
  - a name
  - a textual description
- - a size (volume), expressed in  , notably to evaluate bulkiness
+ - a size (volume), expressed in litres, notably to evaluate bulkiness
  - a base value (if applicable), expressed in credits and in world currency as well. This base value corresponds to the mean found value for that object in the game world, to be modulated by the actual merchant
 
+
+Special Objects
+---------------
+
+Fountains, altars, and thrones may have random effects on players willing to experiment with them. 
+
+
+Object Quality
+--------------
+
+ - bronze, iron, steel
+ 
+
+Object Wear
+-----------
+
+New, Used, Worn, Broken, Unreparable.
 
 
 Exchanging Goods
@@ -800,11 +1366,165 @@ As Orge focuses primarily on fantasy settings, here is the default mapping:
    Gold Coin [#]_   gc                    1 gc = 50 sc 				1000 			  
    ================ ===================== ========================= ================  
 
-.. [#]:: Gold, compared to copper and even silver, is quite rare in Orge. 
+.. [#] Gold, compared to copper and even silver, is quite rare in Orge. 
 
 .. Hint:: Usually making the change is a gameplay killer (since it is too cumbersome and fundamentally uninteresting), thus Orge sees it as a technical detail that can be abstracted away, and no monetary exchange will raise change issues.
 
+
+Social Organizations
+====================
+
+
+Guilds
+------
+
+A lot of guilds are geared towards specific sectors of activity, and therefore correspond quite closely to character classes.
+
+
+Thieves'Guild
+.............
+
+One of the most proeminent and successful guilds: almost every town has it local thieves headquarters, although it is in generally very well concealed from the rest of the population.
+
+
+Brotherhood Of St.Urquhart
+..........................
+
+This monastic community lives apart from secular society, usually in rather large complex of buildings around an abbey. Monks of St.Urquhart are reputed for their hand-to-hand combat technics, and for their focus on group combat.
+
+
+Order Of Aasgard Knights
+........................
+
+Often set on the borders of town or in the wilderness, they take take the form of commanderies. Around an often well-fortified  manor are dispatched a series of stables, training yards, houses and fields.
+
+
+Circle Of Arcane Rulers
+.......................
+
+This ancient guild has for particularity to gather all schoolds of wizardry, although they are known to be hardly able to live together. This guild tends to decline, due to the progress of organizations dedicated to specific schools of magic.
+
+The premises of Arcane Rulers are often near the center of towns, in beautiful buildings, but lacking of repairs, if not already in noticeable decay.
+
+A large number of local circles still have a functional teleportation portal.
+
+
+Places
+======
+
+
+Towns
+-----
+
+These are the place where most commodities for characters in need can be found:
+
+ - taverns offers drinks and meeting places, for example for over-the-counter quests, news exchanges or unofficial recruitment
  
+ - banks allow to store character possessions relatively safely 
+ 
+ - hospitals and clinics help restoring health and recovering from wounds and diseases
+ 
+ - inns offer a place to sleep quietly, and to let party members left behind (not selected for a given action)
+ 
+ - city hall and information panels give access to public services and offers (ex: openly published job offers)
+
+ - stores offer thematically sorted goods, with often a good choice; merchants are often difficult in bargaining
+ 
+ - markets are ideal for haggling second-hand properties, if one does not fear to have its purse stolen
+
+ - mainstream guilds have local premises, secret or not, in most towns
+ 
+ - religious places, like churches, temples, etc., help accommodating with one's deity, if any
+ 
+ 
+Towns are also a place of choice for *safe* social interactions, as combats are expected to be banned there.
+
+
+
+Military Installations
+----------------------
+
+ - outposts
+ - castles
+ - citadels
+ 
+
+
+
+Movement & Exploration
+======================
+
+
+Cartography
+-----------
+
+Unless specific measures are taken (use of map, compass, magical item, mapping spell, etc.), nothing special assists the player in finding directions except other in-world elements, such as helpful creatures and signposts.
+
+As there are basically no auto-mapper, the player has to rely on its sense of direction and/or its own mapping onto graph paper.
+
+Should an auto-mapper be provided, it would have to include a "fog of war" feature.
+ 
+
+Game Ingredients 
+================
+
+
+ - mazes (ex: where is the exit to the surface ?)
+ - riddles
+ - puzzles (ex: zombi chess against the Evil Necromancer)
+ - police investigation (ex: who kill King Fleck ?)
+ - military strategy (ex: cutting the supplies of an army)
+ - military tactics (ex : organizing a raid)
+ 
+ 
+Quests
+======
+
+Dramatic tension can be increased by quests whose success is dictated by achievements within strict time limits.
+
+They are rewarded by:
+
+ - plot progress (milestone unlocked)
+ - gain of experience points
+ - wealth gain, monetary (gold) and/or not (jewels, etc.)
+ - special objects (ex: magical ones)
+ - help (ex: powerful NPC joining the main character)
+ - special scenes and musics
+
+Basic quest examples:
+
+ - free a character and escort him back to a given point before given time-based event	
+ - capture a given boss, too well-guarded for the brute-force raid (infiltration needed)
+ - infiltrate given secret society
+ 
+ 
+A balance has to be found between adventure, action and role-play.
+
+
+
+Audio
+=====
+
+A huge part of player immersion can come from the in-game audio environment. 
+
+With Orge it is composed classically of:
+
+ - a set of background musics, chosen to match the ambiance of a location or quest events
+ 
+ - special effects, to "enhance the player experience", as marketing people say 
+ 
+ 
+We believe these special effects are essential, and should play at multiple levels. 
+
+The first level consists on sounds that directly illustrate the action. This includes all special effects like footsteps, door openings, weapon colliding,  grunts of monsters lurking out of sight, heart beating, etc.
+
+A second level corresponds to sounds that generate indistinct threat and  dramatic tension, like an ominous chord progression, or that suggest the ennemy is moving forward, plotting against the player and gathering its forces.
+
+The game should be hardly playable with muted sound.
+
+
+
+
 
 A More Formal Modelling
 =======================
@@ -847,6 +1567,8 @@ This section describes more precisely how the main concepts used by Orge are mod
    
 
 .. Note:: Many elements passive by nature (ex: a challenge, an area, etc.) can be nevertheless turned into active elements on a per-instance basis, if associated to a given Clock object.
+
+
 
 
 
@@ -921,9 +1643,17 @@ Footnotes
 Citations
 ---------
 
-Bibliography
+
+
+Random Ideas
 ============
 
+ - once authorisation has been obtained from the controlling players, reinject in-game some characters having been played as NPC or monsters
+ 
+ 
+ 
+Bibliography
+============
 
 
 Other well-known game systems
@@ -952,7 +1682,10 @@ References & Sources
 
  - An exciting series of articles of Matt Barton, `The History of Computer Role-Playing Games <http://www.gamasutra.com/features/20070223a/barton_01.shtml>`_
 
+ - *Dungeons & Desktops, The History of Computer Role-Playing Games*, the full book of the same Matt Barton. ISBN : 978-1-56881-411-7. Surely a must-read. See also the corresponding `extract <http://www.gamasutra.com/view/feature/3674/book_extract_dungeons_and_.php>`_
 
+ - Wikipedia article about `MUD <http://en.wikipedia.org/wiki/MUD>`_
+ 
  
 :raw-latex:`\pagebreak`
 
