@@ -112,55 +112,88 @@ start_link(ClientLogin,ClientPassword,ServerDNSName,ServerTCPListeningPort) ->
 init( ClientLogin, ClientPassword, ServerDNSName, ServerTCPListeningPort ) ->
 
 	?emit_debug([ "Client will try to connect now." ]),
+	
+	case gen_tcp:connect( ServerDNSName, ServerTCPListeningPort,
+			[ binary, {packet,?default_packet_header_size} ] ) of 
 		
-	{ok,Socket} = gen_tcp:connect( ServerDNSName, ServerTCPListeningPort,
-		[ binary, {packet,?default_packet_header_size} ] ),
-				
-	ClientState = #client_state{
-		client_login = ClientLogin,
-		client_password = ClientPassword,
-	    client_host = net_adm:localhost(),
-	    starting_time = utils:get_timestamp(),
-		server_host = ServerDNSName,
-		server_listening_port = ServerTCPListeningPort,
-		communication_socket = Socket
-	},
+		{ok,Socket}	->	
+			ClientState = #client_state{
+			client_login = ClientLogin,
+			client_password = ClientPassword,
+			client_host = net_adm:localhost(),
+			starting_time = utils:get_timestamp(),
+			server_host = ServerDNSName,
+			server_listening_port = ServerTCPListeningPort,
+			communication_socket = Socket
+			},
 
-	?emit_debug([ "Client connected." ]),
-	login(ClientState).
+			?emit_debug([ "Client connected, ready for login." ]),
+			login(ClientState);
 
+		{error,econnrefused} ->
+			?emit_fatal([ io_lib:format( 
+				"Connection refused (no server running on ~s at port ~s?), "
+				"stopping the client.", 
+				[   ServerDNSName, 
+					utils:integer_to_string(ServerTCPListeningPort)
+				] ) ]);
 
+		{error,OtherError} ->
+			?emit_fatal([ io_lib:format( 
+				"Connection failed to server running on ~s at port ~s: ~s"
+				"stopping the client.", 
+				[   ServerDNSName, 
+					utils:integer_to_string(ServerTCPListeningPort),
+					OtherError
+				] ) ])
+		
+	end.		
+			
+		
 login(ClientState) ->
 	?emit_debug([ "Sending a login request." ]),
 	Socket = ?getState.communication_socket,	
 	Identifiers = list_to_binary( io_lib:format( "~s~s~s", 
 		[?getState.client_login, ?default_identifier_separator,
 			?getState.client_password] ) ), 
-	ok = gen_tcp:send( Socket, Identifiers ),
-	?emit_debug([ "Login request sent." ]),
-	receive
+	% Uncomment to test the case of too late login (should result on a 
+	% time-out on the server):
+	%timer:sleep(6000),		
+	case gen_tcp:send( Socket, Identifiers ) of 
 	
-		{tcp,Socket,<<?access_granted>>} ->
-			on_successful_login(ClientState);
+		ok ->
+			?emit_debug([ "Login request sent." ]),
+			receive
+	
+				{tcp,Socket,<<?access_granted>>} ->
+					% Only case where the client does not stop:
+					on_successful_login(ClientState);
 		
-		{tcp,Socket,<<?ill_formatted_identifiers>>} ->
-			?emit_fatal( "Server answered: ill formatted identifiers, stopping."
-				);
+				{tcp,Socket,<<?ill_formatted_identifiers>>} ->
+					?emit_fatal( "Server answered: "
+						"ill formatted identifiers, stopping the client." );
 			
-		{tcp,Socket,<<?access_denied>>} ->
-			?emit_fatal( "Server answered: access denied, "
-				"incorrect identifiers." );
+				{tcp,Socket,<<?access_denied>>} ->
+					?emit_fatal( "Server answered: access denied, "
+						"incorrect identifiers, stopping the client." );
 			
-		{tcp,Socket,<<?timed_out>>} ->
-			?emit_fatal( "Server answered: "
-				"time-out while waiting for identifiers." )
+				{tcp,Socket,<<?timed_out>>} ->
+					?emit_fatal( "Server answered: "
+						"time-out while waiting for identifiers, "
+						"stopping the client." )
 		
-	end.
+			end ;
+		
+		{error,closed} ->
+			?emit_fatal([ "The server closed its socket, "
+				"presumably due to a time-out, stopping the client." ])
+		
+	end.		
 
 
 
 on_successful_login(_ClientState) ->
-	?emit_trace( "Login successful." ).
+	?emit_trace( "Client login successful." ).
 
 
 

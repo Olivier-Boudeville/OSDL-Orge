@@ -22,7 +22,7 @@ run() ->
 
 	?test_info([ "Creating a new Orge test TCP client." ]),
 	
-	ClientPid = orge_tcp_client:start_link( "My login", "My Password", 
+	orge_tcp_client:start_link( "My login", "My Password", 
 		localhost ),
 	
 	timer:sleep(2000),

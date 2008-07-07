@@ -106,7 +106,7 @@ init( ClientName, ServerDNSName, ServerTCPListeningPort ) ->
 	{ok,Socket} = gen_tcp:connect( ServerDNSName, ServerTCPListeningPort,
 		[ binary, {packet,4} ] ),
 				
-	ClientState = #client_state{
+	#client_state{
 		client_name = ClientName,
 	    client_host = net_adm:localhost(),
 	    starting_time = utils:get_timestamp(),
