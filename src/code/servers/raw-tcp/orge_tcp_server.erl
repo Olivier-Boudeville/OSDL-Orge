@@ -52,13 +52,15 @@
 
 % Exported API section.
 
--export([create/3,create_link/3,send_request/2,send_request_by_name/2,
+-export([create/4,create_link/4,send_request/2,send_request_by_name/2,
 	update_code_for_client_management/2,state_to_string/1]).
 
 
 % Creates a new Orge TCP server.
 %  - ServerName is the server name, under which it will be registered, if
 % requested
+%  - DatabaseInitializationMode tells whether it should be created empty
+% (if from_scratch) or loaded from a previous instance (from_previous_state)
 %  - RegistrationType is in 'none', 'local_only', 'global_only',
 % 'local_and_global', depending on what kind of registration is requested 
 % for this server
@@ -68,19 +70,23 @@
 %
 % Returns the PID of the launched server.
 % (static)
-create( ServerName, RegistrationType, ClientManagementModule ) ->
+create( ServerName, DatabaseInitializationMode, RegistrationType,
+		ClientManagementModule ) ->
 
 	?emit_trace([ io_lib:format( "Starting a new Orge TCP server named ~s.",
 		[ ServerName ] ) ]),
 	
 	% Allows not to export the init function:
-	spawn( fun() -> init( ServerName,RegistrationType,ClientManagementModule)
+	spawn( fun() -> init( ServerName, DatabaseInitializationMode,
+			RegistrationType, ClientManagementModule )
 		end ).
 		
 
 % Creates a new linked Orge TCP server.
 %  - ServerName is the server name, under which it will be registered if
 % requested
+%  - DatabaseInitializationMode tells whether it should be created empty
+% (if from_scratch) or loaded from a previous instance (from_previous_state)
 %  - RegistrationType is in 'none', 'local_only', 'global_only',
 % 'local_and_global', depending on what kind of registration is requested 
 % for this server
@@ -90,64 +96,83 @@ create( ServerName, RegistrationType, ClientManagementModule ) ->
 %
 % Returns the PID of the launched server.
 % (static)
-create_link( ServerName, RegistrationType, ClientManagementModule ) ->
+create_link( ServerName, DatabaseInitializationMode, RegistrationType,
+		ClientManagementModule ) ->
 
 	?emit_trace([ io_lib:format( 
 		"Starting a new linked Orge TCP server named ~s.", [ ServerName ] ) ]),
 			
 	% Avoids to export the init function:
-	spawn_link( fun() -> 
-		init( ServerName,RegistrationType,ClientManagementModule) end ).
+	spawn_link( fun() -> init( ServerName, DatabaseInitializationMode,
+			RegistrationType, ClientManagementModule )
+		end ).
 
 
 
 % Initializes the TCP server with specified name and module for client 
 % management, and enters its main loop, listening for incoming connections.
 % A default TCP listening port is used here.
-init( ServerName, RegistrationType, ClientManagementModule ) ->
-	init( ServerName, RegistrationType, ClientManagementModule, 
-		?default_listening_orge_tcp_server_port ).
+init( ServerName, DatabaseInitializationMode, RegistrationType,
+		ClientManagementModule ) ->
+	init( ServerName, DatabaseInitializationMode, RegistrationType,
+		ClientManagementModule, ?default_listening_orge_tcp_server_port ).
 
 
 % Initializes the TCP server with specified name, module for client 
 % management and TCP port, and enters its main loop, listening for incoming
 % connections.
-init( ServerName, RegistrationType, ClientManagementModule, 
-		ListeningTCPPort ) ->
+init( ServerName, DatabaseInitializationMode, RegistrationType,
+		ClientManagementModule, ListeningTCPPort ) ->
 
 	ok = utils:register_as( ServerName, RegistrationType ),
 
 	?emit_debug([ io_lib:format( "Server will listen to TCP port ~B, "
 		"with a maximum backlog of ~B.", 
 		[ListeningTCPPort,?default_backlog] ) ]),
-		
+	DatabasePid = orge_database_manager:start_link(),
 	% Listen to all network interfaces:
 	% Packet and other informations are set for this listen socket, and these 
 	% settings will be inherited by all accepted (server-side) sockets. 
-	{ok,ListenSocket} = gen_tcp:listen( ListeningTCPPort, [
-		binary, {backlog,?default_backlog}, {active,true},
-		{packet,?default_packet_header_size}, {reuseaddr,true} ] ),
+	case gen_tcp:listen( ListeningTCPPort, [
+			binary, {backlog,?default_backlog}, {active,true},
+			{packet,?default_packet_header_size}, {reuseaddr,true} ] ) of 
+			
+		{ok,ListenSocket} ->
+			% Only successful case:
+			?emit_debug([ "Server waiting for incoming connections." ]),
 
-	?emit_debug([ "Server waiting for incoming connections." ]),
+			ServerState = #server_state{
+				server_name = ServerName,
+				host = net_adm:localhost(),
+				%server_version = ?server_version,
+				starting_time = utils:get_timestamp(),
+				current_client_module = ClientManagementModule,
+				client_code_update_count = 0,
+				last_client_code_update = undefined,
+				listening_socket = ListenSocket,
+				listening_port = ListeningTCPPort,
+				waiting_managers = [],
+				accepted_connections = [],
+				past_connections = []
+				},
+				% A pool of more than one manager waiting for accept could
+				% also be used:
+				NewState = create_manager( ServerState ),
+				loop( NewState );
+				
+		{error,eaddrinuse} ->
+				
+			?emit_fatal([ io_lib:format( "Error, port ~s already in use "
+				"(another Orge server instance already running?). "
+				"Stopping this server.",
+				[utils:integer_to_string(ListeningTCPPort) ] ) ]);
 
-	ServerState = #server_state{
-		server_name = ServerName,
-	    host = net_adm:localhost(),
-		%server_version = ?server_version,
-	    starting_time = utils:get_timestamp(),
-		current_client_module = ClientManagementModule,
-	    client_code_update_count = 0,
-	    last_client_code_update = undefined,
-		listening_socket = ListenSocket,
-	    listening_port = ListeningTCPPort,
-		waiting_managers = [],
-		accepted_connections = [],
-		past_connections = []
-	},
-	% A pool of more than one manager waiting for accept could also be used:
-	NewState = create_manager( ServerState ),
-	loop( NewState ).
+		{error,OtherError} ->
+				
+			?emit_fatal([ io_lib:format( "Error, server could not be launched "
+				"(reason: ~s), stopping this server.", [OtherError] ) ])
 
+	end.
 
 
 
@@ -257,9 +282,8 @@ on_client_disconnection( ServerState, ClientManagerPid, Login,
 	
 		true ->
 			?emit_debug([ io_lib:format( "Closed connection: "
-				"removing client manager ~w corresponding to login ~s, "
-				"started at ~w, stopped at ~w.",
-				[ClientManagerPid,Login,StartingTime,StoppingTime] ) ]),
+				"removing client manager ~w corresponding to login ~s.",
+				[ClientManagerPid,Login] ) ]),
 			ClientStats = {Login,StartingTime,StoppingTime},	
 			?getState{ 
 				accepted_connections =
@@ -356,7 +380,7 @@ accepted_connections_to_string( AcceptedConnections ) ->
 
 accepted_connections_to_string( [], Acc ) ->
 	 io_lib:format( "currently accepted connections:~n", [] ) 
-		++ utils:join( "~n", lists:reverse(Acc) ) ;
+		++ lists:flatten( Acc ) ;
 	
 accepted_connections_to_string( [H|T], Acc ) ->
 	accepted_connections_to_string( T, 
@@ -375,7 +399,7 @@ past_connections_to_string( PastConnections ) ->
 	
 past_connections_to_string( [], Acc ) ->
 	 io_lib:format( "past connections:~n", [] ) 
-	 	++ utils:join( "~n", lists:reverse(Acc) ) ;
+		++ lists:flatten( Acc ) ;
 	
 past_connections_to_string( [{Login,StartingTime,StoppingTime}|T], Acc ) ->
 	past_connections_to_string( T, 
@@ -384,8 +408,16 @@ past_connections_to_string( [{Login,StartingTime,StoppingTime}|T], Acc ) ->
 			| Acc ] ).
 	
 
+past_connection_to_string( not_logged_in, StartingTime, StoppingTime ) ->
+	io_lib:format( "connection stopped before user log-in, "
+		"from ~s to ~s, duration: ~s", 
+		[ 	utils:get_textual_timestamp(StartingTime),
+			utils:get_textual_timestamp(StoppingTime),
+			utils:get_textual_duration(StartingTime,StoppingTime) ] );
+
 past_connection_to_string( Login, StartingTime, StoppingTime ) ->
-	io_lib:format( "connection of '~s', from ~s to ~s, duration: ~s", 
+	io_lib:format( "connection of logged user '~s', "
+		"from ~s to ~s, duration: ~s", 
 		[ Login,
 			utils:get_textual_timestamp(StartingTime),
 			utils:get_textual_timestamp(StoppingTime),
