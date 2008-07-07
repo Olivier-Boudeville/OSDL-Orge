@@ -23,8 +23,10 @@
 ).
 
 
-
-
+% Character record: flags telling whether the controlling player authorized
+% this character to be reinjected in-game, as NPC or monster.
+% Each character should have an  textual physical and psychological description,
+% of a few lines.
  
 % Internal record that stores the current state of the Orge database:
 -record( database_state, {
