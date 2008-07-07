@@ -9,7 +9,7 @@
 
 
 % For manager_state:
--include("client_manager.hrl").
+-include("orge_client_manager.hrl").
 
 % For default_identifier_separator:
 -include("orge_tcp_server.hrl").
