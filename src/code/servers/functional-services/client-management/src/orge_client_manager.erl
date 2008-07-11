@@ -26,13 +26,13 @@
 % a client connection:
 % client_host is {IPv4,Port}.
 -record( manager_state, {
-	client_login          = undefined,
-	client_host           = undefined,
-	starting_time         = undefined,
-	client_socket         = undefined,
-	server_pid            = undefined,
-	connection_identifier = undefined,
-	database_pid          = undefined
+	client_login,
+	client_host,
+	starting_time,
+	client_socket,
+	server_pid,
+	connection_identifier,
+	database_pid          
 } ).
 
 
