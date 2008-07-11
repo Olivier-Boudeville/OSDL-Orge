@@ -54,7 +54,7 @@
 % (correspond to a non-nested orge_user_settings record, plus other fields).
 % A Orge user can only have one Orge account.
 % The identifier is a counter set by the database manager, starting from 1.
-% account_status: in [active,disabled,deleted].
+% account_status: in [active,suspended,deleted].
 -record( orge_user, 
 	{
 	
@@ -113,7 +113,11 @@
 		ip_address,
 		port,
 		start_time,
-		stop_time
+		stop_time,
+		geolocated_country,
+		geolocated_region,
+		geolocated_city,
+		geolocated_postal_code
 	}
 ).
 
@@ -173,6 +177,7 @@ start_link(InitMode,ListenerPid) ->
 % init returns the first database state.
 init(from_scratch,ListenerPid) ->
 	?emit_info([ "Starting Orge database, created from scratch." ]),
+	start_geolocation_service(),
 	% Includes only this node:
 	DatabaseNodes = get_database_nodes(),
 	% Ignore failure if no schema was already existing:
@@ -203,6 +208,7 @@ init(from_scratch,ListenerPid) ->
 init(from_previous_state,ListenerPid) ->	
 	?emit_info([ "Starting Orge database from previous state." ]),
 	ok = mnesia:start(),
+	start_geolocation_service(),
 	TargetTables = ?table_list,
  	?emit_debug([ io_lib:format( 
 		"Waiting for the loading of following tables: ~w.",
@@ -214,6 +220,10 @@ init(from_previous_state,ListenerPid) ->
 	?emit_trace( [ "Orge database ready." ] ),
 	loop( #database_state{ current_user_id=1 } ).
 
+
+start_geolocation_service() ->
+	?emit_trace( [ "Starting IP geolocation service." ] ),
+	{ok,_Pid} = egeoip:start().
 
 
 notify_ready(no_listener) ->
@@ -613,7 +623,7 @@ user_to_string(OrgeUser) ->
 % Note: no direct patter-matching on login_status to avoid to have to bind 
 % specifically each field of interest.
 connection_to_string(OrgeConnection) ->
-	case OrgeConnection#orge_connection.login_status of
+	String = case OrgeConnection#orge_connection.login_status of
 	
 		not_tried_yet ->
 			untried_connection_to_string(OrgeConnection);
@@ -639,7 +649,8 @@ connection_to_string(OrgeConnection) ->
 		account_not_active ->
 			connection_no_active_account_to_string(OrgeConnection)
 			
-	end.
+	end,
+	String ++ " " ++ geolocation_to_string(OrgeConnection).
 	
 	
 untried_connection_to_string(OrgeConnection) ->
@@ -809,6 +820,52 @@ login_status_to_string(account_not_active) ->
 	"failed login since user account not active".
 		
 
+% Returns a textual description of IP geolocation information stored in
+% specified connection.
+geolocation_to_string(Connection) ->
+	Country = case Connection#orge_connection.geolocated_country of
+	
+		[] ->
+			"no country could be guessed";
+		
+		GuessedCountry ->	
+			io_lib:format( "guessed country is ~s", [GuessedCountry] )
+			
+	end,
+	
+	Region = case Connection#orge_connection.geolocated_region of
+	
+		[] ->
+			"no region could be guessed";
+		
+		GuessedRegion ->	
+			io_lib:format( "guessed region is ~s", [GuessedRegion] )
+			
+	end,
+	
+	City = case Connection#orge_connection.geolocated_city of
+	
+		[] ->
+			"no city could be guessed";
+		
+		GuessedCity ->	
+			io_lib:format( "guessed city is ~s", [GuessedCity] )
+			
+	end,
+	
+	
+	PostalCode = case Connection#orge_connection.geolocated_postal_code of
+	
+		[] ->
+			"no postal code could be guessed";
+		
+		GuessedPostalCode ->	
+			io_lib:format( "guessed postal code is ~s", [GuessedPostalCode] )
+			
+	end,
+	io_lib:format( "IP geolocation informations: ~s, ~s, ~s, ~s", 
+		[Country, Region, City, PostalCode] ).
+	
 
 % Section for user informations validity checking (on initial registration).
 
@@ -1009,7 +1066,8 @@ record_access_granted( Login, Password, ConnectionId,
 		start_time = utils:get_timestamp(),
 		stop_time = undefined
 	},
-	F = fun() -> mnesia:write( NewConnection ) end,
+	LocatedConnection = add_geolocation_infos(NewConnection),
+	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
@@ -1037,7 +1095,8 @@ record_bad_login( Login, Password, ConnectionId, {ClientIP,ClientPort} ) ->
 		start_time = utils:get_timestamp()
 		%stop_time
 	},
-	F = fun() -> mnesia:write( NewConnection ) end,
+	LocatedConnection = add_geolocation_infos(NewConnection),
+	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
@@ -1066,7 +1125,8 @@ record_bad_password( Login, Password, ConnectionId, {ClientIP,ClientPort} ) ->
 		start_time = utils:get_timestamp()
 		%stop_time
 	},
-	F = fun() -> mnesia:write( NewConnection ) end,
+	LocatedConnection = add_geolocation_infos(NewConnection),
+	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
@@ -1094,7 +1154,8 @@ record_timeout( ConnectionId, {ClientIP,ClientPort} ) ->
 		start_time = utils:get_timestamp()
 		%stop_time
 	},
-	F = fun() -> mnesia:write( NewConnection ) end,
+	LocatedConnection = add_geolocation_infos(NewConnection),
+	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
@@ -1123,7 +1184,8 @@ record_marshalling_failure(ConnectionId,{ClientIP,ClientPort}) ->
 		start_time = utils:get_timestamp()
 		%stop_time
 	},
-	F = fun() -> mnesia:write( NewConnection ) end,
+	LocatedConnection = add_geolocation_infos(NewConnection),
+	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
@@ -1153,7 +1215,8 @@ record_already_connected( Login, Password, ConnectionId,
 		start_time = utils:get_timestamp()
 		%stop_time
 	},
-	F = fun() -> mnesia:write( NewConnection ) end,
+	LocatedConnection = add_geolocation_infos(NewConnection),
+	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
@@ -1182,7 +1245,8 @@ record_account_non_active( Login, Password,	ConnectionId,
 		start_time = utils:get_timestamp()
 		%stop_time
 	},
-	F = fun() -> mnesia:write( NewConnection ) end,
+	LocatedConnection = add_geolocation_infos(NewConnection),
+	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
@@ -1206,7 +1270,8 @@ record_end_of_session(ConnectionId) ->
 	NewConnection = Connection#orge_connection { 
 		stop_time = utils:get_timestamp()
 	},
-	F = fun() -> mnesia:write( NewConnection ) end,
+	LocatedConnection = add_geolocation_infos(NewConnection),
+	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
@@ -1220,3 +1285,26 @@ record_end_of_session(ConnectionId) ->
 	
 	end.	
 
+
+% Updates connection records with IP geolocation informations.
+add_geolocation_infos(Connection) ->
+	TargetAddress = utils:ipv4_to_string( 
+		Connection#orge_connection.ip_address ),
+	case egeoip:lookup( TargetAddress ) of
+	
+		{ ok, {geoip,_CountryCode, _OtherCountryCode, CountryName, Region, City,
+				PostalCode, _Latitude, _Longitude, _AreaCode, _DMACode } } ->
+			Connection#orge_connection{
+				geolocated_country = CountryName,
+				geolocated_region = binary_to_list(Region),
+				geolocated_city = binary_to_list(City),
+				geolocated_postal_code = binary_to_list(PostalCode)
+			};
+			
+		{ error, Reason } ->
+			?emit_error([ io_lib:format( "Geolocation of ~s failed: ~w",
+				[TargetAddress,Reason] ) ]),
+			Connection
+			
+	end.				
+		
