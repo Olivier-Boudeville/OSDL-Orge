@@ -127,7 +127,7 @@ run() ->
 	BasePid ! {stop,self()},
 	receive
 	
-		database_stopped ->
+		orge_database_stopped ->
 			ok
 			
 	end,
@@ -149,7 +149,7 @@ run() ->
 	NewBasePid ! {stop,self()},
 	receive
 	
-		database_stopped ->
+		orge_database_stopped ->
 			ok
 			
 	end,
