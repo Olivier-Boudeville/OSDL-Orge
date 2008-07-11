@@ -28,27 +28,3 @@
 % (32-bit header)
 -define(default_packet_header_size,4).
 
-
-
-% The version of this TCP server.
--define(server_version,0.1).
-
-
-
-% Internal record that stores the current state of a TCP server:
--record( server_state, {
-	server_name = undefined,
-	host = undefined,
-	server_version = ?server_version,
-	starting_time = undefined,
-	database_pid = undefined,
-	current_client_module = undefined,
-	client_code_update_count = 0,
-	last_client_code_update = undefined,
-	listening_socket = undefined,
-	listening_port = undefined,
-	waiting_managers = [],
-	accepted_connections = [],
-	connection_count = 0
-} ).
-
