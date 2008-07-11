@@ -28,7 +28,8 @@ Overview
 
 The Orge database contains the various informations about:
  
- * the simulation users
+ * the Orge users (stored in the ``orge_user`` table)
+ * the connections to the Orge server (stored in the ``orge_connection`` table)
  * the simulation state
  * the monitored events
 
@@ -61,6 +62,8 @@ All main informations are identified by an intentionally meaningless number, to 
 This number, the information identifier, is implemented by a simple unsigned integer counter, starting at 1, and incremented for each new entry. The related type/format is named ``OrgeIdentifier``.
 
 The information identifier is a primary key, on which an index is created for faster look-up.
+
+The identifiers for Orge users are set by the Orge database, whereas the identifiers for connections are set by the Orge TCP server.
 
 
 Strings
@@ -126,6 +129,11 @@ The field ``Controlled Characters`` lists the simulated characters that the Orge
 
 The corresponding Erlang ``record`` is defined in orge_database_manager.hrl_.
 
+To inspect the data in the tables of the Orge database, one just has to launch from the shell::
+
+ > tv:start().
+ 
+ 
  
 Schema For Simulation State
 ---------------------------
