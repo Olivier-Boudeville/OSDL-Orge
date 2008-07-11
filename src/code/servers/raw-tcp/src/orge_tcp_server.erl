@@ -70,6 +70,27 @@
 -export([create/3,create_link/3,create/4,create_link/4,state_to_string/1]).
 
 
+% The version of this TCP server.
+-define(server_version,0.1).
+
+
+% Internal record that stores the current state of a TCP server:
+-record( server_state, {
+	server_name,
+	host,
+	server_version = ?server_version,
+	starting_time,
+	database_pid,
+	current_client_module,
+	client_code_update_count = 0,
+	last_client_code_update,
+	listening_socket,
+	listening_port,
+	waiting_managers = [],
+	accepted_connections = [],
+	connection_count = 0
+} ).
+
 
 % Creates a new Orge TCP server.
 %  - ServerName is the server name, under which it will be registered, if
