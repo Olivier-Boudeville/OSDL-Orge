@@ -485,16 +485,48 @@ Creature Characterization
 
 Not depending on a creature being a humanoid, a sentient being, a NPC, a monster or a PC, it will be described in an uniform way, by the means of *character's statistics*.
 
+Gender
+------
+
+Most creatures are either male or female, permanently.
+
+
 Traits
 ------
 
 Alignment
 ---------
 
-Good ?Evil ? 
+Alignment is not chosen as such by the controller of a creature: it just results from its beliefs, choices and actions.
+
+Alignment is a minor indicator. 
+
+For the vast majority of creatures, it is overshadowed by reputation, as these creatures cannot see directly in the system of values of a target character, and therefore can only rely on observation and reputation.
+
+Alignment is useful though for telepaths and, more importantly, deities, which can check to which extent their followers respect their expected approach to life.
+
+
+In Orge, alignment is determined quite classically from two measures:
+
+ - a **moral** balance, which ranges continuously from good to evil:
+ 
+	1. *good*: compassion and search for the common good
+	2. *neutral*: selfishness and lack of interest for others
+	3. *evil*: taste for the suffering of others
+ 
+ - a **psychosocial** balance, which ranges continuously from lawful to chaotic:
+ 
+	1. *lawful*: loyal, reliable, rational, stable, logical, having respect for all kinds of rules, but also dull, predictable, narrow-minded, unimaginative 
+	2. *neutral*: balanced, but also indifferent or lacking the capacity to judge
+	3. *chaotic*: original, free, surprising, creative, but also offensive, changing, untrustworthy, disturbing, contradictory, disorderly, arbitrary
+	
+See also the  nine combinations, as detailed this Wikipedia `article <http://en.wikipedia.org/wiki/Alignment_(Dungeons_%26_Dragons)#Alignments>`_, in the rather close context of *Dungeons & Dragons*.
+	
+	
 
 +-------------+-------------------------------------------+-------------------+
 | Creature    | Description                               |         |
+| Alignment   |                                           |                   |
 | Alignment   |                                           |                   |
 +=============+===========================================+===================+
 | Lawful      |       |          |
@@ -530,10 +562,13 @@ Races
 | Gnome       |       |          |
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
-| Hobbit      |       |          |
+| Halfling    |       |          |
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
-|       |       |          |
+| Goblin      |       |          |
+|             |                          |                   |
++-------------+-------------------------------------------+-------------------+
+|     |       |          |
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
 
@@ -546,14 +581,16 @@ Life base expectancy, in years
 Base Classes
 ------------
 
-direct characterization by archetypal characters
-stereotyping 
+Classes allow only direct characterization of a creature thanks to the use of archetypal, stereotyped profiles.
+
+They do not belong to the in-game notions managed by the Orge system, they are just a convenience to build characters or to identify them: depending on a character statistics, the game system can determine whether a character is a druid and/or a thief, etc.
+
 
 +-------------+-------------------------------------------+-------------------+
 | Name of the | Description                               | Subclasses        |
 | Base Class  |                                           |                   |
 +=============+===========================================+===================+
-| Fighter     |       |  Barbarian        |
+| Fighter     |       | Barbarian, Warrior        | Melee Fighter, Duelist, Berseker, Archer
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
 | Cleric      |       |          |
@@ -571,7 +608,7 @@ stereotyping
 | Bard        |       |          |
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
-|    |        |          |
+| Druid       |        |          |
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
 
@@ -1260,19 +1297,80 @@ Spell List
 Bestiary
 ========
 
-The bestiary depends heavily on the scenario setting. Orge comes with the following built-in species [#]_, listed alphabetically:
+The bestiary depends heavily on the scenario setting. It is mainly composed of `monsters <http://en.wikipedia.org/wiki/Monster>`_, in the traditional sense. A complete list can be found in `this <http://en.wikipedia.org/wiki/List_of_species_in_fantasy_fiction>`_ Wikipedia article.
+
+
+Orge comes with the following built-in species [#]_, listed alphabetically in each theme:
 
 .. [#] The SW can of course add any other creatures of his own. 
 
 
- - Bat
+Main Sapient Beings
+-------------------
+
+ - Dwarf
+ - Elf
  - Giant
+ - Gnome
  - Goblin
  - Halfling
  - Human
- - Lich
  - Orc
+ - Ogre
  - Troll
+ 
+
+Animals
+-------
+
+ - Bat
+ - Dragon
+ - Griffin
+ - Manticore
+ - Unicorn
+ - Monkey 
+ - Spider
+ 
+Undead
+------
+
+ - Ghoul
+ - Lich
+ - Vampire
+ - Zombie
+ - Skeleton
+ - Specter
+ - Wraith
+ 
+ 
+Monsters
+--------
+
+ - Basilisk
+ - Gargoyle
+ - Imp
+ - Wraith
+ - Banshee
+ - Beholder 
+ - Chimera
+ - Cyclope
+ - Golem
+ - Demon
+ - Djinn
+ - Doppelgänger 
+ - Gorgon
+ - Harpy
+ - Kobold
+ - Hydra
+ - Kraken
+ - Giant Spider
+ - Mermaid
+ - Minotaur
+ - Phoenix
+ - Sphinx 
+ - Lizard Man
+ 
+
 
 
 Creature Behaviours
@@ -1524,6 +1622,11 @@ The game should be hardly playable with muted sound.
 
 
 
+
+Multiplayer
+===========
+
+Player versus Player.
 
 
 A More Formal Modelling
