@@ -6,6 +6,7 @@
 %  - multiple parallel sessions can be handled
 %  - hot code update
 %  - simple state management
+%  - database integration
 %
 -module(orge_tcp_server).
 
@@ -32,9 +33,23 @@
 % appropriate client requests passed to client managers, and to send updates
 % to clients.
 %
+% Servers are not expected to record informations about connections: this is
+% done by the Orge database.
+%
+% Servers just keep track of the client managers they launch, as they control
+% their lifecycle.
+%
+% Currently running managers are split between waiting ones and the ones having
+% accepted their connection.
+% 
+% Servers count as well the total number of spawned managers, to preserve unique
+% identifier (thanks to a manager counter) despite terminations of managers.
+%
 % For these TCP servers, there is one listening socket, and as many
 % per-connection sockets as clients.
-% TO-DO: limit the max number of simultaneous connections ?
+%
+% TO-DO: limit the maximum number of simultaneous connections ?
+%
 
 
 % For server defaults, the internal record server_state and the getState macro:
@@ -52,8 +67,58 @@
 
 % Exported API section.
 
--export([create/4,create_link/4,send_request/2,send_request_by_name/2,
-	update_code_for_client_management/2,state_to_string/1]).
+-export([create/3,create_link/3,create/4,create_link/4,state_to_string/1]).
+
+
+
+% Creates a new Orge TCP server.
+%  - ServerName is the server name, under which it will be registered, if
+% requested
+%  - DatabaseInitializationMode tells whether it should be created empty
+% (if from_scratch) or loaded from a previous instance (from_previous_state)
+%  - RegistrationType is in 'none', 'local_only', 'global_only',
+% 'local_and_global', depending on what kind of registration is requested 
+% for this server
+%
+% The default client management module will be used.
+%
+% Returns the PID of the launched server.
+% (static)
+create( ServerName, DatabaseInitializationMode, RegistrationType ) ->
+
+	?emit_trace([ io_lib:format( "Starting a new Orge TCP server named ~s.",
+		[ ServerName ] ) ]),
+	
+	% Allows not to export the init function:
+	spawn( fun() -> init( ServerName, DatabaseInitializationMode,
+			RegistrationType )
+		end ).
+		
+
+% Creates a new linked Orge TCP server.
+%  - ServerName is the server name, under which it will be registered if
+% requested
+%  - DatabaseInitializationMode tells whether it should be created empty
+% (if from_scratch) or loaded from a previous instance (from_previous_state)
+%  - RegistrationType is in 'none', 'local_only', 'global_only',
+% 'local_and_global', depending on what kind of registration is requested 
+% for this server
+%
+% The default client management module will be used.
+%
+% Returns the PID of the launched server.
+% (static)
+create_link( ServerName, DatabaseInitializationMode, RegistrationType ) ->
+
+	?emit_trace([ io_lib:format( 
+		"Starting a new linked Orge TCP server named ~s.", [ ServerName ] ) ]),
+			
+	% Avoids to export the init function:
+	spawn_link( fun() -> init( ServerName, DatabaseInitializationMode,
+			RegistrationType )
+		end ).
+
+
 
 
 % Creates a new Orge TCP server.
@@ -109,6 +174,15 @@ create_link( ServerName, DatabaseInitializationMode, RegistrationType,
 
 
 
+% Initializes the TCP server with specified name, and enters its main loop,
+% listening for incoming connections.
+% Default client management module and TCP listening port are used here.
+init( ServerName, DatabaseInitializationMode, RegistrationType ) ->
+	init( ServerName, DatabaseInitializationMode, RegistrationType,
+		?default_client_management_module,
+		?default_listening_orge_tcp_server_port ).
+
+
 % Initializes the TCP server with specified name and module for client 
 % management, and enters its main loop, listening for incoming connections.
 % A default TCP listening port is used here.
@@ -126,10 +200,22 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 
 	ok = utils:register_as( ServerName, RegistrationType ),
 
-	?emit_debug([ io_lib:format( "Server will listen to TCP port ~B, "
+	?emit_trace([ io_lib:format( "Orge server will listen to TCP port ~B, "
 		"with a maximum backlog of ~B.", 
 		[ListeningTCPPort,?default_backlog] ) ]),
-	DatabasePid = orge_database_manager:start_link(),
+		
+	?emit_trace([ io_lib:format( "Starting the Orge database, in '~w' mode.",
+		[DatabaseInitializationMode] ) ]),
+		
+	DatabasePid = orge_database_manager:start_link( 
+		DatabaseInitializationMode, self() ),	
+	receive
+	
+		orge_database_ready ->
+			?emit_trace([ "Orge database ready." ])
+			
+	end,	
+	
 	% Listen to all network interfaces:
 	% Packet and other informations are set for this listen socket, and these 
 	% settings will be inherited by all accepted (server-side) sockets. 
@@ -146,6 +232,7 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 				host = net_adm:localhost(),
 				%server_version = ?server_version,
 				starting_time = utils:get_timestamp(),
+				database_pid = DatabasePid,
 				current_client_module = ClientManagementModule,
 				client_code_update_count = 0,
 				last_client_code_update = undefined,
@@ -153,12 +240,12 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 				listening_port = ListeningTCPPort,
 				waiting_managers = [],
 				accepted_connections = [],
-				past_connections = []
+				connection_count = 0
 				},
-				% A pool of more than one manager waiting for accept could
-				% also be used:
-				NewState = create_manager( ServerState ),
-				loop( NewState );
+			% A pool of more than one manager waiting for accept could
+			% also be used:
+			NewState = create_client_manager( ServerState ),
+			loop( NewState );
 				
 		{error,eaddrinuse} ->
 				
@@ -170,41 +257,10 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 		{error,OtherError} ->
 				
 			?emit_fatal([ io_lib:format( "Error, server could not be launched "
-				"(reason: ~s), stopping this server.", [OtherError] ) ])
+				"(reason: ~w), stopping this server.", [OtherError] ) ])
 
 	end.
 
-
-
-
-% Client API.
-
-
-% Sends specified request to specified PID or name registered locally.
-% (static)
-send_request( ServerPid, Request ) when is_pid(ServerPid) ->
-	ServerPid ! {self(),Request},
-	receive
-	
-		{ServerPid,Answer} ->
-			Answer;
-
-		{ServerPid,request_failed,Message} ->
-			{request_failed,Message}		
-	
-	end.
-
-
-% (static)
-send_request_by_name( ServerName, Request ) ->
-	send_request( erlang:whereis(ServerName), Request ).
-	
-
-% Replaces, for specified server, current version of functional code by
-% specified one.
-update_code_for_client_management(ServerPid,NewClientManagementModule) ->
-	send_request( ServerPid,
-		{update_code_for_client_management,NewClientManagementModule} ).
 
 
 
@@ -215,15 +271,21 @@ update_code_for_client_management(ServerPid,NewClientManagementModule) ->
 
 % Creates a client manager waiting for any newly accepted connection.
 % Returns an updated state.
-create_manager( ServerState ) ->
+create_client_manager( ServerState ) ->
 
-	?emit_trace([ "Spawning a client manager for next connection." ]),
+	?emit_trace([ "Spawning a client manager for next future connection." ]),
+
+	NewConnectionCount = ?getState.connection_count + 1,
 
 	NewClientManagerPid = spawn_link( ?getState.current_client_module,
-		init, [	self(), ?getState.listening_socket ] ),
-		
-	?getState{ waiting_managers =
-		[ NewClientManagerPid | ?getState.waiting_managers ] }.
+		init, [	self(), ?getState.listening_socket, NewConnectionCount,
+			?getState.database_pid ] ),
+	
+	% Waiting managerS as a pool of pre-spawn managers could be used:	
+	?getState{ 
+		waiting_managers = [ NewClientManagerPid | ?getState.waiting_managers ],
+		connection_count = NewConnectionCount
+	}.
 
 
 
@@ -238,12 +300,23 @@ loop( ServerState ) ->
 	
 	receive
 	
+		{register_user,NewUserSettings,CallerPid} ->
+			{NewState,Result} = on_user_registration( ServerState, 
+				NewUserSettings ),
+			CallerPid ! {registration_result,Result},
+			loop(NewState);
+			 			
+		{unregister_user,UserLogin,CallerPid} ->
+			{NewState,Result} = on_user_unregistration( ServerState, 
+				UserLogin ),
+			CallerPid ! {unregistration_result,Result},
+			loop(NewState);
+			 			
 		{NewClientManagerPid,accepted} ->
 			loop( on_client_connection( ServerState, NewClientManagerPid ) );
 					
-		{AClientManagerPid,closed,Login,Times} ->
-			loop( on_client_disconnection( ServerState, AClientManagerPid,
-				Login,Times ) );
+		{AClientManagerPid,closed} ->
+			loop( on_client_disconnection( ServerState, AClientManagerPid ) );
 		
 		{SenderPid,get_info} ->
 			SenderPid ! {server_info,state_to_string(ServerState)},
@@ -252,7 +325,30 @@ loop( ServerState ) ->
 		{SenderPid,shutdown} ->
 			on_shutdown_request( ServerState, SenderPid )
 			% No loop( ServerState ) here !
-									
+	end.
+
+
+% Declares a new Orge user for future logins.
+% Returns {NewState,Result}. 
+on_user_registration( ServerState, NewUserSettings ) ->
+	?getState.database_pid ! {register_user,NewUserSettings,self()},
+	receive
+	
+		RegistrationResult ->
+			{ServerState,RegistrationResult}
+	
+	end.
+	
+			 			
+% Unregisters an Orge user, specified by login.
+% Returns {NewState,Result}. 
+on_user_unregistration( ServerState, UserLogin ) ->
+	?getState.database_pid ! {unregister_user,UserLogin,self()},
+	receive
+	
+		UnregistrationResult ->
+			{ServerState,UnregistrationResult}
+	
 	end.
 
 
@@ -268,47 +364,58 @@ on_client_connection( ServerState, ClientManagerPid ) ->
 		?getState.waiting_managers ) },
 	
 	% No test for multiple registering of a manager necessary here:
-	ManagerLessState = NewState#server_state{ accepted_connections =
-		[ ClientManagerPid | ?getState.accepted_connections ] },
-	
-	create_manager(ManagerLessState).
+	ManagerLessState = NewState#server_state{ 
+		accepted_connections =
+			[ ClientManagerPid | ?getState.accepted_connections ]
+	},
+	create_client_manager(ManagerLessState).
 
 
 % Returns an updated server state.
-on_client_disconnection( ServerState, ClientManagerPid, Login, 
-		{StartingTime,StoppingTime} ) ->
+on_client_disconnection( ServerState, ClientManagerPid ) ->
 	CurrentConnections = ?getState.accepted_connections,
 	case lists:member( ClientManagerPid, CurrentConnections ) of
 	
 		true ->
 			?emit_debug([ io_lib:format( "Closed connection: "
-				"removing client manager ~w corresponding to login ~s.",
-				[ClientManagerPid,Login] ) ]),
-			ClientStats = {Login,StartingTime,StoppingTime},	
-			?getState{ 
-				accepted_connections =
-					lists:delete( ClientManagerPid, CurrentConnections ),
-				past_connections = [ClientStats|?getState.past_connections]	
-				 };
+				"removing client manager ~w.",[ClientManagerPid] ) ]),
+			?getState{ accepted_connections =
+				lists:delete( ClientManagerPid, CurrentConnections ) };
 				
 		false ->
 			?emit_error([ io_lib:format( "Error, closed connection ~w "
 				"was not a registered one, nothing done.",
-				[ClientManagerPid] ) ])
+				[ClientManagerPid] ) ]),
+			ServerState	
 	
 	end.
 	
-% User creation: make_ref()
 
 
 % Manages a server shutdown.
 on_shutdown_request( ServerState, SenderPid ) ->
+
 	?emit_trace([ io_lib:format( 
 		"Received a shutdown request from ~w, notifying client managers.",
 		[SenderPid] ) ]),
-	lists:foreach( fun(Manager) -> Manager ! orge_server_shutdown end, 
+	% Waiting managers will be notified by the closing of the listening socket.	
+	lists:foreach( 
+		fun(Manager) -> 
+			unlink(Manager),
+			Manager ! orge_server_shutdown
+		end, 
 		?getState.accepted_connections ),
-	?emit_info([ "Shutdown completed." ]).
+		
+	?emit_trace([ "Shutting down database." ]),
+	?getState.database_pid ! {stop,self()},
+	receive
+	
+		orge_database_stopped ->
+			ok
+			
+	end,
+	?emit_info([ "Shutdown completed." ]),
+	SenderPid ! orge_server_shutdown.
 
 
 
@@ -316,9 +423,9 @@ on_shutdown_request( ServerState, SenderPid ) ->
 state_to_string(ServerState) ->
 	io_lib:format( "State of TCP Orge server version ~.1f named ~s:~n"
 		"  + started on ~s at ~s~n"
+		"  + using database instance ~w~n"
 		"  + listening to TCP port ~w~n"
 		"  + current client management module: ~s~n"
-		"  + ~s~n"
 		"  + ~s~n"
 		"  + ~s~n"
 		"  + ~s~n",
@@ -327,12 +434,12 @@ state_to_string(ServerState) ->
 			?getState.server_name,
 			?getState.host,
 			utils:get_textual_timestamp(?getState.starting_time), 
+			?getState.database_pid, 
 			?getState.listening_port, 
 			?getState.current_client_module,
 			code_updates_to_string(ServerState),
 			waiting_managers_to_string( ?getState.waiting_managers ),
-			accepted_connections_to_string( ?getState.accepted_connections ),
-			past_connections_to_string( ?getState.past_connections )
+			accepted_connections_to_string( ?getState.accepted_connections )
 		] ).	
 
 
@@ -379,47 +486,10 @@ accepted_connections_to_string( AcceptedConnections ) ->
 
 
 accepted_connections_to_string( [], Acc ) ->
-	 io_lib:format( "currently accepted connections:~n", [] ) 
+	 io_lib:format( "currently accepted connections:", [] ) 
 		++ lists:flatten( Acc ) ;
 	
 accepted_connections_to_string( [H|T], Acc ) ->
 	accepted_connections_to_string( T, 
-		[ io_lib:format( "      * ~w~n", [H] ) | Acc ] ).
+		[ io_lib:format( "~n      * ~w", [H] ) | Acc ] ).
 	
-
-	
-% Returns a textual description of past connections.
-
-past_connections_to_string( [] ) ->
-	"no past connection yet" ;
-
-past_connections_to_string( PastConnections ) ->
-	past_connections_to_string( PastConnections, [] ).
-	
-	
-past_connections_to_string( [], Acc ) ->
-	 io_lib:format( "past connections:~n", [] ) 
-		++ lists:flatten( Acc ) ;
-	
-past_connections_to_string( [{Login,StartingTime,StoppingTime}|T], Acc ) ->
-	past_connections_to_string( T, 
-		[ io_lib:format( "   * ~s~n", 
-				[ past_connection_to_string(Login,StartingTime,StoppingTime) ] )
-			| Acc ] ).
-	
-
-past_connection_to_string( not_logged_in, StartingTime, StoppingTime ) ->
-	io_lib:format( "connection stopped before user log-in, "
-		"from ~s to ~s, duration: ~s", 
-		[ 	utils:get_textual_timestamp(StartingTime),
-			utils:get_textual_timestamp(StoppingTime),
-			utils:get_textual_duration(StartingTime,StoppingTime) ] );
-
-past_connection_to_string( Login, StartingTime, StoppingTime ) ->
-	io_lib:format( "connection of logged user '~s', "
-		"from ~s to ~s, duration: ~s", 
-		[ Login,
-			utils:get_textual_timestamp(StartingTime),
-			utils:get_textual_timestamp(StoppingTime),
-			utils:get_textual_duration(StartingTime,StoppingTime) ] ).
-		
