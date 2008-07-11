@@ -7,9 +7,36 @@
    :format: latex
 
 
-.. _tcp_server.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/raw-tcp/tcp_server.hrl?view=markup
 
-.. _tcp_server.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/raw-tcp/tcp_server.erl?view=markup
+.. _orge_tcp_server.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/raw-tcp/src/orge_tcp_server.hrl?view=markup
+
+.. _orge_tcp_server.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/raw-tcp/src/orge_tcp_server.erl?view=markup
+
+.. _orge_tcp_server_test.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/raw-tcp/src/orge_tcp_server_test.erl?view=markup
+
+
+
+.. _orge_tcp_client.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/clients/raw-tcp/src/orge_tcp_client.hrl?view=markup
+
+.. _orge_tcp_client.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/clients/raw-tcp/src/orge_tcp_client.erl?view=markup
+
+.. _orge_tcp_client_test.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/clients/raw-tcp/src/orge_tcp_client_test.erl?view=markup
+
+
+
+.. _orge_client_manager.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/client-management/src/orge_client_manager.hrl?view=markup
+
+.. _orge_client_manager.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/client-management/src/orge_client_manager.erl?view=markup
+
+
+
+.. _orge_database_manager.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/orge_database_manager.hrl?view=markup
+
+.. _orge_database_manager.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/orge_database_manager.erl?view=markup
+
+.. _orge_database_manager_test.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/orge_database_manager_test.erl?view=markup
+
+
 
 
 .. _testbed: orge-testbed.esperide.com
@@ -86,7 +113,20 @@ Furthermore each server can be based on:
 	
 .. Note:: The term *clients* will be used quite often. This must be of course understood here in a client/server context, not as "paying customers".
 
- 	
+
+Sources 	
+-------
+	
+Currently raw TCP Orge servers are used. They are implemented in orge_tcp_server.hrl_ and orge_tcp_server.erl_, and tested in orge_tcp_server_test.erl_.
+
+To a given Orge server instance, any number of Orge clients can connect. Orge test clients are implemented in orge_tcp_client.hrl_ and orge_tcp_client.erl_, and tested in orge_tcp_client_test.erl_.
+
+Each raw TCP Orge server will spawn one client manager per connected client. The client manager is implemented in orge_client_manager.hrl_ and orge_client_manager.erl_.
+
+Each raw TCP Orge server uses an Orge database, implemented in orge_database_manager.hrl_ and orge_database_manager.erl_, and tested in orge_database_manager_test.erl_.
+
+
+
 	
 	
 Setting Up An Orge Server Instance
@@ -575,7 +615,7 @@ Main TCP listening port
 
 It handles incoming client connections, which will result in the creation of a short-lived per-client TCP socket, dedicated to administration (ex: client authentification) and data streaming (ex: downloading of newer simulation resources).
 
-This main TCP listening port is set by default to ``9512``, see tcp_server.hrl_.
+This main TCP listening port is set by default to ``9512``, see orge_tcp_server.hrl_.
 
 It is autorized by the firewall thanks to::
 
@@ -589,7 +629,7 @@ Per-client TCP ports
 
 Once the previous listening TCP socket accepted a new connection, a socket dedicated to exchanges with this client is opened by the server.
 
-All these per-client TCP sockets are in a port range (default: ``51000-51999``, see tcp_server.hrl_)::
+All these per-client TCP sockets are in a port range (default: ``51000-51999``, see orge_tcp_server.hrl_)::
 
 	# For client TCP Orge server sockets:
 	iptables -A INPUT -p tcp --dport 51000:51999 -m state --state NEW -j ACCEPT
@@ -628,10 +668,63 @@ Erlang should be configured, compiled and installed specifically for the Orge ne
 Managing An Orge Server Instance
 --------------------------------
  
+
+Administration
+..............
+
+A special Orge client exists for server administration: the orge_admin module.
+
+stop/shutdown/deconnection
+
+
+Monitoring
+..........
  
+
+Connections to the Orge server - whether they are successful or not - are traced and stored in database.
+
+Several informations about each incoming client are gathered:
  
- stop/shutdown/deconnection
+ - the client IP address
+ - the reverse DNS corresponding to this IP address
+ - the login associated with this connection
  
+
+
+Geolocation
+___________
+
+Geolocation informations can be deduced from the IP address of Orge clients.
  
- 
- 
+They are obtained thanks to the `egeoip <http://code.google.com/p/egeoip/>`_ module using the `GeoLite City <http://www.maxmind.com/app/geolitecity>`_ location database, proposed free of charge by `MaxMind <http://www.maxmind.com>`_.
+
+The pair was found to working very well, returning very accurate look-ups::
+
+ 1> egeoip:start().
+ {ok,<0.33.0>}
+ 2> egeoip:lookup("82.225.152.215").
+ {ok,{geoip,"FR",
+ 			"FRA",
+ 			"France",
+ 			<<"A8">>,
+ 			<<"Sèvres">>,
+ 			<<>>,
+ 			48.8167,
+ 			2.20000,
+ 			0,
+ 			0}}
+ 3> egeoip:lookup("192.168.0.8").
+ {ok,{geoip,[],[],[],<<>>,<<>>,<<>>,601.517,601.519,0,0}}
+ 4> egeoip:lookup("64.233.187.99").
+ {ok,{geoip,"US",
+ 			"USA",
+ 			"United States",
+ 			<<"CA">>,
+ 			<<"Mountain View">>,
+ 			<<"94043">>,
+ 			37.4192,
+ 			-122.057,
+ 			650,
+ 			807}}
+
+
