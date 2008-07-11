@@ -9,9 +9,16 @@
 
 :raw-latex:`\pagebreak`
 
-.. include:: OrgeServer.rst
+.. include:: OrgeServers.rst
 
 :raw-latex:`\pagebreak`
 
-.. include:: OrgeClient.rst
+.. include:: OrgeClients.rst
+
+
+
+:raw-latex:`\pagebreak`
+
+.. include:: OrgeDatabase.rst
+
 
