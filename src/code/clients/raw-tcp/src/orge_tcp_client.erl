@@ -19,11 +19,28 @@
 % default_packet_header_size:
 -include("orge_tcp_server.hrl").
 
+% For default_identifier_separator:
+-include("orge_client_manager.hrl").
+
 % For client informations like the client_state record:
 -include("orge_tcp_client.hrl").
 
+
 % For emit_*:
 -include("traces.hrl").
+
+
+% Record that stores the current state of a TCP client:
+-record( client_state, {
+	client_login = undefined,
+	client_password = undefined,
+	client_host = undefined,
+	client_version = ?client_version,
+	starting_time = undefined,
+	server_host = undefined,
+	server_listening_port = undefined,
+	communication_socket = undefined
+} ).
 
 
 % Shortcut macro, for convenience: 
@@ -132,16 +149,16 @@ init( ClientLogin, ClientPassword, ServerDNSName, ServerTCPListeningPort ) ->
 
 		{error,econnrefused} ->
 			?emit_fatal([ io_lib:format( 
-				"Connection refused (no server running on ~s at port ~s?), "
-				"stopping the client.", 
+				"Connection refused (no Orge server running on ~s at port ~s?),"
+				" stopping the client.", 
 				[   ServerDNSName, 
 					utils:integer_to_string(ServerTCPListeningPort)
 				] ) ]);
 
 		{error,OtherError} ->
 			?emit_fatal([ io_lib:format( 
-				"Connection failed to server running on ~s at port ~s: ~s"
-				"stopping the client.", 
+				"Connection failed to server running on ~s at port ~s: ~s,"
+				" stopping the client.", 
 				[   ServerDNSName, 
 					utils:integer_to_string(ServerTCPListeningPort),
 					OtherError
@@ -177,6 +194,10 @@ login(ClientState) ->
 					?emit_fatal( "Server answered: access denied, "
 						"incorrect identifiers, stopping the client." );
 			
+				{tcp,Socket,<<?already_connected>>} ->
+					?emit_fatal( "Server answered: access denied, "
+						"account already in use." );
+			
 				{tcp,Socket,<<?timed_out>>} ->
 					?emit_fatal( "Server answered: "
 						"time-out while waiting for identifiers, "
@@ -192,9 +213,20 @@ login(ClientState) ->
 
 
 
-on_successful_login(_ClientState) ->
-	?emit_trace( "Client login successful." ).
+on_successful_login(ClientState) ->
+	?emit_trace( "Client login successful." ),
+	loop(ClientState).
 
+
+loop(ClientState) ->
+	?emit_trace( "Client in main loop." ),
+	receive
+	
+		{get_login_status,CallerPid} ->
+			CallerPid ! login_success,
+			loop(ClientState)
+	
+	end.
 
 
 
