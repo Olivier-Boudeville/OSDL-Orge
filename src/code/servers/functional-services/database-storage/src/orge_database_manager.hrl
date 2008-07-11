@@ -1,6 +1,6 @@
 
 
-% Describes the Mnesia entry type (fields) for Orge users:
+% Describes the Mnesia entry type (fields) for Orge user settings:
 -record( orge_user_settings, 
 	{
 		first_name,
@@ -21,15 +21,4 @@
 		security_answer
 	}
 ).
-
-
-% Character record: flags telling whether the controlling player authorized
-% this character to be reinjected in-game, as NPC or monster.
-% Each character should have an  textual physical and psychological description,
-% of a few lines.
  
-% Internal record that stores the current state of the Orge database:
--record( database_state, {
-	current_user_id
-} ).
-
