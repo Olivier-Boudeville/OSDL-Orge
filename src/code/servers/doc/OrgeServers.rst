@@ -427,8 +427,6 @@ which results in these measures::
 
 
 
-
-
 Network Addresses & DNS
 _______________________
 
@@ -593,8 +591,9 @@ Some checkings can be made::
 
 This setting forbids login with the ``orge`` user and access to a shell by using ``su``. 
 
-As nevertheless it may be convenient to be logged as ``orge``, one can issue ``chsh orge`` to specify a real shell or use directly ``adduser`` with the ``--shell``. This way, root (only) can switch, once logged, to the ``orge`` user.
+As nevertheless it may be convenient to be logged as ``orge``, one can issue ``chsh orge`` to specify a real shell or use directly ``adduser`` with the ``--shell``. This way, root (only) can switch, once logged, to the ``orge`` user. The recommended way is to use from root ``su orge`` rather than ``su - orge``, to ensure any shell configuration file (ex: ``/home/orge/.bashrc``) will be parsed.
 
+In this example we will be installing Orge in ``/home/orge/``, using as prefix```/home/orge/software``.
 
 
 
@@ -604,7 +603,18 @@ ________
 
 We are using the `Netfilter <http://www.netfilter.org/>`_ firewall, also known as ``iptables``.
 
-We provide a complete and fully commented iptable configuration script, customized for the hosting of Orge servers, `iptables.rules-Gateway.sh <http://ceylan.svn.sourceforge.net/viewvc/ceylan/Ceylan/trunk/src/code/scripts/shell/iptables.rules-Gateway.sh?view=markup>`_. We did our best to create the most secure rules, any feedback would be appreciated. Of course, depending on the configuration and the services that run on your server, this script should be customized accordingly (ex: regarding the name of the network interfaces).
+We provide a complete and fully commented iptable configuration script, customized for the hosting of Orge servers, `iptables.rules-Gateway.sh <http://ceylan.svn.sourceforge.net/viewvc/ceylan/Ceylan/trunk/src/code/scripts/shell/iptables.rules-Gateway.sh?view=markup>`_.
+
+The ``Orge section`` is the part we are interested in here [#]_:
+
+  - a TCP port (4369) is left open for the ``epmd`` daemon
+  - a TCP port range (51000 to 51999) is left open for dynamically created Erlang connections, knowing that the interpreter must be given this range (thanks to the ``inet_dist_listen_min/max`` kernel option)
+  
+
+.. [#] More informations about Erlang and firewalling issues can be found in this `article <http://www.bluishcoder.co.nz/2005/11/distributed-erlang-and-firewalls.html>`_.
+
+
+We did our best to create the most secure rules, any feedback would be appreciated. Of course, depending on the configuration and the services that run on your server, this script should be customized accordingly (ex: regarding the name of the network interfaces). Only SSH login is allowed. 
 
 
 With the basic default configuration, an Orge server has to open various ports, listed below. 
@@ -652,7 +662,60 @@ It implies the following rule:;
 The same port number can be used both for the TCP listening socket and for the main UDP port, as TCP and UDP port numbers are completely independent.
 
 
-netstat
+The ``netstat`` tool can be used to check local open ports.
+
+
+
+
+Security
+________
+
+
+At the lowest level, security is obtained thanks to the kernel, the corresponding distribution, and the aforementioned firewall settings.
+
+At the highest level, the Orge database allows to authenticate each Orge user thanks to identifiers, and to report through supervision traces every abnormal connection attempt.
+
+In between lies the Erlang environment, with strict laws regarding the interconnecion of virtual machines and processes.
+
+
+
+Erlang Cookie
+*************
+
+It allows to choose which 
+
+The recommended way is to set the same Erlang cookie in the Orge server(s) and every computer allowed to connect to the Orge instance (say, on the laptop of an Orge admin).
+
+This can be done that way [#] _::
+
+.. [#] Of course other cookie sentences should be used instead.
+
+ echo 'This is my Orge cookie.' > ~/.erlang.cookie
+ chmod 400 ~/.erlang.cookie
+ 
+ 
+Then that cookie shall be transferred (ex: thanks to ssh) to every computer to be connected with. Check that the owner and permissions are correct (ex: ``-r-------- 1 orge orge``).
+
+The cookie can be checked from an Erlang shell: use ``erlang:get_cookie().``.
+
+An host file (see ``net_adm:host_file``) can be used as well::
+
+  > cat  ~/.hosts.erlang
+  'aranor.esperide.com'.
+  'sonata.esperide.com'.
+  'rainbow.esperide.com'.
+  
+Then ``net_adm:world(verbose)`` can be used to detect all accessible nodes.
+  
+
+Remote Connection to the Orge Server Erlang Shell
+*************************************************
+
+This is a convenient way of manipulating an Erlang shell remotely. 
+
+See `Interconnecting Erlang Nodes <http://www.ejabberd.im/interconnect-erl-nodes>`_ for further details.
+
+Another maybe more interesting solution is to use SSH to log-in to the server, create a local shell and use it to communicate (locally) with the server one.
 
 
 
@@ -661,7 +724,73 @@ _____________
 
 Both Orge servers and monitoring clients should run the lastest stable release of Erlang and Orge.
 
-Erlang should be configured, compiled and installed specifically for the Orge needs, with relevant settings.
+More precisely, the following set of software and data should be kept up to date:
+
+	- the running operating system (ex: Debian, including the Linux kernel and all packages)
+	- the latest custom stable build of Erlang/OTP environment
+	- the latest custom stable build of the Orge server
+	- the `egeoip` module and the GeoLite database, for IP geolocation
+
+Erlang and other prerequesites should be configured, compiled and installed specifically for the Orge needs, with relevant settings. See the `Installation Thanks To LOANI`_ section.
+
+
+Installation Thanks To LOANI
+____________________________
+
+LOANI allows to download, build, install, link together a set of Ceylan and OSDL developments, including Orge.
+
+In the context of an Orge server, once some base tools have been installed (ex: flex), one may download `latest LOANI archive <http://sourceforge.net/project/showfiles.php?group_id=71354&package_id=161367>`_ and for example run from the LOANI-x.y extracted directory with the ``orge`` user::
+
+  ./loani.sh --onlyOrgeTools --prefix /home/orge/software
+
+
+LOANI will take care of Erlang, egeoip and GeoLite.
+
+Note that the development package for libcurses is needed to build Erlang. On Debian and Ubuntu, the corresponding package is ``libncurses5-dev``, to be installed before running LOANI.
+
+This leads to following output::
+
+ orge@myserver:~/LOANI-0.5$  ./loani.sh --onlyOrgeTools --prefix /home/orge/software
+
+
+         < Welcome to Loani >
+
+ This is the Lazy OSDL Automatic Net Installer, dedicated to the lazy and the fearless.
+
+ Its purpose is to have OSDL and all its pre requesites installed with the minimum of time and effort. Some time is nevertheless needed, since some downloads may have to be performed, and the related build is CPU-intensive, so often a bit long. Therefore, even with a powerful computer and broadband access, some patience will be needed.
+ Retrieving all pre requesites, pipe-lining when possible.
+ Target package list is <Erlang egeoip Geolite >.
+ Some tools already available (Erlang Geolite), others will be downloaded (egeoip).
+ 	   <---- egeoip retrieved [from SVN]
+ All pre requesites available.
+ 	   ----> Erlang 	 : extracting [OK] configuring [OK] building [OK] installing [OK]
+ 	   ----> egeoip 	 : extracting [OK] configuring [OK] building [OK] installing [OK]
+	   ----> Geolite	 : extracting [OK] configuring [OK] building [OK] installing [OK]
+ Post-install cleaning of build trees.
+ End of LOANI, started at 09:01:00, successfully ended at 09:46:59.
+ 
+ 
+A simple shell configuration file is generated by LOANI, and can be applied to the Orge user environment, for example::  
+
+ orge@myserver:~/LOANI-0.5$ cat /home/orge/software/Orge-environment.sh >> /home/orge/.bashrc
+ orge@myserver:~/LOANI-0.5$ cat ~/.bashrc
+ # This is the Orge environment file.
+ # It has been generated by LOANI on July 2008, 12 (Saturday).
+ # Source it to update your environment, so that it takes into
+ # account this LOANI installation.
+ # PATH and LD_LIBRARY_PATH will be automatically updated accordingly.
+ #
+ # Usage example:
+ # . /home/orge/software/OSDL-environment.sh
+ # This script can be also appended to a shell configuration file. 
+ # Ex: 'cat /home/orge/software/OSDL-environment.sh >> ~/.bashrc'. 
+ echo "--- Orge Settings File sourced ---"
+
+ # Erlang section.
+ Erlang_PREFIX=/home/orge/software/Erlang-R12B-3
+ export Erlang_PREFIX
+ PATH=$Erlang_PREFIX/bin:${PATH}
+ LD_LIBRARY_PATH=$Erlang_PREFIX/lib:${LD_LIBRARY_PATH}
 
 
 
@@ -677,8 +806,8 @@ A special Orge client exists for server administration: the orge_admin module.
 stop/shutdown/deconnection
 
 
-Monitoring
-..........
+Monitoring Data
+...............
  
 
 Connections to the Orge server - whether they are successful or not - are traced and stored in database.
@@ -689,6 +818,30 @@ Several informations about each incoming client are gathered:
  - the reverse DNS corresponding to this IP address
  - the login associated with this connection
  
+See `Schema For Monitored Events`_ for more details.
+
+
+Supervision
+...........
+
+When running an Orge server instance, traces are stored in a local file by the aggregator, so that nothing is lost in case the communication link is lost.
+
+However usually an administrator wants to be able to have access to traces in real-time from another host, for example the remote administrator's laptop.
+
+
+Trace Monitoring
+________________
+
+
+A running Orge server records traces of the main events of interest regarding its operation. Distributed traces are collected (in the case where the Orge server is running on several nodes), and stored locally, in a file respecting a given trace format. For that a collection of WOOPER classes - TraceEmitter, TraceAggregator, TraceSupervisor - are readily available.
+
+A specific Java parser has been developed so that the `LogMX <http://www.logmx.com/>`_ log file visualizer can interpret directly these traces, and become the recommended TraceSupervisor.
+
+However this would allow only for local supervision (i.e. supervision from the server Orge is running on). 
+
+An additional feature is provided by Orge: while letting the reference trace file on the server (if stored elsewhere it could be affected by network problems), any number of Orge Trace Listeners can connect to the server and have all traces delivered to them: past traces are automatically gathered, compressed and sent by the Orge server to a new Trace Listener, whereas new traces are directly sent afterwards to each connected listener.
+
+A typical use-case is an Orge admin connecting simply from its laptop to an Orge server, analyzing the traces, and deconnecting when having finished, without further interferences on the server. 
 
 
 Geolocation
@@ -726,5 +879,4 @@ The pair was found to working very well, returning very accurate look-ups::
  			-122.057,
  			650,
  			807}}
-
 
