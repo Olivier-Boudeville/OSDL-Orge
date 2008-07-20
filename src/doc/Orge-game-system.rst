@@ -40,6 +40,9 @@ OSDL RPG Game Engine
 .. section-numbering::
 
 
+.. include:: Orge-implementation-references.rst
+
+
 :raw-latex:`\pagebreak`
 
 Overview
@@ -65,6 +68,7 @@ Some definitions first
 ----------------------
 
 These following central terms will be used everywhere in this document.
+See also the `Orge Glossary`_.
 
 
 Types of games
@@ -116,6 +120,8 @@ Non-Player Character (NPC)
 	A NPC is a Character that is not interpreted by a player, it has thus to be managed by the GM
 
 
+
+
 Other Conventions
 .................
 
@@ -124,6 +130,9 @@ Terms
 _____
 
 
+Buff
+	Temporary beneficial effect on a character. See also this `Wikipedia article <http://en.wikipedia.org/wiki/Buff_(computer_gaming)>`_. In the context of Orge, a Buff can come from two sources: drugs and magic
+	
 iff
 	It means `If And Only If <http://en.wikipedia.org/wiki/If_and_only_if>`_. ``A iff B`` means either both statements are true or both are false. 
 
@@ -148,7 +157,7 @@ This includes:
 Unit name          Symbol Associated Quantity Common multiples
 ================== ====== =================== =============================== 
 metre 	           m      length              kilometer (km), centimeter (cm)
-cubic decimetre    dm^3   volume              cubic metre (1 m^3 = 1000 dm^3), FIXME litre (1L = 1 dm^3) 
+cubic decimetre    dm^3   volume              cubic metre (1 m^3 = 1000 dm^3), litre (1L = 1 dm^3) 
 kilogram           kg     mass                gram (1 kg = 1000 g), metric ton (1t = 1000 kg)
 second 	           s      time                minute, hour, day, year, century
 metre per second   m/s    speed               km/h (1 m/s = 3.6 km/h)
@@ -312,50 +321,39 @@ Multiplayer games in a persistent world should have a far increased lifespan, le
 Unethical endings may or may not be discouraged by the game system.
 
 
+Time
+----
+
+Time is internally managed in rounds, i.e. unsigned integer simulation ticks. There is a strict relation between user time (wall-clock) and virtual (game) time: this simulated time flows 8 times as fast as the user one. Thus a virtual day lasts for 3 hours.
+
 
 Passage of time
 ---------------
 
-This is another major game element, directly linked to the `Place of Death`_ and to `Aging`_. The time cannot be stopped and flows quite fast.
+This is another major game element, directly linked to the `Place of Death`_, to `Aging`_ and, to a lesser extent, to `Object Wear`_. The time cannot be stopped, and flows quite fast.
 
 The game world is persistant, but most beings are relatively short-lived, and a trade-off must be found between youth and experience.
-
-
-
-Place of Death
----------------
-
-Most RPG insist on character building and provide some ways of bypassing the total loss of one's character, as it would be deemed to frustrating for a player to have to start from scratch again.
-
-On non-persistent RPG, saving the game regularly (with ou without restriction) is a technical solution. On persistent RPG, time cannot be changed at will and often various solutions are implemented directly in the gameplay, like resurrection in temples, afterlife in the wild, etc.
-
-One considerable drawback of non-terminal death is that it allows players to act without much fear for the consequences: for example there is no point in an assassination attempt on a king if, even in case of success, he will able to be back within minutes, as if nothing had happened.
-
-On the contrary, if permanent death (a.k.a. `permadeath <http://en.wikipedia.org/wiki/Permadeath>`_) was retained, then that king would most probably be a lot more careful when travelling, would have to select carefully his escort (powerful and loyal guards), there could be plots among his vassals, etc. This kind of power struggle would benefit a lot to gameplay, and would require the player a lot more of self-control and constant care for his character, lest it is removed permanently from the game .
-
-Thus in Orge we favour permadeath. Note that it tends to make a character's health binary, being either in perfect condition or dead, as the role of permanent injuries is considerably lessen thanks to magic. A related concern for players is that "perfect condition" is to be understood regarding a given age.
-
 
 
 
 Aging
 -----
 
-Another significant factor weighing on a character's life is the age of that character.
+Another significant factor weighing on a character's life is the age of that character. Age is managed thanks as an unsigned integer number of years, and updated once per simulated year.
 
 
 Life Expectancy
 ...............
 
-Should no brutal death occur, any creature will die when its life expectancy has been reached. The creature lifespan is determined at its creation, and is generally only known by the game system. 
+Should no brutal death occur, any creature will die when its life expectancy has been reached. The creature lifespan is determined at its creation (see the *Longevity* primary attribute), and is generally only known by the game system. 
 
-Life expectancy is computed the following way. To the average lifespan corresponding to the race of the creature, modifiers are added:
+Life expectancy is computed the following way. To the average lifespan corresponding to the species of the creature, modifiers are added:
 
  - the constitution modifier of that creature
  - a 8% bonus if it is a female creature, otherwise a 8% malus
  - a random modifier in the -10% to 10% range
  
- 
+As stated in the `orders of magnitude for time`_ section, life expectancy is medieval times was quite shorter than nowadays, approximately 40 years. Thus if one played with one's character for three years, the character actually gained 24 years, i.e. spent more than half of its life in the meantime. 
 
 
 
@@ -367,7 +365,7 @@ Impact of Age on Abilities
 Globally, for a human whose lifespan will be 40 years, they will start from zero in the first years of the character, increase steadily until a threshold of maturity is reached (at around 16 years). This will correspond to the peak abilities. They will then decrease a bit until stabilizing in a plateau (about 22 years). They will remain in this good condition until about 30 years, where they will begin to decline back to zero, not unlike in a `Attack Decay Sustain Release <http://en.wikipedia.org/wiki/ADSR_envelope>`_ scheme:
 
 
-This global aging profile in Orge is common to all races, genders, individal, etc.: the same evolution will apply, once scaled according to the effective planned lifespan of each creature. For example, if dwarves on average live for 320 years and if a given dwarf, Hgog, is expected to live for 355 years [#]_, then his abilities will reach zero only when being 355-year-old.
+This global aging profile in Orge is common to all species, genders, individal, etc.: the same evolution will apply, once scaled according to the effective planned lifespan of each creature. For example, if dwarves on average live for 320 years and if a given dwarf, Hgog, is expected to live for 355 years [#]_, then his abilities will reach zero only when being 355-year-old.
 
 .. [#] Determined by various factors, including sex, constitution and some randomness. 
  
@@ -379,7 +377,7 @@ Textual Translation of Age
 __________________________
 
 
-The following *Age Table* allows to determine the age-related textual description of a creature, based on its *Age Percentage*, which is equal to its current age divided by the life expectancy of its race [#]_ :
+The following *Age Table* allows to determine the age-related textual description of a creature, based on its *Age Percentage*, which is equal to its current age divided by the life expectancy of its species [#]_ :
 
 
 +------------------------+---------------------------+-------------------+---------------------+
@@ -414,7 +412,7 @@ The following *Age Table* allows to determine the age-related textual descriptio
   
 .. [#] The creature's own life expectancy is not taking into account here: not all creatures could reach the *Ancient* age classifier.
 
-.. [#] Unless specific conditions are met during the lifespan of a creature (ex: special magic used), its life expectancy should not exceed 150% of the average one defined for its race.
+.. [#] Unless specific conditions are met during the lifespan of a creature (ex: special magic used), its life expectancy should not exceed 150% of the average one defined for its species.
 
 
 For example, knowing that dwarves live on average for 320 years, and that Hgog is a 272-year-old dwarf, he could be named *Hgog, Elder Dwarf*, as his age percentage is ``272/320 = 85%``. 
@@ -429,6 +427,22 @@ Cadet/
 
 
 Example: 'Arthur, Young Human, Untrained Soldier' might become 'Arthur, '
+
+
+Place of Death
+---------------
+
+Most RPG insist on character building and provide some ways of bypassing the total loss of one's character, as it would be deemed to frustrating for a player to have to start from scratch again.
+
+On non-persistent RPG, saving the game regularly (with ou without restriction) is a technical solution. On persistent RPG, time cannot be changed at will and often various solutions are implemented directly in the gameplay, like resurrection in temples, afterlife in the wild, etc.
+
+One considerable drawback of non-terminal death is that it allows players to act without much fear for the consequences: for example there is no point in an assassination attempt on a king if, even in case of success, he will able to be back within minutes, as if nothing had happened.
+
+On the contrary, if permanent death (a.k.a. `permadeath <http://en.wikipedia.org/wiki/Permadeath>`_) was retained, then that king would most probably be a lot more careful when travelling, would have to select carefully his escort (powerful and loyal guards), there could be plots among his vassals, etc. This kind of power struggle would benefit a lot to gameplay, and would require the player a lot more of self-control and constant care for his character, lest it is removed permanently from the game .
+
+Thus in Orge we favour permadeath. Note that it tends to make a character's health binary, being either in perfect condition or dead, as the role of permanent injuries is considerably lessen thanks to magic. A related concern for players is that "perfect condition" is to be understood regarding a given age.
+
+
 
 
 Ranks
@@ -499,7 +513,7 @@ Alignment
 
 Alignment is not chosen as such by the controller of a creature: it just results from its beliefs, choices and actions.
 
-Alignment is a minor indicator. 
+Alignment is thus considered in Orge as a minor indicator. 
 
 For the vast majority of creatures, it is overshadowed by reputation, as these creatures cannot see directly in the system of values of a target character, and therefore can only rely on observation and reputation.
 
@@ -542,14 +556,32 @@ See also the  nine combinations, as detailed this Wikipedia `article <http://en.
 Good and evil characters cannot join the same party.
 
 
-Races
------
+Species
+-------
+
+In Orge *Species* is preferred to *Speciess*. No distinction is made between sentient, intelligent, advanced creatures, animals, monsters, etc. They are all creatures of a given species.
 
 
-+-------------+-------------------------------------------+-------------------+
-| Creature    | Description                               |         |
-| Races       |                                           |                   |
-+=============+===========================================+===================+
+Species Characteristics
+....................
+
+
++------------------+----------------+--------------------------------------------------+
+| Species             | Species 		    |Description  							           |
+| Characteristic   | Characteristic |                                                  |
+| Name             | Usual Acronym  |                                                  |
++==================+================+==================================================+
+| SpeciesWeightFactor | RWF 		    | A creature too much loaded will grow tired       |
+|                  |                | sooner, depending on its species.                   |
+|                  |                | See `Fatigue Due To Carried Weight`_.            |
++------------------+----------------+--------------------------------------------------+
+
+
+
++-------------+-------------------------------------------+-----+--------------+
+| Creature    | Description                               | RWF |              |
+| Speciess       |                                           |         |              |
++=============+===========================================+=====+==============+
 | Human       |       |          |
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
@@ -568,12 +600,14 @@ Races
 | Goblin      |       |          |
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
-|     |       |          |
+| Orc         |       |          |
 |             |                          |                   |
 +-------------+-------------------------------------------+-------------------+
 
 
-Table of race statistics
+.. 
+
+Table of species statistics
 
 Life base expectancy, in years
 
@@ -660,53 +694,79 @@ Regarding classes, some alignment restrictions apply:
 
 
 
-Characteristics & Attributes
-----------------------------
 
-The potential of a creature is described by following attributes:
 
+
+
+Characteristics
+---------------
+
+The characteristics of a creature are determined by a set of attributes. Most attributes are positive unit-less integers, with no upper limit, although attribute values beyond 100 should be very, very rare.
+
+The characteristics of a creature are split in following attribute sets:
+
+ #. primary attributes
+ #. secondary attributes
+ #. state attributes
+ #. abilities
+ #. skills
+
+ 
+All characteristics are declared in class_Creature.hrl_.
+ 
+ 
+
+Primary Attributes
+..................
+
+The core potential of a creature is described by following *primary attributes*:
+ 
+ 
 +-------------+-------------------------------------------+-------------------+
 | Name of the | Meaning and Use [#]_                      | Usual Synonyms    |
-| Attribute   |                                           | and Close Terms   |
+| Primary     |                                           | and Close Terms   |
+| Attribute   |                                           |                   |
 +=============+===========================================+===================+
 | Strength    | Physical force, vigor, power              |                   |
 +-------------+-------------------------------------------+-------------------+
-| Agility     | Power of moving the limbs quickly and     | Dexterity         |
-|             | easily; nimbleness                        |                   |
+| Agility     | Power of moving the limbs quickly and     | Dexterity,        |
+|             | easily; nimbleness                        | Accuracy          |
 +-------------+-------------------------------------------+-------------------+
 | Constitution| Ability to withstand fatigue, disease,    | Endurance,        |
-|             | deprivation, etc., and continue working   | hardiness,        |
-|             |                                           | stamina           | 
+|             | deprivation, etc., and continue working   | Hardiness,        |
+|             |                                           | Stamina           | 
 +-------------+-------------------------------------------+-------------------+
-| Charisma    | Personal attractiveness that enables      |                   | 
-|             | to influence others                       |                   |
+| Intelligence| Readiness of comprehension                | I.Q.              | 
 +-------------+-------------------------------------------+-------------------+
 | Wisdom      | Knowledge, and the capacity to make due   | Discernment,      |
 |             | of it                                     | judgment          |
 +-------------+-------------------------------------------+-------------------+
-| Intelligence| Readiness of comprehension                | I.Q.              | 
+| Willpower   | Power of the mind by which we decide to do| Will,             |
+|             | or not to do                              | Self-control,     |
+|             |                                           | Courage           |
 +-------------+-------------------------------------------+-------------------+
-| Willpower   | Power of the mind by which we decide to do| Will, self-control|
-|             | or not to do                              |                   |
+| Charisma    | Personal attractiveness that enables      |                   | 
+|             | to influence others                       |                   |
 +-------------+-------------------------------------------+-------------------+
-| Longevity   | Length of life                            |                   |
-+-------------+-------------------------------------------+-------------------+
-|     |           |                   |
-+-------------+-------------------------------------------+-------------------+
-|     |           |                   |
-+-------------+-------------------------------------------+-------------------+
-|     |           |                   |
+| Longevity   | Expected length of life                   | Lifespan          |
 +-------------+-------------------------------------------+-------------------+
 
 .. [#] Most definitions are taken from various dictionaries, like the Webster.
 
 
-The player may be given a total number of points to distribute across the character attributes.
-
-These attributes are intrinsic, characteristic of a character, and should not increase during its life (experience applies to skills only). The attributes can however decrease in some cases, for example when a character suffers from permanent wounds.
+These primary attributes can be dispatched into *physical* ones (Strength, Agility and Constitution) and *mental* ones (Intelligence, Wisdom and Willpower), whereas Charisma is in both categories, and Longevity in neither (this particular attribute is seldom used for attribute rolls).
 
 
-Other attributes that were not retained are:
+Primary attributes are first-order ones, as they are the true original values from which secondary attributes will be computed.
+
+They are intrinsic, characteristic of a character, and should not increase during its life (experience applies to skills mostly). The primary attributes can however decrease in some cases, for example when a character suffers from permanent wounds.
+
+
+At character creation, the player may be given a total number of points to distribute among these primary attributes.
+
+
+
+Other attributes that were not retained here were:
 
 +-------------+-------------------------------------------+
 | Name of the | Rejection Reason                          |
@@ -725,32 +785,139 @@ Other attributes that were not retained are:
 
 
 
-current age
  
-tree
 
+
+
+
+Secondary Attributes
+....................
+
+
+Each creature will have following *secondary attributes*, determined at least partly from primary ones:
+
++-------------+-------------------------------------------+-------------------+
+| Name of the | Meaning and Use [#]_                      | Formula           |
+| Secondary   |                                           | parametrized by   |
+| Attribute   |                                           | Primary           |
+|             |                                           | Attributes        |
++=============+===========================================+===================+
+| Fatigue     | Physical and mental ability to overcome   | See below         |
+| Model       | fatigue, by resistance and recovery       |                   |
++-------------+-------------------------------------------+-------------------+
+| Movement    | The maximum walking speed under nominal   | Strength,         |
+| Rate        | conditions                                | Agility           |
++-------------+-------------------------------------------+-------------------+
+| Nominal     | The maximum carried weight with no        | Strength,         |
+| Carried     | movement penalty. A creature will not be  | Constitution      |
+| Weight (NCW)| able to move at all if loaded with        |                   |
+|             | ``SpeciesWeightFactor*NCW`` kilograms or  |                   |
+|             | higher. See                               |                   |
+|             |`Fatigue Due To Carried Weight`_.          |                   |
++-------------+-------------------------------------------+-------------------+
+
+
+Fatigue Model
+_____________
+
+
+The fatigue model is parametrized by two pairs of values regarding physical and mental:
+	 
+ - maximum sustainable fatigue (`max_physical_fatigue` and `max_mental_fatigue`)	  
+ - recovery rate (`max_mental_fatigue` and `mental_recover_rate`)
+
+
+The fatigue attributes of a character are determined at character creation, from a base value computed from the primary attributes and affected by various modifiers.
+
+
++-------------------------+----------------------------------------------+-------------------+
+| Name of the             | Base Value                               	 | Potential		 |
+| Fatigue                 |                                          	 | Modifiers		 |
+| Attribute               |                                          	 |  				 |
+|                         |                                          	 |  				 |
++=========================+==============================================+===================+
+| Maximum Physical        | ``Constitution * 5 + Strength * 2 + Agility``| Species, Traits,  |
+| Sustainable Fatigue     |                                          	 | Buffs			 |
++-------------------------+----------------------------------------------+-------------------+
+| Maximum Mental          | ``Willpower * 5 + Intelligence * 2 + Wisdom``| Species, Traits,  |
+| Sustainable Fatigue     |                                          	 | Buffs			 |
++-------------------------+----------------------------------------------+-------------------+
+| Physical Recovery       | 5 physical fatigue points per round      	 | Species, Traits,  |
+| Rate                    |                                          	 | Buffs			 |
++-------------------------+----------------------------------------------+-------------------+
+| Mental Recovery         | 5 mental fatigue points per round        	 | Species, Traits,  |
+| Rate                    |                                          	 | Buffs			 |
++-------------------------+----------------------------------------------+-------------------+
+
+  
+
+This model is declared in class_Creature_, with the `creature_fatigue_model` record.
+
+See the `Fatigue`_ section for further details.
+
+
+
+Movement Rate
+_____________
+
+
+The base walking speed of a character is equal to ``Agility * 2 + Strength``.
+It is further modified by species, 
+
+
+Nominal Carried Weight
+______________________
+
+
+
+Creature State
+--------------
+
+Contrary to characteristics (primary/ssecondary attributes), which are rather static, there are other attributes that reflect the changing state of a creature.
+
+These *state attributes* are:
+
+  - current age
+  - health
+  - location in virtual world
+
+
+
+
+Abilities & Traits
+------------------
 
 Some characters are able to perform specific actions due to their nature. This includes for instance telepathy, or the ability of destroying armor by mere contact. This corresponds to *abilities*. 
 
-Abilities
----------
 
-+----------------------------+-----------------------------------------------+
-| Name of the                |Description                                    |
-| Ability                    |                                               |
-+============================+===============================================+
-| Armor Decomposition        | When the creature touches a piece of          |
-|                            | armor, the armor is permanently weaken [#]_   |
-+----------------------------+-----------------------------------------------+
-| Empathy                    | The creature may be able to feel an           |
-|                            | emotion of close creatures                    |
-+----------------------------+-----------------------------------------------+
-| Telepathy                  | The creature may be able to project           |
-|                            | intentionally emotions to close creatures     |
-+----------------------------+-----------------------------------------------+
++----------------------------+-----------------------------------------------+------------------------------------+-------+
+| Name of the                | Description                                   | Effect       			 	      | Cost  |
+| Ability / Trait            |                                               | 		                     	      |       |
++============================+===============================================+====================================+=======+
+| Armor Decomposition        | When the creature touches a piece of          | Each direct touch from the	      | 1 CCP |
+|                            | armor, the armor is permanently weaken [#]_   | creature deals 20 CWL to  	      | 	  |
+|                            |                                               | the target armor          	      | 	  |
++----------------------------+-----------------------------------------------+------------------------------------+-------+
+| Empathy                    | The creature may be able to feel some         | Strength of emotion    	 	      | 5 CCP |
+|                            | emotions of close creatures                   | perception increased by 	 	      | 	  |
+|                            |                                               | 80% 						 	      | 	  |
++----------------------------+-----------------------------------------------+------------------------------------+-------+
+| Telepathy                  | The creature may be able to project           | Strength of emotion projectiond    | 5 CCP |
+|                            | emotions of close creatures                   | increased by 80%				      | 	  |
++----------------------------+-----------------------------------------------+------------------------------------+-------+
+| Enduring                   | The creature is an exceptionally enduring     | + 6 physical FP recovery per round | 4 CCP |
+|                            | specimen of its species, physically           | + 2 mental FP recovery per round   | 	  |
++----------------------------+-----------------------------------------------+------------------------------------+-------+
+| Tough                      | The creature is an exceptionally tough        | + 2 physical FP recovery per round | 4 CCP |
+|                            | specimen of its species, mentally             | + 6 mental FP recovery per round   | 	  |
++----------------------------+-----------------------------------------------+------------------------------------+-------+
+| Light Foot                 | The creature can move exceptionally           | + 25% in all movement rates        | 4 CCP |
+|                            | efficiently for its species                   | + 10% in stealth movement    	  | 	  |
++----------------------------+-----------------------------------------------+------------------------------------+-------+
 
 .. [#] See for example "gelatinous cubes" in some games.
 
+ 
  
 Skills
 ------ 
@@ -796,6 +963,24 @@ Orge skill tree is the following:
  - horse-riding
  - taming
  - martial arts
+
+ 
+Interactions
+------------
+
+
+Intimidation
+............
+
+
+When a creature notices other creatures, it may be scared by this encounter. The reaction of the creature depends on:
+ 
+ - its experience level
+ - its mental fatigue
+ - on the intimidation factor of the met creatures, which is the sum of the intimidation factors of all the creatures it the group
+
+Should the creature fail the intidimidation test, it can suffer from an action penalty the next rounds, or be completely paralyzed by fear.
+
  
 
 
@@ -946,11 +1131,53 @@ Health, Wounds and Death
 Fatigue
 -------
 
-Orge offers a real-time fatigue system. Physical and psychological exhaustion are internally managed. 
+Orge offers a real-time fatigue system. Physical and mental (psychological) exhaustion are internally managed, they are quantified with ``Physical Fatigue Point`` (PFP) and ``Mental Fatigue Point`` (MFP). Note that the latter has nothing to do with mana points, it applies as well to non-magical users.
 
-The current state of fatigue and stress of the main character is reported to the player only by the audio feedback of a heart beating quicker and quicker - until fainting (and likely becoming monster meat). Thus the player has to discriminate himself between the two kinds of fatigue.
+The current overall state of fatigue and stress of the main character is reported to the player only by the audio feedback of a heart beating quicker and quicker - until fainting (and likely becoming monster meat). Thus the player has to discriminate himself between the two kinds of fatigue.
 
-Taking damage or moving too quickly will cause the heart to pulse rapidly, as ambushes and horrific sights will do.
+Taking damage, or moving too quickly and too much loaded will cause the heart to pulse rapidly, as ambushes and horrific sights will do.
+
+The different causes of fatigue adds up, and may lead to the character exhaustion or unability to act without resting.
+
+The fatigue system is internally managed that way, for each kind of fatigue:
+ 
+ - each creature has a ``Base Fatigue Budget`` (BFB) and a ``Fatigue Recovery Rate`` (FRR), which are determined by its specy, its statistics (notably its Constitution), its age
+ 
+ - each creature is born without fatigue, but its various actions have a fatigue penalty, depending on many factors including a base cost (depending on the action) and context-depent additional costs which may depend on weight carried, temperature, age, state of health (if the character is wounded, or poisoned, etc.)
+ 
+ - each round, each creature having non-null fatigue points (FP) have them decreased by FRR
+ 
+ - a creature is unable to perform any action which would result in having a fatigue budget higher than its BFB
+ 
+ 
+ 
+One can picture the fatigue system as a water bucket whose maximum level is the BFB, with a leak equal to the FRR, which starts initially empty but is filled a bit as each action of the character. The goal is to avoid that the water level reaches the top of the bucket.
+
+
+Fatigue is managed in class_Creature.erl_ and tested in class_Creature_test.erl_.
+
+ 
+ 
+Fatigue Due To Carried Weight
+.............................
+
+Knowing that ``RWF`` is the ``Species Weight Factor`` and ``NCW`` is the character ``Nominal Carried Weight``:
+
+ - a static (non-moving character) can carry up to ``RWF * NCW`` kilograms
+ - a walking character can carry up to ``NCW`` kilograms without additional fatigue penalty
+ - a running character can carry up to ``NCW/4`` kilograms without additional fatigue penalty
+
+Between these thresholds, fa
+
+Let's take the example of Ulf the Gnome, whose ``NCW`` is equal to 4 (it is a strong gnome indeed). As a gnome, Ulf has a ``RWF`` of 2.
+
+Thus: 
+
+ - Ulf can carry without moving no more than ``RWF * NCW = 8 kilograms``
+ - he can walk with up to `NCW = 4 kilograms`` without additional fatigue
+
+évaluer les points de fatigue 
+ 
 
 
 Loot & Possessions
@@ -1390,6 +1617,12 @@ Some creatures may tend to steal the possessions of other creatures.
 There are all-purpose kleptomaniacs (they will try to rob all kinds of objects) and specialized ones (ex: only foods interest them).
 
 
+Frightening
+...........
+
+Some monsters are so disturbing lifeforms for a non-accustomed observer that she may be paralysed or even, in the case of abnormal abominations (Cthulu-like creatures), be scared to madness or to instant death. 
+
+
 Pets
 ----
 
@@ -1415,13 +1648,24 @@ Each object is determined by:
  - a textual description
  - a size (volume), expressed in litres, notably to evaluate bulkiness
  - a base value (if applicable), expressed in credits and in world currency as well. This base value corresponds to the mean found value for that object in the game world, to be modulated by the actual merchant
+ - a wear level, which determines how much the object is worn-out. This is notably useful for armors and weapons
+
+manuals, armor, weapons, flares, lamps.
+
+Treasures
 
 
 Special Objects
 ---------------
 
-Fountains, altars, and thrones may have random effects on players willing to experiment with them. 
-
+ - fountains, whose liquids can have different effects 
+ - altars
+ - thrones, they may have random effects on players willing to experiment with them
+ - opal eyes
+ - scrolls, that describe spells
+ - manuals, that teach interesting matters or not
+ 
+ 
 
 Object Quality
 --------------
@@ -1432,8 +1676,39 @@ Object Quality
 Object Wear
 -----------
 
-New, Used, Worn, Broken, Unreparable.
+The wear of each object is described by a `Maximum Wear Level` (MWL) and a `Current Wear Level` (CWL). CWL must be in the [0;MWL] range.
 
+The wear percentage is defined to be equal to ``CWL/MWL``.
+
++-----------------+--------------+--------+----------+
+| Wear Percentage | Wear State	 | Usable | Reparable|
++=================+==============+========+==========+
+| 0%        	  | New  		 | Yes    | No  	 |
++-----------------+--------------+--------+----------+
+| ]0%;25%[  	  | Lightly Used | Yes    | Yes 	 |
++-----------------+--------------+--------+----------+
+| [25%;55%[  	  | Used     	 | Yes    | Yes 	 |
++-----------------+--------------+--------+----------+
+| [55%;85%[  	  | Worn-out   	 | Yes    | Yes 	 |
++-----------------+--------------+--------+----------+
+| [85%;100%[  	  | Broken		 | No	  | Yes 	 |
++-----------------+--------------+--------+----------+
+| 100%            | Unreparable  | No	  | No  	 |
++-----------------+--------------+--------+----------+
+
+
+Each time an object is used, its wear increases by an amount which depends on the action and on its context. For example, when a dagger is used to stab a foe, the wear of the dagger is increased due to the stabbing (action) and to the resistance of the armor of the opponent (context). If it is a chain mail, the dagger may be worn sooner than if the foe had no armor.
+
+Reciprocally, any armor would see its wear increase due to the stabbing.
+
+When an object becomes broken, it cannot operate normally. For instance a weapon would deal little or no damage, an armor would protect a little or not at all. However these broken objects can still be used, thus they can reach an unreparable state.
+
+
+Managing the wear of equipments can be an interesting gameplay element at first, but in most cases it should not be a constant concern for the player.
+
+To alleviate when appropriate this constraint, object with significant `Maximum Wear Level` and/or relevant repair spells and/or cheap tinkers could be introduced later in the game.
+
+Wear is managed in class_Object.erl_ and tested in class_Object_test.erl_.
 
 Exchanging Goods
 ================
@@ -1629,6 +1904,19 @@ Multiplayer
 Player versus Player.
 
 
+User-Generated Content
+======================
+
+Playing in one's virtual world is pleasing, but being able to add some elements of its own is often considered still more enjoyable.
+
+For the ruler of a virtual world, user-generated content is probably the most interesting way of expanding the game and renewing it. Thus this should be encouraged, beginning from the release to the public of some of the tools, editors, documentation, resources (if the license allows it) that were gathered for in-house world creation.
+
+
+
+
+Player versus Player.
+
+
 A More Formal Modelling
 =======================
 
@@ -1640,7 +1928,7 @@ This section describes more precisely how the main concepts used by Orge are mod
    
      - Creature: corresponds to all beings, monsters or characters
 	 
-	   - belongs to a Race
+	   - belongs to a Species
 	   - Has an age and a life expectancy at births
 	   - Has a gender
 	   - has an Inventory
@@ -1807,4 +2095,8 @@ Appendices
 
 .. include:: Orge-orders-of-magnitude.rst
 
+
+:raw-latex:`\pagebreak`
+
+.. include:: Orge-glossary.rst
 
