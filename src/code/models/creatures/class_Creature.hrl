@@ -60,7 +60,7 @@
 % Records the secondary attributes of a creature.
 -record( creature_secondary_attributes, {
 
-	fatigue_model
+	fatigue_model,
 	max_nominal_carried_weight
 	
 } ).
