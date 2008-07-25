@@ -880,3 +880,13 @@ The pair was found to working very well, returning very accurate look-ups::
  			650,
  			807}}
 
+
+
+Orge Lightweight Client
+.......................
+
+This Orge client is developed in Erlang, and can satisfy two goals:
+
+ - provide a MUD-like interface, for narrow-band access and nostalgic players (if any)
+ - help debugging the Orge Heavy Client
+
