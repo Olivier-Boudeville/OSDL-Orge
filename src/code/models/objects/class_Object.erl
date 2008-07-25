@@ -7,15 +7,18 @@
 
 
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters,Description,Size,Weight,BaseCreditValue).
+-define(wooper_construct_parameters,Description,Size,Weight,MaximumWearLevel,
+	BaseCreditValue).
 
 % Life-cycle related exported operators:
--define(wooper_construct_export,new/4,new_link/4,
-	synchronous_new/4,synchronous_new_link/4,construct/5,delete/1).
+-define(wooper_construct_export,new/5,new_link/5,
+	synchronous_new/5,synchronous_new_link/5,construct/6,delete/1).
 
 % Method declarations.
 -define(wooper_method_export,getSize/1,setSize/2,getWeight/1,setWeight/2,
-	getBaseCreditValue/1,setBaseCreditValue/2,toString/1).
+	getBaseCreditValue/1,setBaseCreditValue/2,
+	isUsable/1,isReparable/1,increaseWearOf/2,
+	toString/1).
 
 
 
@@ -42,16 +45,19 @@
 % (unit: dm^3, i.e. litres), with a floating-point number
 %  - Weight is the weight of this object, expressed in kilograms (kg), with a
 % floating-point number
+%  - MaximumWearLevel: the Maximum Wear Level for this object (MWL)
 %  - BaseCreditValue: the base value, in credits, of this object, if 
-% applicable (expressed with an integer); otherwise: undefined.
+% applicable (expressed with an integer); otherwise: undefined
 construct(State,?wooper_construct_parameters) ->
 
 	% First the direct mother classes, then this class-specific actions:
 	DescribableState = class_Describable:construct( State, Description ),
 	TraceState = class_TraceEmitter:construct( DescribableState, "An object" ),
 	
+	% wear_level is 'Current Wear Level' (CWL).
 	ReadyState = ?setAttributes( TraceState, [ 
 		{size,Size}, {weight,Weight},
+		{wear_level,0},{max_wear_level,MaximumWearLevel},
 		{base_credit_value,BaseCreditValue},
 		{trace_categorization,?TraceEmitterCategorization} ] ),
 
@@ -119,6 +125,38 @@ setBaseCreditValue(State,NewValue) ->
 		?setAttribute(State,base_credit_value,NewValue) ).
 	
 	
+% Tells whether this object can be effectively used, i.e. if it is actually
+% functional.
+% Returns true or false.
+% (const request)
+isUsable(State) ->
+	?wooper_return_state_result( State, is_usable(State) ).
+
+
+% Tells whether this object can be repaired, i.e. if it needs to, and is still
+% able to be repaired.
+% Returns true or false.
+% (const request)
+isReparable(State) ->
+	?wooper_return_state_result( State, is_reparable(State) ).
+	
+	
+% Adds specified wear level to this object.
+% (oneway)
+increaseWearOf(State,WearToAdd) ->	
+	MaxWear = ?getAttr(max_wear_level), 
+	% Caps new wear to the maximum one:
+	NewWearValue = case ?getAttr(wear_level) + WearToAdd of
+	
+		Value when Value > MaxWear ->
+			MaxWear;
+				
+		OtherValue ->
+			OtherValue
+			
+	end,
+	?wooper_return_state_only( ?setAttribute(State,wear_level,NewWearValue) ).
+	
 	
 % Returns a textual description of the state of this object.
 % (const request)
@@ -130,6 +168,94 @@ toString(State) ->
 % Section for helper functions (not methods).
 
 
+% Tells whether this object can be effectively used, i.e. if it is actually
+% functional.
+% Returns true or false.
+is_usable(State) ->
+	case get_wear_percentage(State) of
+	
+		Value when Value < 0.85 ->
+			true;
+	
+		_Value ->
+			false
+			
+	end.
+	
+	
+
+% Tells whether this object can be repaired, i.e. if it needs to, and is still
+% able to be repaired.
+% Returns true or false.
+is_reparable(State) ->
+	MaxWear = ?getAttr(max_wear_level),
+	case ?getAttr(wear_level) of
+	
+		0 ->
+			false;
+	
+		MaxWear ->
+			false;
+	
+		_Value ->
+			true
+			
+	end.
+	
+
+% Returns the wear percentage for this object.
+get_wear_percentage(State) ->
+	?getAttr(wear_level) / ?getAttr(max_wear_level).
+	
+
+% Returns the wear state (atom) for this object.
+get_wear_state(State) ->
+	% Beware to rounding errors:
+	case get_wear_percentage(State) of
+	
+		0.0 ->
+			new;
+		
+		Value when Value < 0.25	->
+			lightly_used;
+		
+		Value when Value < 0.55	->
+			used;
+		
+		Value when Value < 0.85	->
+			worn_out;
+		
+		Value when Value < 100	->
+			broken;
+		
+		_Value ->
+			unreparable	
+			
+	end.
+
+	
+% Returns a textual description of the wear state of this object.
+wear_state_to_string(State) ->
+	case get_wear_state(State) of
+	
+		new ->
+			"New";
+		
+		lightly_used ->
+			"Lightly Used";
+				
+		worn_out ->
+			"Worn-Out";
+			
+		broken ->
+			"Broken";
+			
+		unreparable ->
+			"Unreparable"
+					
+	end.
+	
+	
 % Returns a textual description of the state of this object.
 state_to_string(State) ->
 
@@ -145,6 +271,9 @@ state_to_string(State) ->
 		
 	io_lib:format( "Object whose description is: '~s', "
 		"whose size is ~f litres, whose weight is ~f kilograms, "
-		"whose base value is ~s",
-		[ ?getAttr(description), ?getAttr(size), ?getAttr(weight), ValueMsg ] ).
+		"whose wear state is ~s (~B/~B), whose base value is ~s",
+		[ class_Describable:get_description(State), ?getAttr(size),
+			?getAttr(weight),wear_state_to_string(State), ?getAttr(wear_level),
+			?getAttr(max_wear_level), ValueMsg ] ).
+		
 		
