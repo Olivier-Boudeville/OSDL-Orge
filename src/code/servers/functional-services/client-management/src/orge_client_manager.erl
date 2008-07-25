@@ -7,6 +7,13 @@
 %
 -module(orge_client_manager).
 
+
+% Implementation notes.
+
+% TO-DO: The client manager should buffer a bit sendings, so that gen_tcp:send
+% does not eat all the CPU.
+
+
 -export([init/4]).
 
 
