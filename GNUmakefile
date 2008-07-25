@@ -3,7 +3,7 @@ ORGE_TOP = .
 .PHONY: bz2 work-archive to-archive info-local info-tools
 
 
-MODULES_DIRS = src test tools 
+MODULES_DIRS = doc src test tools 
 
 # No trace supervisor or graphical output wanted when running all tests from 
 # the root (batch mode vs interactive one):	 	
