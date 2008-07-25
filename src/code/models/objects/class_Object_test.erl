@@ -22,7 +22,8 @@ run() ->
 			
 	Size = 0.8,
 			
-	MyObject = class_Object:new_link( "Bottle of Whisky", Size, 1.1, 120 ),	
+	MyObject = class_Object:new_link( "Bottle of Whisky", Size, 1.1, 
+		555, 120 ),	
 	
 	MyObject ! {getSize,[],self()},
 	receive
@@ -47,10 +48,54 @@ run() ->
 	MyObject ! {toString,[],self()},
 	receive
 	
-		{wooper_result,StateString} ->
+		{wooper_result,FirstStateString} ->
 				?test_info([ io_lib:format( 
 					"Received following full textual description: ~s",
-					[StateString] ) ])
+					[FirstStateString] ) ])
+
+	end,
+
+	MyObject ! {isUsable,[],self()},
+	receive
+	
+		{wooper_result,true} ->
+				?test_info([ "Object is usable as expected." ])
+
+	end,
+	
+	MyObject ! {isReparable,[],self()},
+	receive
+	
+		{wooper_result,false} ->
+				?test_info([ "Object is not reparable as expected." ])
+
+	end,
+	
+	?test_info([ "Adding almost full wear for this object." ]),
+	MyObject ! {increaseWearOf,500},
+	
+	MyObject ! {isUsable,[],self()},
+	receive
+	
+		{wooper_result,false} ->
+				?test_info([ "Object is no more usable, as expected." ])
+
+	end,
+	
+	MyObject ! {isReparable,[],self()},
+	receive
+	
+		{wooper_result,true} ->
+				?test_info([ "Object is reparable now, as expected." ])
+
+	end,
+	MyObject ! {toString,[],self()},
+	receive
+	
+		{wooper_result,SecondStateString} ->
+				?test_info([ io_lib:format( 
+					"Received following full textual description: ~s",
+					[SecondStateString] ) ])
 
 	end,
 	
