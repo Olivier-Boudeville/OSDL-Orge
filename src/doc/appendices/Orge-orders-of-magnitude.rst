@@ -1,5 +1,7 @@
 
 
+.. _orders of magnitude:
+
 Some scales and orders of magnitude
 -----------------------------------
 
@@ -155,6 +157,8 @@ Mass
 .. [#] Largest elephant on record: 12 t.
 
 
+
+.. _orders of magnitude for time:
 
 Time & Durations
 ................
