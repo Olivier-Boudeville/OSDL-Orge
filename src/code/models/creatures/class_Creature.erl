@@ -7,15 +7,18 @@
 
 
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters,CreatureName,Description,Location).
+-define(wooper_construct_parameters,CreatureName,Description,Location,Age).
 
 % Life-cycle related exported operators:
--define(wooper_construct_export,new/3,new_link/3,
-	synchronous_new/3,synchronous_new_link/3,construct/4,delete/1).
+-define(wooper_construct_export,new/4,new_link/4,
+	synchronous_new/4,synchronous_new_link/4,construct/5,delete/1).
 
 % Method declarations.
 -define(wooper_method_export,act/1,getAge/1,setAge/2).
 
+
+% Helper functions.
+-export([state_to_string/1]).
 
 
 % Allows to define WOOPER base variables and methods for that class:
@@ -32,12 +35,27 @@
 % For location:
 -include("space.hrl").
 
+-include("class_Creature.hrl").
+
+
+% Implementation notes:
+%
+%  - physical_fatigue: current physical fatigue
+%  - max_physical_fatigue: physical BFB (Base Fatigue Budget) 
+%  - physical_recover_rate: physical FRR (Fatigue Recovery Rate)
+%
+%  - mental_fatigue: current mental fatigue
+%  - max_mental_fatigue: mental BFB (Base Fatigue Budget) 
+%  - mental_recover_rate: mental FRR (Fatigue Recovery Rate)
+%
 
 	
 % Constructs a new creature:
 %  - CreatureName, the name of the creature
+%  - Description, a description of this creature
 %  - Location, a 'location' record designating an in-world location 
-% Creature starts at age 0.
+%  - Age, the initial age of this creature
+% Creature starts with no physical nor mental fatigue.
 construct(State,?wooper_construct_parameters) ->
 
 	% First the direct mother classes, then this class-specific actions:
@@ -50,7 +68,11 @@ construct(State,?wooper_construct_parameters) ->
 		"and whose location is ~s.",
 		[ CreatureName, Description, space:location_to_string(Location) ] ) ]),
 	
-	?setAttributes( LocatableState, [ {age,0},
+	?setAttributes( LocatableState, [ {age,Age},
+		{physical_fatigue,0}, {max_physical_fatigue,0},
+		{physical_recover_rate,0}, 
+		{mental_fatigue,0}, {max_mental_fatigue,0},
+		{mental_recover_rate,0}, 
 		{trace_categorization,?TraceEmitterCategorization} ] ).
 	
 	
@@ -103,4 +125,16 @@ act(State) ->
 	
 % Section for helper functions (not methods).
 
+
+% Returns a textual description of the state of this creature.
+state_to_string(State) ->
+	io_lib:format( "Creature whose name is '~s', whose description is: '~s', "
+		"located at ~s, whose age is ~B, whose physical fatigue is ~B/~B, "
+		"whose mental fatigue is ~B/~B,",
+		[   class_Actor:get_name(State),
+			class_Describable:get_description(State),
+			class_Locatable:describe_location(State),
+			?getAttr(age),
+			?getAttr(physical_fatigue),?getAttr(max_physical_fatigue),
+			?getAttr(mental_fatigue),?getAttr(max_mental_fatigue) ] ).
 	
