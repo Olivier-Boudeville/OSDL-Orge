@@ -360,14 +360,16 @@ As stated in the `orders of magnitude for time`_ section, life expectancy is med
 Impact of Age on Abilities
 ..........................
 
- During his life expectancy (average one for a humain in Orge is 40 years), various stages will be reached, affecting his abilities. 
+During the life expectancy of a character, various stages will be reached, affecting his abilities (actually, his primary atributes), physical as well as mental, through an age multiplicative modifier. 
 
-Globally, for a human whose lifespan will be 40 years, they will start from zero in the first years of the character, increase steadily until a threshold of maturity is reached (at around 16 years). This will correspond to the peak abilities. They will then decrease a bit until stabilizing in a plateau (about 22 years). They will remain in this good condition until about 30 years, where they will begin to decline back to zero, not unlike in a `Attack Decay Sustain Release <http://en.wikipedia.org/wiki/ADSR_envelope>`_ scheme:
+For example, a creature whose base strength is 40 and whose age results in a modifier of +20% will be having currently an actual strength of ``40 + 0.2*40 = 48``.
+
+Globally, for a human whose lifespan is 40 years (average one for a human in Orge), the age modifier will start from -90% in the first year of the character, increase steadily until a threshold of maturity is reached (at around 16 years). This will correspond to the peak abilities (modifier: +120%). They will then decrease a bit until stabilizing in a plateau (about 22 years) with a null modifier (+0%). They will remain in this good condition until about 30 years, where they will begin to decline back to zero, not unlike in a `Attack Decay Sustain Release <http://en.wikipedia.org/wiki/ADSR_envelope>`_ scheme:
 
 
-This global aging profile in Orge is common to all species, genders, individal, etc.: the same evolution will apply, once scaled according to the effective planned lifespan of each creature. For example, if dwarves on average live for 320 years and if a given dwarf, Hgog, is expected to live for 355 years [#]_, then his abilities will reach zero only when being 355-year-old.
+This global aging profile in Orge is common to all species, genders, etc.: the same evolution will apply for all creatures, once scaled according to the effective planned lifespan of each creature. For example, if Dwarves on average live for 320 years and if a given Dwarf, Hgog, is expected to live for 355 years [#]_, then his abilities will reach zero only when being 355-year-old (not 320).
 
-.. [#] Determined by various factors, including sex, constitution and some randomness. 
+.. [#] Determined by various factors, including gender, constitution and some randomness. 
  
 
 The impact of aging is taken into account in the form of a modifier, see `Resolving Actions`_.
@@ -410,7 +412,7 @@ The following *Age Table* allows to determine the age-related textual descriptio
 +------------------------+---------------------------+-------------------+---------------------+
 
   
-.. [#] The creature's own life expectancy is not taking into account here: not all creatures could reach the *Ancient* age classifier.
+.. [#] The creature's own life expectancy is not taken into account here: not all creatures could reach the *Ancient* age classifier.
 
 .. [#] Unless specific conditions are met during the lifespan of a creature (ex: special magic used), its life expectancy should not exceed 150% of the average one defined for its species.
 
@@ -453,10 +455,25 @@ Ranks
 Military
 ........
 
- - Lieutenant
- - Captain
+This hierarchy is based on following ranks:
 
- 
+ #. Private
+ #. Second Class
+ #. Corporal
+ #. Sergeant
+ #. Sergeant Major
+ #. Lieutenant
+ #. Captain
+ #. Major
+ #. Lieutenant Colonel
+ #. Colonel
+ #. Brigadier
+ #. General
+ #. Field Marshal
+ #. Amiral
+
+
+
 Religious
 .........
 
@@ -497,12 +514,13 @@ Citation
 Creature Characterization
 =========================
 
-Not depending on a creature being a humanoid, a sentient being, a NPC, a monster or a PC, it will be described in an uniform way, by the means of *character's statistics*.
+Not depending on a creature being a humanoid, a sentient being, a NPC, a monster or a PC, it will be described in an uniform way, by the means of *character's statistics* (a.k.a. "stats").
+
 
 Gender
 ------
 
-Most creatures are either male or female, permanently.
+Most creatures are either male or female, permanently. This has an impact on attributes.
 
 
 Traits
@@ -745,8 +763,15 @@ The core potential of a creature is described by following *primary attributes*:
 |             | or not to do                              | Self-control,     |
 |             |                                           | Courage           |
 +-------------+-------------------------------------------+-------------------+
-| Charisma    | Personal attractiveness that enables      |                   | 
-|             | to influence others                       |                   |
+| Charisma    | Personal attractiveness that enables      | Appeal,           | 
+|             | to influence others                       | Attractiveness    |
+|             |                                           | Authority, Charm, |
+|             |                                           | Leadership,       |
+|             |                                           | Suggestion        |
++-------------+-------------------------------------------+-------------------+
+| Quickness   | Rapidity of action (speed) and wit        | Speed, Sagacity,  |
+|             | (mental alertness)                        | Initiative,       |
+|             |                                           | Sharpness         |
 +-------------+-------------------------------------------+-------------------+
 | Longevity   | Expected length of life                   | Lifespan          |
 +-------------+-------------------------------------------+-------------------+
@@ -754,15 +779,17 @@ The core potential of a creature is described by following *primary attributes*:
 .. [#] Most definitions are taken from various dictionaries, like the Webster.
 
 
-These primary attributes can be dispatched into *physical* ones (Strength, Agility and Constitution) and *mental* ones (Intelligence, Wisdom and Willpower), whereas Charisma is in both categories, and Longevity in neither (this particular attribute is seldom used for attribute rolls).
+
+
+These primary attributes can be dispatched into *physical* ones (Strength, Agility and Constitution) and *mental* ones (Intelligence, Wisdom and Willpower), whereas Charisma and Quickness are in both categories, and Longevity in neither (this particular attribute is seldom used for attribute rolls).
 
 
 Primary attributes are first-order ones, as they are the true original values from which secondary attributes will be computed.
 
-They are intrinsic, characteristic of a character, and should not increase during its life (experience applies to skills mostly). The primary attributes can however decrease in some cases, for example when a character suffers from permanent wounds.
+They are intrinsic, characteristic of a character. The primary attributes can increase during the life of the character (ex: stronger character after training) or decrease (ex: a character suffers from permanent wounds).
+Age modifiers apply as well.
 
-
-At character creation, the player may be given a total number of points to distribute among these primary attributes.
+At character creation, the player may be given a total number of points to distribute among these primary attributes, or they might be drawn according to a random law. In either case, no primary attribute is allowed be below 10 or above 60.
 
 
 
@@ -786,6 +813,37 @@ Other attributes that were not retained here were:
 
 
  
+
+Gender Attribute Modifiers
+..........................
+
+
+This applies independently from the species.
+
+
++-------------+---------------+-----------------+
+| Name of the | Male Modifier | Female Modifier |
+| Primary     |               |                 |
+| Attribute   | 			  | 			    |
++=============+===============+=================+
+| Strength    | +8			  | 0			    |
++-------------+---------------+-----------------+
+| Agility     | -2			  | +2			    |
++-------------+---------------+-----------------+
+| Constitution| +5			  | 0			    |
++-------------+---------------+-----------------+
+| Intelligence| 0			  | 0			    |
++-------------+---------------+-----------------+
+| Wisdom      | -4			  | +4			    |
++-------------+---------------+-----------------+
+| Willpower   | +3			  | 0			    |
++-------------+---------------+-----------------+
+| Charisma    | 0			  | +3			    |
++-------------+---------------+-----------------+
+| Quickness   | +2			  | 0			    |
++-------------+---------------+-----------------+
+| Longevity   | 0			  | +10			    |
++-------------+---------------+-----------------+
 
 
 
@@ -2058,7 +2116,9 @@ Other well-known game systems
  
  - FUDGE
  
- - Starcomm
+ - Star Command: see `1 <http://www.the-underdogs.info/game.php?id=1040>`_, `2 <http://www.mobygames.com/game/star-command>`_
+
+
  
  - `Diablo II <http://www.battle.net/diablo2exp/>`_
 
