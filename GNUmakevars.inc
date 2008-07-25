@@ -4,8 +4,19 @@ PROJECT_NAME := Orge
 PROJECT_VERSION := 0.1
 
 
+# LOANI-repository root:
+LOANI_REPOSITORY_ROOT=$(ORGE_TOP)/../../..
+
+# LOANI-installations root:
+LOANI_INSTALLATIONS_ROOT=$(LOANI_REPOSITORY_ROOT)/../LOANI-installations
+
+
+# egeoip root (for IP geolocation):
+EGEOIP_ROOT = $(LOANI_INSTALLATIONS_ROOT)/egeoip
+
+
 # Ceylan sources supposed to be available at the same directory level as OSDL:
-CEYLAN_ROOT := $(ORGE_TOP)/../../../ceylan
+CEYLAN_ROOT := $(LOANI_REPOSITORY_ROOT)/ceylan
 
 CEYLAN_TRUNK := $(CEYLAN_ROOT)/Ceylan/trunk
 
@@ -15,7 +26,7 @@ CEYLAN_ERLANG_TOP := $(CEYLAN_TRUNK)/src/code/scripts/erlang
 OSDL_ROOT := $(ORGE_TOP)/../..
 
 
-ORGE_DEV_TOP := $(ORGE_TOP)/src/code/
+ORGE_DEV_TOP := $(ORGE_TOP)/src/code
 
 
 # Directory section.
@@ -30,6 +41,8 @@ UDP_CLIENTS_BASE_DIR := $(CLIENTS_BASE_DIR)/raw-udp
 
 CREATURES_BASE_DIR := $(MODELS_BASE_DIR)/creatures
 OBJECTS_BASE_DIR   := $(MODELS_BASE_DIR)/objects
+
+SOCIETY_BASE_DIR := $(RULESET_BASE_DIR)/society
 
 TCP_SERVERS_BASE_DIR := $(SERVERS_BASE_DIR)/raw-tcp
 UDP_SERVERS_BASE_DIR := $(SERVERS_BASE_DIR)/raw-udp
@@ -48,6 +61,8 @@ UDP_CLIENTS_SRC := $(UDP_CLIENTS_BASE_DIR)/src
 CREATURES_SRC := $(CREATURES_BASE_DIR)
 OBJECTS_SRC   := $(OBJECTS_BASE_DIR)
 
+SOCIETY_SRC := $(SOCIETY_BASE_DIR)
+
 TCP_SERVERS_SRC := $(TCP_SERVERS_BASE_DIR)/src
 UDP_SERVERS_SRC := $(UDP_SERVERS_BASE_DIR)/src
 
@@ -64,6 +79,8 @@ UDP_CLIENTS_INC = -I$(UDP_CLIENTS_SRC)
 CREATURES_INC = -I$(CREATURES_SRC)
 OBJECTS_INC   = -I$(OBJECTS_SRC)
 
+SOCIETY_INC = -I$(SOCIETY_SRC)
+
 TCP_SERVERS_INC = -I$(TCP_SERVERS_SRC)
 UDP_SERVERS_INC = -I$(UDP_SERVERS_SRC)
 
@@ -72,7 +89,7 @@ DATABASE_STORAGE_INC  = -I$(DATABASE_STORAGE_SRC)
 
 
 INC += $(TCP_CLIENTS_INC) $(UDP_CLIENTS_INC)                \
-	   $(CREATURES_INC) $(OBJECTS_INC)                      \
+	   $(CREATURES_INC) $(OBJECTS_INC) $(SOCIETY_INC)       \
 	   $(TCP_SERVERS_INC) $(UDP_SERVERS_INC)                \
 	   $(CLIENT_MANAGEMENT_INC) $(DATABASE_STORAGE_INC)
 	    
@@ -85,6 +102,8 @@ UDP_CLIENTS_BEAM := $(UDP_CLIENTS_SRC)
 
 CREATURES_BEAM := $(CREATURES_SRC)
 OBJECTS_BEAM   := $(OBJECTS_SRC)
+
+SOCIETY_BEAM := $(SOCIETY_SRC)
 
 SERVERS_BEAM := $(SERVERS_SRC)
 
@@ -99,10 +118,21 @@ DATABASE_STORAGE_BEAM  := $(DATABASE_STORAGE_SRC)
 
 BEAM_DIRS := \
 	$(TCP_CLIENTS_BEAM) $(UDP_CLIENTS_BEAM)                                \
-	$(CREATURES_BEAM) $(OBJECTS_BEAM)                                      \
+	$(CREATURES_BEAM) $(OBJECTS_BEAM) $(SOCIETY_BEAM)                      \
 	$(SERVERS_BEAM) $(TCP_SERVERS_BEAM) $(UDP_SERVERS_BEAM)                \
-	$(FUNCTIONAL_BEAM) $(CLIENT_MANAGEMENT_BEAM) $(DATABASE_STORAGE_BEAM)
+	$(FUNCTIONAL_BEAM) $(CLIENT_MANAGEMENT_BEAM) $(DATABASE_STORAGE_BEAM)  \
+	$(EGEOIP_ROOT)/ebin
 
+
+# See corresponding firewall rules in 'iptables.rules-Gateway.sh':
+TCP_FIREWALL_OPT = "--tcp-range 51000 51999"
+
+
+# Defined intentionally to avoid command-line cookies:
+# (Orge is expected to rely on file-based cookies instead)
+NO_DEFAULT_COOKIE_WANTED="true"
+
+THIRD_PARTY_OPT = "$(TCP_FIREWALL_OPT)"
 
 include $(CEYLAN_ERLANG_TOP)/GNUmakevars.inc
 
