@@ -374,6 +374,9 @@ This global aging profile in Orge is common to all species, genders, etc.: the s
 
 The impact of aging is taken into account in the form of a modifier, see `Resolving Actions`_.
 
+Conversely, being older might imply being more experienced, trading weaken statistics against improved skills.
+
+
 
 Textual Translation of Age
 __________________________
@@ -450,10 +453,11 @@ Thus in Orge we favour permadeath. Note that it tends to make a character's heal
 Ranks
 -----
 
+Promotion is usually obtained thanks to achievements (i.e. is often based on experience points).
  
  
-Military
-........
+Military Ranks
+..............
 
 This hierarchy is based on following ranks:
 
@@ -472,17 +476,30 @@ This hierarchy is based on following ranks:
  #. Field Marshal
  #. Amiral
 
+The military rank directly impacts the montly wage, among other things.
 
 
-Religious
-.........
+Religious Hierarchy
+...................
+
+The secular authority, which involves legal and military authority, should not be mixed up with the clerical authority.
+
+Secular Hierarchy
+_________________
+
+ - Bishop
+ - Cardinal
+ - Pope
+ 
+Clerical Hierarchy
+__________________
 
  - Novice
- - 
+ - Monk
+
  
- 
-Levels of Expertise
-...................
+Levels of Expertise In Martial Arts
+...................................
 
  - Untrained
  - SwordMaster
@@ -630,17 +647,22 @@ Table of species statistics
 Life base expectancy, in years
 
 
-Base Classes
-------------
+Professions
+-----------
 
-Classes allow only direct characterization of a creature thanks to the use of archetypal, stereotyped profiles.
+There is no such thing in Orge like Character Classes: Character Professions are introduced instead.
 
-They do not belong to the in-game notions managed by the Orge system, they are just a convenience to build characters or to identify them: depending on a character statistics, the game system can determine whether a character is a druid and/or a thief, etc.
+Professions allow only direct characterization of a creature thanks to the use of archetypal, stereotyped profiles based on *skills*.
+
+Professions do not belong to the in-game notions managed by the Orge system, they are just a convenience to build characters or to identify them: depending on a character know-how (skills), the game system can determine whether a character is a druid and/or a thief, etc.
+
+Professions are stored hierarchically, in the *Career Tree*.
 
 
 +-------------+-------------------------------------------+-------------------+
 | Name of the | Description                               | Subclasses        |
-| Base Class  |                                           |                   |
+| Base        |                                           |                   |
+| Profession  |                                           |                   |
 +=============+===========================================+===================+
 | Fighter     |       | Barbarian, Warrior        | Melee Fighter, Duelist, Berseker, Archer
 |             |                          |                   |
@@ -789,7 +811,7 @@ Primary attributes are first-order ones, as they are the true original values fr
 They are intrinsic, characteristic of a character. The primary attributes can increase during the life of the character (ex: stronger character after training) or decrease (ex: a character suffers from permanent wounds).
 Age modifiers apply as well.
 
-At character creation, the player may be given a total number of points to distribute among these primary attributes, or they might be drawn according to a random law. In either case, no primary attribute is allowed be below 10 or above 60.
+At character creation, the player may be given a total number of points to distribute among these primary attributes, or they might be drawn according to a random law. In either case, no primary attribute is allowed be below 10 or above 60. See also: `Character Creation`_.
 
 
 
@@ -1262,6 +1284,19 @@ These respawn locations should be used with care, since they are often abused by
 Perception & Senses
 -------------------
 
+
+Character Creation
+------------------
+
+If the player is given the ability of customize the characteristics of a creature she controls, she will have in most cases a budget (expressed in Character Points) to spend on primary attributes (including age) and skills.
+
+
+Age vs Skills Trade-Off
+.......................
+
+The player might prefer to create a middle-aged character (thus having decreased actual statistics, including lifespan) who would compensate with augmented skills. Sometimes relying on a trained thief is safer than to bet on a promising yet unexperienced burglar.
+
+Some professions (ex: soldier) require usually that characters are trained for some years (ex: for 16 to 20-year-old) before being acknowledged competent for a certain rank (see `Military Ranks`_).
 
 
 
