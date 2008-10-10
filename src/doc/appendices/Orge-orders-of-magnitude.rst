@@ -1,9 +1,14 @@
 
+:raw-latex:`\pagebreak`
+
 
 .. _orders of magnitude:
 
+
 Some scales and orders of magnitude
 -----------------------------------
+
+To help Scenario Writers, Game Masters and Players alike figuring out reasonable scales and values, some hints are given here.
 
 Most examples are taken from the corresponding `Wikipedia articles <http://en.wikipedia.org/wiki/Category:Orders_of_magnitude>`_.
 
@@ -214,7 +219,7 @@ Time & Durations
 |                                                                   | years              |
 +-------------------------------------------------------------------+--------------------+
 
-.. [#] In Orge we chose a mean life	expectancy significantly higher than the one of Medieval Britain, thanks to the effect of magic cures, of course.
+.. [#] In Orge we chose a mean life    expectancy significantly higher than the one of Medieval Britain, thanks to the effect of magic cures, of course.
 
 
 Speed
@@ -226,6 +231,9 @@ Speed
 +=====================================================================+====================+
 | Speed of an average person walking [#]_                             | 1 - 1.5 m/s        |
 |                                                                     | (3.6 - 5.4 km/h)   |
++---------------------------------------------------------------------+--------------------+
+| Speed of an average person swimming                                 | 1 m/s              |
+|                                                                     | (3.6 km/h)         |
 +---------------------------------------------------------------------+--------------------+
 | World record 100 m (human) sprint                                   | 11.5 m/s           |
 |                                                                     | (41.5 km/h)        |
@@ -353,7 +361,7 @@ Light
 
 
 
-	  
+      
 Pressure
 ........
 
