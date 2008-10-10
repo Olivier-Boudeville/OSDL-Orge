@@ -1,0 +1,57 @@
+digraph orge_weapon_tree {
+
+	bgcolor=white
+
+	edge [color=black]
+	
+	node [fontcolor=blue,color=black]
+
+	"Weapon" -> "Close\nCombat\nWeapon"
+	"Weapon" -> "Range\nWeapon"
+	
+	"Close\nCombat\nWeapon" -> "Melee\nWeapon"
+	"Close\nCombat\nWeapon" -> "Pole\nWeapon"
+	
+	"Melee\nWeapon" -> "Knife"
+	"Melee\nWeapon" -> "Sword"
+	"Melee\nWeapon" -> "Blunt\nWeapon"
+
+	"Knife" -> "Dagger"
+	"Knife" -> "Katana"
+	
+	"Sword" -> "ShortSword"
+	"Sword" -> "BroadSword"
+	"Sword" -> "LongSword"
+	"Sword" -> "Two-Handed\nSword"
+	"Sword" -> "Falchion"
+	"Sword" -> "Rapier"
+	"Sword" -> "Scimitar"
+		
+	"Blunt\nWeapon" -> "Club"
+	"Blunt\nWeapon" -> "Mace"
+	"Blunt\nWeapon" -> "BattleAxe"
+	"Blunt\nWeapon" -> "Morning\nStar"
+	"Blunt\nWeapon" -> "Warhammer"
+
+	"Pole\nWeapon" -> "Stick"
+	"Pole\nWeapon" -> "Spear"
+	"Pole\nWeapon" -> "Spike"
+	"Pole\nWeapon" -> "Halberd"
+	
+	"Range\nWeapon" -> "Archery"
+	"Range\nWeapon" -> "Sling"
+	"Range\nWeapon" -> "Blow\nPipe"
+	"Range\nWeapon" -> "Thrown\nMissiles"
+	
+	"Archery" -> "Bow"
+	"Archery" -> "Crossbow"
+
+	"Bow" -> "Short\nBow"
+	"Bow" -> "Longbow"
+	"Bow" -> "Composite\nBow"
+	
+	"Thrown\nMissiles" -> "Throwing\nKnife"
+	"Thrown\nMissiles" -> "Javelin"
+	"Thrown\nMissiles" -> "Shuriken"
+
+}	

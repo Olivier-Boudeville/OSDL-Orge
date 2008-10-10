@@ -1,0 +1,15 @@
+digraph orge_ammunition_tree {
+
+	bgcolor=white
+
+	edge [color=black]
+	
+	node [fontcolor=blue,color=black]
+
+	"Ammunition" -> "Arrow"
+	"Ammunition" -> "Bolt"
+	"Ammunition" -> "Dart"
+	"Ammunition" -> "Small\nStones"
+    
+
+}	

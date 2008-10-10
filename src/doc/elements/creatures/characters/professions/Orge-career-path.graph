@@ -1,0 +1,67 @@
+digraph orge_career_path {
+
+	bgcolor=white
+
+	edge [color=black]
+	
+	node [fontcolor=blue,color=black]
+
+	Professions -> Fighter
+	Professions -> Cleric
+	Professions -> Wizard
+	Professions -> Rogue
+	Professions -> Bard
+	
+	Fighter -> Guard
+	Fighter -> "Melee\nFighter"
+	Fighter -> Barbarian
+	Fighter -> Archer
+	
+	"Melee\nFighter" -> Duelist
+	"Melee\nFighter" -> Knight
+
+	Barbarian -> Champion
+	Guard -> Defender
+	Guard -> Paladin
+	
+	Cleric -> Monk
+	Cleric -> Priest
+	Cleric -> Shaman
+	Cleric -> Paladin
+	Cleric -> Druid
+	
+	Priest -> Bishop
+	Priest -> Warpriest
+	
+	Rogue -> Thief
+	Rogue -> Druid
+	Rogue -> Scout
+	Rogue -> Spy
+	Rogue -> Barbarian
+
+	Scout -> Ranger
+
+	Thief -> Assassin
+	
+	Barbarian -> Berseker
+	
+	Wizard -> Mage
+	Wizard -> "Hedge\nWizard"
+	Wizard -> Sorcerer
+
+	Mage -> Bishop
+	Mage -> Archmage
+
+	"Hedge\nWizard" -> Summoner
+	"Hedge\nWizard" -> Warlock
+	
+	Sorcerer -> Necromancer
+	
+	             
+	Bard -> Minstrel
+	Bard -> Spy
+	Bard -> Ambassador
+
+	Minstrel -> Jester
+	
+}	

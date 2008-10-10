@@ -1,0 +1,252 @@
+digraph orge_skill_tree {
+
+	bgcolor=white
+
+	edge [color=black]
+	
+	node [fontcolor=blue,color=black]
+
+
+	"Talent" -> "Craftsmanship"
+	"Talent" -> "Arts"
+	"Talent" -> "Lore"
+	"Talent" -> "Physical\nDevelopment"
+	"Talent" -> "Perception\nEnhancement"
+	"Talent" -> "Resistance\nImprovement"
+	"Talent" -> "Combat"
+	"Talent" -> "Arcane"
+	
+
+	"Craftsmanship" -> "Tool\nPractise"
+	"Craftsmanship" -> "Stealth\nOperations"
+	"Craftsmanship" -> "Trapping"
+	"Craftsmanship" -> "First\nAid"
+	"Craftsmanship" -> "Craft"
+
+	"Tool\nPractise" -> "Lock-Picking"
+	"Tool\nPractise" -> "Repairing"
+	
+	"Stealth\nOperations" -> "Silent\nMove"
+	"Stealth\nOperations" -> "Scouting\nRecon"
+	"Stealth\nOperations" -> "Camouflage"
+	"Stealth\nOperations" -> "Pick-Pocket"
+		
+	"Trapping" -> "Trap\nArming"
+	"Trapping" -> "Trap\nDetection"
+	"Trapping" -> "Trap\nDisarming"
+	
+	"Craft" -> "Material\nCraft"
+	"Craft" -> "Armor\nCraft"
+	"Craft" -> "Alchemy\nCraft"
+	"Craft" -> "Weapon\nCraft"
+	"Craft" -> "Trap\nCraft"
+	
+	"Material\nCraft" -> "Wood\nCraft"
+	"Material\nCraft" -> "Leather\nCraft"
+	"Material\nCraft" -> "Stone\nCraft"
+	"Material\nCraft" -> "Metal\nCraft"
+    
+	"Arts" -> "Music"
+	"Arts" -> "Drawing"
+	"Arts" -> "Singing"
+	"Arts" -> "Dancing"
+	"Arts" -> "Calligraphy"
+
+	"Music" -> "Interpretation"
+	"Music" -> "Composition"
+	
+	"Interpretation" -> "Harp"
+	"Interpretation" -> "Violin"
+	
+	
+	
+	"Lore" -> "Folk\nLore"
+	"Lore" -> "Arcane\nLore"
+	"Lore" -> "Nature\nLore"
+	
+    "Folk\nLore" -> "Written\nLanguage\nLore"
+    "Folk\nLore" -> "Spoken\nLanguage\nLore"
+    
+	"Arcane\nLore" -> "Cabalistic\nLanguage\nLore"
+    
+	"Nature\nLore" -> "Creature\nLore"
+	"Nature\nLore" -> "Vegetal\nLore"
+	
+	"Creature\nLore" -> "Taming"
+	
+	"Taming" -> "Bird\nTaming"
+	"Taming" -> "Dog\nTaming"
+	"Taming" -> "Wolf\nTaming"
+	"Taming" -> "Horse\nTaming"
+	"Taming" -> "Dragon\nTaming"
+	
+	"Physical\nDevelopment" -> "Mount\nRiding"
+	"Physical\nDevelopment" -> "Swimming"
+	"Physical\nDevelopment" -> "Climbing"
+	"Physical\nDevelopment" -> "Gymnastics"
+	"Physical\nDevelopment" -> "Athletics"
+    	
+	"Athletics" -> "Running"
+	"Athletics" -> "Jumping"
+	
+	"Mount\nRiding" -> "Horse\nRiding"
+	"Mount\nRiding" -> "Dragon\nRiding"
+	"Mount\nRiding" -> "Giant Rat\nRiding"
+	
+	"Horse\nRiding" -> "Warhorse\nRiding"
+	"Horse\nRiding" -> "Racehorse\nRiding"
+	"Horse\nRiding" -> "Unicorn\nRiding"
+
+	"Running" -> "Sprint"
+	"Running" -> "Marathon"
+
+
+	"Perception\nEnhancement" -> "Observation\nTraining"
+	"Perception\nEnhancement" -> "Night\nVision\nTraining"
+	"Perception\nEnhancement" -> "Auditory\nWatch\nTraining"
+	"Perception\nEnhancement" -> "Fine\nSmell\nTraining"
+	"Perception\nEnhancement" -> "Fine\nTouch\nTraining"
+	"Perception\nEnhancement" -> "Fine\nTaste\nTraining"
+	"Perception\nEnhancement" -> "Orientation\nTraining"
+
+	"Resistance\nImprovement" -> "Physical\nHardening"
+	"Resistance\nImprovement" -> "Cold\nResistance"
+	"Resistance\nImprovement" -> "Fire\nResistance"
+	"Resistance\nImprovement" -> "Arcane\nResistance"
+	"Resistance\nImprovement" -> "Poison\nResistance"
+	"Resistance\nImprovement" -> "Acid\nResistance"
+    
+	
+	"Combat" -> "Close\nCombat\nTechnics"
+	"Combat" -> "Ranged\nCombat\nTechnics"
+	"Combat" -> "Specialized\nCombat\nTechnics"
+	
+	"Close\nCombat\nTechnics" -> "Unarmed\nCombat\nTechnics"
+	"Close\nCombat\nTechnics" -> "Melee\nWeapons\nTechnics"
+	"Close\nCombat\nTechnics" -> "Pole\nWeapons\nTechnics"
+	
+	"Unarmed\nCombat\nTechnics" -> "Martial Arts"
+	
+    "Melee\nWeapons\nTechnics" -> "Knife\nWeapons\nTechnics"
+    "Melee\nWeapons\nTechnics" -> "Sword\nWeapons\nTechnics"
+    "Melee\nWeapons\nTechnics" -> "Blunt\nWeapons\nTechnics"
+
+	"Knife\nWeapons\nTechnics" -> "Dagger\nTechnics"
+	"Knife\nWeapons\nTechnics" -> "Katana\nTechnics"
+
+    "Sword\nWeapons\nTechnics" -> "Short\nSword\nTechnics"
+    "Sword\nWeapons\nTechnics" -> "Broad\nSword\nTechnics"
+    "Sword\nWeapons\nTechnics" -> "Long\nSword\nTechnics"
+    "Sword\nWeapons\nTechnics" -> "Two-Hand\nSword\nTechnics"
+    "Sword\nWeapons\nTechnics" -> "Falchion\nTechnics" 
+    "Sword\nWeapons\nTechnics" -> "Rapier\nTechnics"
+    "Sword\nWeapons\nTechnics" -> "Scimitar\nTechnics"
+    
+	"Blunt\nWeapons\nTechnics" -> "Club\nTechnics"
+	"Blunt\nWeapons\nTechnics" -> "Mace\nTechnics"
+	"Blunt\nWeapons\nTechnics" -> "BattleAxe\nTechnics"
+	"Blunt\nWeapons\nTechnics" -> "Morning\nStar\nTechnics"
+	"Blunt\nWeapons\nTechnics" -> "Warhammer\nTechnics"
+	
+
+
+	"Pole\nWeapons\nTechnics" -> "Stick\nTechnics"
+	"Pole\nWeapons\nTechnics" -> "Spear\nTechnics"
+	"Pole\nWeapons\nTechnics" -> "Spike\nTechnics"
+	"Pole\nWeapons\nTechnics" -> "Halberd\nTechnics"
+
+	"Ranged\nCombat\nTechnics" -> "Archery\nTechnics"
+	"Ranged\nCombat\nTechnics" -> "Sling\nTechnics"
+	"Ranged\nCombat\nTechnics" -> "Blow\nPipe\nTechnics"
+	"Ranged\nCombat\nTechnics" -> "Thrown\nMissiles\nTechnics"
+    
+    "Archery\nTechnics" -> "Bow\nTechnics"
+    "Archery\nTechnics" -> "Crossbow\nTechnics"
+
+	"Bow\nTechnics" -> "Short\nBow\nTechnics"
+	"Bow\nTechnics" -> "Longbow\nTechnics"
+	"Bow\nTechnics" -> "Composite\nBow\nTechnics"
+
+	"Thrown\nMissiles\nTechnics" -> "Throwing\nKnife\nTechnics"
+	"Thrown\nMissiles\nTechnics" -> "Javelin\nTechnics"
+	"Thrown\nMissiles\nTechnics" -> "Shuriken\nTechnics"
+
+	"Specialized\nCombat\nTechnics" -> "Combat\nManoeuvers"
+	"Specialized\nCombat\nTechnics" -> "Defense"
+	"Specialized\nCombat\nTechnics" -> "Non\nLethal\nCombat"
+	"Specialized\nCombat\nTechnics" -> "Special\nAttacks"
+	"Specialized\nCombat\nTechnics" -> "Battle\nDisciplines"
+	"Specialized\nCombat\nTechnics" -> "Group\nCombat"
+
+	"Combat\nManoeuvers" -> "Patrol"
+	"Combat\nManoeuvers" -> "On\nThe\nWatch"
+	"Combat\nManoeuvers" -> "Escort"
+	"Combat\nManoeuvers" -> "Protect" 
+	"Combat\nManoeuvers" -> "Deter\nArcane" 
+	
+	"Defense" -> "Block"
+	"Defense" -> "Parry"
+	"Defense" -> "Dodge"
+	"Defense" -> "Specialized\nDefense\nTechnics"
+	
+    "Parry" -> "Parrying\nDagger"
+    
+	"Specialized\nDefense\nTechnics" -> "Defense\nAgainst\nAnimals"
+	"Specialized\nDefense\nTechnics" -> "Defense\nAgainst\nOpponents"
+    
+    "Defense\nAgainst\nOpponents" -> "Defense\nAgainst\nHumans"
+    "Defense\nAgainst\nOpponents" -> "Defense\nAgainst\nElves"
+    "Defense\nAgainst\nOpponents" -> "Defense\nAgainst\nDwarves"
+    "Defense\nAgainst\nOpponents" -> "Defense\nAgainst\nHalflings"
+    "Defense\nAgainst\nOpponents" -> "Defense\nAgainst\nGnomes"
+    "Defense\nAgainst\nOpponents" -> "Defense\nAgainst\nGoblins"
+    "Defense\nAgainst\nOpponents" -> "Defense\nAgainst\nOrcs"
+
+ 
+	"Non\nLethal\nCombat" -> "Intimidation"
+	"Non\nLethal\nCombat" -> "Wound\nSimulation"
+	"Non\nLethal\nCombat" -> "Disengagement"
+	"Non\nLethal\nCombat" -> "Blinding"
+	"Non\nLethal\nCombat" -> "Disarming"
+	"Non\nLethal\nCombat" -> "Hostage\nHold"
+	"Non\nLethal\nCombat" -> "Knock-Out"
+		
+	"Special\nAttacks" -> "Initiative"
+	"Special\nAttacks" -> "Bully"
+	"Special\nAttacks" -> "Fight\nIn The\nDark"
+	"Special\nAttacks" -> "Feint"
+	"Special\nAttacks" -> "Backstab"
+	"Special\nAttacks" -> "Ambush"
+	"Special\nAttacks" -> "Duel"
+	"Special\nAttacks" -> "Silent\nAssassination"
+	"Special\nAttacks" -> "Body\nPart\nTargeting"
+	"Special\nAttacks" -> "Berserker"
+	"Special\nAttacks" -> "Critical\nStrike"
+	"Special\nAttacks" -> "Marksmanship"
+	"Special\nAttacks" -> "Additional\nAttacks"
+
+	"Group\nCombat" -> "Attack\nIn\nFormation"
+	"Group\nCombat" -> "Defense\nWhile\nOutnumbered"
+	
+	"Arcane" -> "Magery"
+	"Arcane" -> "Priesthood"
+	"Arcane" -> "Bardic\nVerse"
+	"Arcane" -> "Arcane\nTechnics"
+	"Arcane" -> "Arcane\nDevelopment"
+	
+	"Magery" -> "Summoning"
+	"Magery" -> "Battle\nSpells"
+	"Magery" -> "Illusions"
+    
+	"Priesthood" -> "Healing"
+	"Priesthood" -> "Deity\nIntercession"
+	
+	"Arcane\nTechnics" -> "Incantation"
+	"Arcane\nTechnics" -> "Gesture\nSpellcasting"
+	"Arcane\nTechnics" -> "Rune\nCarving"
+	"Arcane\nTechnics" -> "Pure\nMental\nSpellcasting"
+
+	"Arcane\nDevelopment" -> "Mana\nTank"
+	"Arcane\nDevelopment" -> "Chained\nCasts"
+    
+}	
