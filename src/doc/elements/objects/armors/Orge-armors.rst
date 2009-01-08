@@ -1,11 +1,12 @@
 Armor
 -----
 
-Several 
-armor types
+Their main objective is to increase the protection of their wearer.
 
+There are several pieces of armor, of different types and matters.
 
-Defense
+The effect regarding protection provided by belts and spurs is not taken into account here.
+
 
 
 Pieces of Armor
@@ -51,6 +52,9 @@ Helmet
 ______
 
 
+Travel Hat
+**********
+
 Leather Coif
 ************
 
@@ -64,6 +68,13 @@ Chainmail Coif
 
 Armor
 _____
+
+
+
+Robe & Cassocks
+***************
+
+Most priests and monks wear robes, which offer little protection in armed combat.
 
 
 Cloth
@@ -130,6 +141,9 @@ Boiled leather makes better armors than raw leather.
 Studded Leather Armor
 *********************
 
+Breast Plate
+************
+
 Ringmail
 ********
 
@@ -151,14 +165,25 @@ Full Plate
 Plates covering the full chest, all in one block.
 
 
-Gauntlets
-_________
 
+Gauntlets & Gloves
+__________________
+
+
+Wool Gloves
+***********
+
+Leather Gloves
+**************
+
+Gauntlet
+********
 
 Spiked Gauntlet
 ***************
 
 Not considered as a weapon by guards, but still able to inflict considerable damages...
+
 
 
 Shoes
@@ -177,6 +202,8 @@ Regular Boots
 Leather Boots
 *************
 
+Leather Leggings
+****************
 
 
 Shield
@@ -191,4 +218,10 @@ Small Wooden Shield
 
 Large Wooden Shield
 *******************
+
+
+Rings
+_____
+
+They offer some (small) physical protection, and in some cases a magical one as well.
 
