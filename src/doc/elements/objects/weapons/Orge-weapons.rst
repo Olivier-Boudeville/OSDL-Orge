@@ -4,15 +4,18 @@ Weapons
 
 Weapons are used in armed combat, as opposed to unarmed combat like some martial arts, boxing, wrestling, etc.
 
-Weapons can be used in close combat and/or ranged combat. For example, a knife could be used to stab, or can be throwned.
+Weapons can be used in close combat and/or ranged combat. For example, a knife could be used to stab, or can be thrown.
 
 Close combat weapons are further split into:
 
  - melee weapons, like swords
  - pole weapons, like spears
 
+There are weapons by purpose (ex: a sword) or by usage (ex: a pickaxe).
 
 All weapons - even for close combat - have an attack range. For example an halberd allows for a larger range than a dagger.
+
+The controller of a creature can select which creature is to be targeted, but then Orge will determine which creature(s) is/are hit, which may or may not be the desired result (ex: friendly fire can happen). 
 
 Most weapons can be used different ways, to throw, stab, bash, slash, etc, called *attack style*.
 
@@ -25,9 +28,12 @@ This impacts notably on:
 	- the wear of the attacker weapon
 	- the wear of the defender armor
 	
-All weapons, depending on the attack style, inflict at least a specific kind of damage. For example, a Sword can only be used for chopping, and this deals Slashing Damages.
+All weapons, depending on the attack style, inflict at least one specific kind of damage. For example, a Sword can only be used for chopping, and this deals Slashing Damages.
 
-Some weapons support multiple attack styles. For example, an Halberd  
+Some weapons support multiple attack styles. For example, an Halberd can be used to perform three different attacks, each with specific characteristics.
+
+Moreover, depending on the weapon and on the attack style, damages will be either inflicted to specific targets (usually one creature; ex: with a sword) or will have an area of effect (which may include zero to any number of creatures; ex: with a fireball). 
+
 
 
 Weapon Repository
@@ -78,9 +84,9 @@ axe: when chopping, deals Slashing Damage
 longsword: when chopping, deals Slashing Damage
 scimitar: when chopping, deals Slashing Damage
 
-rapier: when , deals Piercing Damage
-Katana
-Dagger
+rapier: when used, deals Piercing Damage
+katana: when used, deals Piercing Damage
+dagger: when used, deals Piercing Damage
 
 
 Halberd 
@@ -110,12 +116,13 @@ To be added:
   - Crossbow: different Bolts
   - Blunt (most can be light or heavy): Hammer, Hand Axe, Flail, Ball and Chain
   - Crossbow: Hand Crossbow, Light Crossbow
-  - Stick: Rod, Cudgel, Quarterstaff, Tonfa, Blackjack
+  - Stick: Rod, Cudgel, Quarterstaff, Tonfa, Blackjack, Wand
   - Slash: Sickle, Sabre, Bastard Sword
   - Sabre: Cutlass
   - Spear: Long Spear, Voulge
-  - Lance: Long Lange
+  - Lance: Long Lance
   - Pierce: Pick, Fork, Trident, Sleeve Tangler, Gaff, Crowbill Hammer
-  - Thrown Missiles: Throwing Axe
+  - Thrown Missiles: Throwing Axe, Shuriken
+  - Sling 
     
 See also: http://members.aol.com/dargolyt/TheForge/WPNMAIN.HTM
