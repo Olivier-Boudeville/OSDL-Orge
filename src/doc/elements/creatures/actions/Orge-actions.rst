@@ -7,8 +7,16 @@
 .. include:: Orge-interactions.rst
 
 
+
+
 Main Supported Creature Actions
 ...............................
+
+
+Most usual actions are made available thanks to a specialized verb (ex: ``attack monster`` instead of ``use sword with monster``), for conveniency purposes.
+
+Some other actions are not described by a specific verb, as they are several different means of performing them (ex: ``heal`` would be ambiguous: use bandage, spell, or other?).
+
 
 
 Communicating
@@ -23,6 +31,12 @@ Dismounting Rider
 _________________
 
 Some weapons, like the `Halberd`_, provide bonuses.
+
+
+Drink
+_____
+
+A creature may ingest liquids from a "container" (ex: bottle, spring, etc.).
 
 
 Fighting
@@ -65,10 +79,29 @@ An ambush corresponds to a party hiding themselves and waiting for others to com
 
 
 
+Giving an Object to a Creature
+______________________________
+
+A creature may (attempt to) give an object to another creature (which may or may not take it). See `Taking an Object Offered by a Creature`_.
+
+
+Inspecting
+__________
+
+A creature may inspect a specific place or object. It will spend time in doing so, but some interesting findings can be done that way.
+
+
+
 Lighting a fire
 _______________
 
 The success of this actions depends a lot on the character having `Kindling Objects`_, or Fire Spells, or the creature having some Breathing Fire ability. Without any of them, little chances would remain. 
+
+
+Manage Inventory
+________________
+
+A creature might manage its inventory (if any): search for objects, sort them, etc.
 
 
 Moving
@@ -76,6 +109,31 @@ ______
 
 All movements will be harder to perform with drawn weapons or too much carried weight.
 
+
+Opening
+_______
+
+Various objects can be opened by various creatures, including doors, chests, etc.
+
+Sometimes some objects (e.g. a key) or skills (e.g. lock-picking or magic) are needed.
+
+
+Pulling an Object
+_________________
+
+A creature may attempt to pull an object (ex: a wardrobe).
+
+
+Pushing an Object
+_________________
+
+A creature may attempt to push an object (ex: a chest).
+
+
+Putting an Object on the Ground
+_______________________________
+
+A creature helding in hand(s) an object may put it on the ground.
 
 
 Rallying
@@ -105,6 +163,39 @@ Spellcasting By Incantations
 ____________________________
 
 
+Stacking Objects
+________________
+
+A creature may move various objects and stack them (series of pick-up or retrieve from inventory/put in hand/put on the ground).
+
+This may be useful to reach places that otherwise would be too high for the creature.
+
+
+Taking an Object Offered by a Creature
+______________________________________
+
+A creature may accept to grasp an object given by another creature. 
+See `Giving an Object to a Creature`_.
+
+
+Taking an Object on the Ground
+______________________________
+
+A creature may pick up an object from the ground and then hold it, sometimes before putting it in a bag (inventory). 
+
+
+Using an Object
+_______________
+
+Very general action that can be performed by a creature on an object or on a set of objects when appropriately combined (ex: using a bolt with a crossbow to load it, using a poisoned key with a water bucket to clean it, etc.).
+
+Often specialized actions should be preferred instead: using a door is opening it, etc.
+
+
+Throwing an Object
+__________________
+
+Most objects held in hand(s) can be thrown by a creature, as a weapon, or to trigger mechanisms, or to break them, or to make noise, etc.
 
 
 .. include:: Orge-movement.rst
