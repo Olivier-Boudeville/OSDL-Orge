@@ -4,6 +4,8 @@ Damage Resistance
 
 The damage resistance corresponds to the ability of a creature to withstand certain types of damages. See also: the `Damages`_ section. 
 
+This models the fact that some weapons are especially efficient in specific contexts, like a blessed falchion against undeads, a fire blade agains mummies, the enchanched dague of a royal assassin to back-stab, etc.
+
 
 Species Resistance Modifiers
 ____________________________
