@@ -13,6 +13,14 @@ One concern is to avoid that experienced characters based on fighting skills (ba
 
 The solution used in Orge is to put the stress on the tactical combat, and to offer a wide range of actions for non-arcane users as well, thanks to various kinds of Close Combat (Unarmed, or with Melee or Pole Weapons) and Ranged Combat, and also thanks to Specialized Combat Technics, which includes many sorts of Defenses, Combat Maneuvers, Non Lethal Combat Technics, Battle Disciplines, Special Attacks, and Group Combat Technics.
 
+
+Combats are expected to be finely driven by the players: for example, instead of just designating a target, the player is able to choose the weapon, the kind of attack, the attack/defense ratio, if not playing on a system allowing to accumulate power until unleashing it thanks to powerful blows. Of course spells can be cast, objects be used (ex: grenade-like).  
+
+Combats seek a certain level of realism. For example, sword blows can be attempted even if no opponent is in range. In that case the attacking character just performs a fruitless movement.
+
+But if an ally happen to be in the attack range, this unfortunate ally might be hurt: *friendly fire* can occur, since the game engine just simulates the attack and, based on its range, determines which creature(s) is/are affected, regardless of the intention of the attacker. In Orge like in the real world, only the acts matter.
+  
+
 Regarding time, a combat is made of a series of rounds, each round being further divided in a series of phases. As for all interactions, combat rounds are affected by `Time Bubbles`.
 
 
@@ -126,6 +134,7 @@ Before attacking with a ranged weapon, it is advisable for a character to aim it
 
 Of course, depending on the size and distance of the target (i.e. depending on its solid angle from the sniper), further modifiers will apply, if and only if the target is in range.
 
+Some aiming can be performed with melee weapons too: a character might spend one round planning its melee attack for a +10% increase in its To Hit Bonus.
 
 Costs action points.
 
@@ -376,6 +385,17 @@ The Hit Bonus depends on:
 
 Close Combat Attacks
 --------------------
+
+Depending on the melee weapon being used, a character might use one or more of the supported attack styles (see Weapons_).
+
+For example, if using a sword, the character will be able to try to slash or to pierce its opponent.
+
+This directly impacts the probability to hit and the inflicted damages.
+
+Currently no specific body part of the opponent can be targeted when striking.
+
+
+
 
 
 Ranged Combat Attacks
