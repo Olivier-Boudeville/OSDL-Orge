@@ -23,16 +23,28 @@ _____________________________________________________
 
 They are listed per function. Some objects offering multiple functions are thus listed more than once.
 
+
+
 Food
 ****
 
- - vegetables
- - meat
  - fruits
+ - meat
+ - vegetables
+ - mushrooms
  
 Drinks are to be described together with their container (ex: wine bottle).
 
-  
+	
+Kitchen Utensils
+****************
+
+ - bowl
+ - plate
+ - fork
+ - knife
+ - dish
+   
  
 Light Emitters
 **************
@@ -41,6 +53,8 @@ Light Emitters
  - lamp
  - lantern: regular or hoodable
  - torch
+ - candlestick
+ - candle
  
  
 Health-related Objects
@@ -48,8 +62,8 @@ Health-related Objects
 
 They are used to restore some health and/or to cure diseases, poisons, etc.:
 
- - ointments
  - bandage
+ - ointments
  
  
 Cosmetic-related Objects
@@ -57,9 +71,9 @@ Cosmetic-related Objects
 
 Using them generally improves charisma, and they often deal with hygiene as well:
 
+ - perfume
  - razor
  - soap
- - perfume
 
 
  
@@ -78,6 +92,8 @@ These tools are not usable as weapons:
  - string: stronger and heavier rope
  - weapon and armor oil: to preserve them
  - whetstone
+ - pickaxe
+ - bucket
  
  
 Travel Objects
@@ -85,15 +101,17 @@ Travel Objects
 
  - bedroll: for a better sleep
  - blanket: for a better sleep in low temperatures
- - tent: when comfort matters
  - riding equipment: priceless with a mount
+ - tent: when comfort matters
  
  
 Valuable Objects
 ****************
 
- - jewel
  - coin
+ - jewel
+ - gems
+ - money
  
  
 Writing Objects
@@ -102,6 +120,8 @@ Writing Objects
  - chalk: to write things temporarily on various surfaces
  - parchment
  - quill
+ - notebook
+ - book
 
 
 Kindling Objects
@@ -124,8 +144,8 @@ They can contain other objects:
 
 There are special containers for liquid and gaseous substances:
 
- - bottle: water, wine, fine wine, spirits
  - ale, flask (ex: for Holy water)
+ - bottle: water, wine, fine wine, spirits
  - phial (ex: for Reagents, Ink)
 
 
@@ -133,29 +153,117 @@ See also: `Furnitures`_, `Magazines`_.
 
 
 
+Random Objects
+**************
+
+ - stones
+ - bones 
+ - keys
+ 
+ 
+
+List of Furnitures
+__________________
+
+ - bed
+ - chest
+ - cupboard
+ - drawer
+ - seat, chair, armchair
+ - stool
+ - table
+ - throne
+ - wardrobe
+ 
+ 
 Vehicles
 ________
 
  - cart
  - chariot
+ - small boat, barque
  - stagecoach
  - wagon
 
 
 
+Decor Elements
+______________
+
+
+They allow to build the scenery, but are not classical `Furnitures`_.
+
+They usually cannot be taken, they are in general static and non-interactive. Nevertheless some of them have a state (ex: a windmill whose wings are turning).
+
+Some elements can be moved (ex: a chair), some can be destroyed with enough energy (ex: walls, doors).
+
+They include:
+
+ - carpet (fabric or fur)
+ - alcove
+ - altar
+ - arch
+ - barrel, box, chest
+ - base, pedestal
+ - bench
+ - chair, armchair
+ - crack on a wall or on the ground
+ - fire-place, with or without a fire 
+ - fountain
+ - loophole (*meurtrière*, in French)
+ - paving stone
+ - pillar
+ - platform, stage
+ - pond
+ - portcullis (*herse*, in French)
+ - recumbent statue (*gisant*, in French)
+ - retable
+ - shrub, bush, flowers in pot
+ - standing armour
+ - statue
+ - steps
+ - wall
+ - wall lamp
+ - well, shaft, pit
+ - window
+
+ 
 Special Objects
 ...............
+
+These are objects and decor elements that can have specific effects in specific contexts.
+
+They include:
 
  - altars
  - fountains, whose liquids can have different effects 
  - holy symbol: may help communicating with a deity
+ - lever, to trigger mechanisms
  - manuals, that teach interesting matters (improve skills) or not
  - maps, that give indications and directions (correct or not)
+ - message boards
  - opal eyes
+ - paving stone with an invisible pressure-sensitive mechanism, which can trigger various systems that can teleport or make any creature standing on it rotate immediately (either of a U-turn or of a quarter turn)
  - scrolls, that describe spells
+ - sign, notice
+ - springs, whose liquids can have different effects 
+ - staircase, going downstairs or upstairs, right or helical
+ - teleporter (see portal)
  - thrones, they may have random effects on players willing to experiment with them
- 
+ - trap (ex: mechanical, explosive, magical, with missile, collapse of scenery, creature ambush, etc.)
 
+
+Decoration
+..........
+	
+ - hanging, curtain, kakemono
+ - inscriptions (often enigmatic, sometimes sensible)
+ - painted pentagram  
+ - paintings
+ - plate, slab
+ - trophies
+ - weapons hung on the wall
+ 
 .. include:: Orge-weapons.rst
 .. include:: Orge-ammunitions.rst
 .. include:: Orge-armors.rst
