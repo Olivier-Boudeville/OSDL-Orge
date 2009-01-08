@@ -1,3 +1,5 @@
+
+
 Professions
 -----------
 
@@ -105,3 +107,22 @@ Regarding classes, some alignment restrictions apply:
 	- a Warlord must be good
 	- a Ninja must be evil
 
+
+
+Other Professions And Social Roles
+----------------------------------
+
+They are currently less formalized than professions in the career path, as they are less defined in terms of skills than in terms of actual activities.
+
+ - Chaos Servant
+ - Gambler
+ - Guard, Sentinel
+ - Illusionist
+ - Merchant, Vendor
+ - Monk
+ - Priest
+ - Prisoner
+ - Rebel Knight
+ - Sorcerer Apprentice
+ - Thief
+ 
