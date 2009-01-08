@@ -37,6 +37,23 @@ Playing with time can lead to unexpected results. Players may hijack the system 
 
 
 
+Encounters
+..........
+
+
+When at least two groups of creatures are about to encounter each other, basically it can result in one of these five outcomes:
+
+	- one of the parties detects the other before being itself detected, and opts for ``concealement``, notably to avoid	a confrontation or to perform an ambush. The detecting party tries to hide from the detected one, which may or may not succeed in a late detection
+	
+	- both parties are aware of the other and go immediatly for combat: they attack, defend, etc. until either a party succeeds in eliminating the other or in breaking the combat
+	
+	- at least a party tries to flee out of range, even this implies that the other party may attack it from behind and run after it
+	
+	- ``talk``, including intimidations, threats, briberies, surrenders, challenges, etc.
+	
+	- ``mutual ignorance``, for example when they are neither friend nor foe
+
+
 
 Intimidation
 ............
