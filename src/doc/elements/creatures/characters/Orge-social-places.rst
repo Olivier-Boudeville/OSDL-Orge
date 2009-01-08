@@ -26,11 +26,52 @@ These are the place where most commodities for characters in need can be found:
  
  - religious places, like churches, temples, etc., help accommodating with one's deity, if any
  
+ - dormitories and boarding schools
+ 
+ - graveyard: crypts, tombs and graves
  
 Towns are also a place of choice for *safe* social interactions, as combats are expected to be banned there.
 
 
+Specific Rooms
+--------------
 
+ - attic
+ - balcony
+ - bar
+ - bathroom
+ - bedroom
+ - cloakroom
+ - dining room
+ - dormitory
+ - driveway
+ - entrance room, entrance vestibule,
+ - garden
+ - greenhouse, conservatory
+ - hallway
+ - kitchen
+ - landing (stairs)
+ - living room
+ - lobby
+ - loft
+ - loundge
+ - lumber room, junk room
+ - nursery
+ - porch
+ - reception room
+ - shed
+ - shower room
+ - sitting room
+ - stable
+ - storeroom
+ - study room
+ - swimming pool
+ - terrace
+ - toilets
+ - utility area
+ - workshop
+ 
+ 
 Military Installations
 ----------------------
 
