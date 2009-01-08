@@ -61,7 +61,7 @@ When an object becomes broken, it cannot operate normally. For instance a weapon
 
 Managing the wear of equipments can be an interesting gameplay element at first, but in most cases it should not be a constant concern for the player.
 
-To alleviate when appropriate this constraint, object with significant `Maximum Wear Level` and/or relevant repair spells and/or cheap tinkers could be introduced later in the game.
+To alleviate when appropriate this constraint, objects with significant `Maximum Wear Level` and/or relevant repair spells and/or widespread replacements (ex: thanks to cheap tinkers) could be introduced later in the game.
 
 Wear is managed in class_Object.erl_ and tested in class_Object_test.erl_.
 
