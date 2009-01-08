@@ -39,15 +39,13 @@ A large number of local circles still have a functional teleportation portal.
 
 
 
-Rookie/Freshman (Novice)/Apprentice (Untrained)/Trained/Seasoned/Veteran/Master/Elite
+Rookie / Freshman (Novice) / Apprentice (Untrained) / Trained / Seasoned / Veteran / Master / Elite.
 
 
-Junior/Senior/Doyen
-
-Cadet/
+Junior/Senior/Doyen/Cadet.
 
 
-Example: 'Arthur, Young Human, Untrained Soldier' might become 'Arthur, '
+Example: 'Arthur, Young Human, Untrained Soldier'.
 
 
 
@@ -127,4 +125,15 @@ Levels of Expertise In Martial Arts
  - Untrained
  - SwordMaster
  - Grand Master
+
+
+
+Police
+------
+
+Towns are protected by different kinds of police forces, in general efficient and with numerous agents.
+
+When a character is arrested (regardless of the reality of his bad deeds), the character risks various displeasures, from the Court Hall to the immediate killing.
+
+Police can be seen as well as a specific guild.
 
