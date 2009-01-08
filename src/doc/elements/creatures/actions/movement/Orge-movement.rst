@@ -378,6 +378,12 @@ A lot of scenery elements cannot be interacted with (ex: carpets), so they are p
 Orge built-in active scenery elements are listed below, together with their default values.
 
 
+Ground
+......
+
+This includes different kinds of indoor and outdoor grounds (ex: wooder floor, pavement, dirt, carpet, etc.) and buildings (terrace, bridge, etc.).
+
+
 Walls
 .....
 
@@ -429,6 +435,7 @@ Doors
 
 Some other door can be seen through (ex: portcullis) or destroyed.
 
+A door can be hidden, destructible, locked (with a key), based on a mechanism (driven by a lever, a button, a paving stone, etc.).
 
 
 Furnitures
@@ -505,5 +512,19 @@ Portals
 | Hit Points             | indestructible |
 +------------------------+----------------+
 
-Portals can be created by magic, and thus may exist dynamically in non predetermined places.
+Portals can be created by magic, and thus may exist dynamically in non-predetermined places.
 
+Pits, shafts, wells can be seen as portals which may kill creatures falling in them, or make them arrive into new places, etc.). 
+
+
+Windows
+.......
+
+They block movement but not visibility.
+
+They include:
+
+ - classical windows
+ - loopholes
+ 
+ 
