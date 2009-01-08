@@ -1,3 +1,5 @@
+
+
 Creature State
 --------------
 
@@ -8,7 +10,7 @@ These *state attributes* are:
   - current age
   - health
   - location in virtual world
-
+  - belongings
 
 Other states of altered consciousness are:
 
@@ -68,3 +70,15 @@ Both physical and psychological portraits should be updated from time to time du
 
 Life base expectancy, in years
 
+
+Belongings
+----------
+
+Each AI-controlled creature - character (NPC) or not (monsters and alike) must have realistical belongings, and this must be reflected by appearance, behaviour and loot.
+
+For example, a swamp lizzard is not expected to wear an armor of plates or to collect silver coins, and if a rogue attacked with slashing damages, once dead the corresponding weapon (ex: a sword) must be found on his body.
+
+
+
+
+ 
