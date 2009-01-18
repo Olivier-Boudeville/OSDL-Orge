@@ -2,6 +2,5 @@
 include $(ORGE_TOP)/GNUmakevars.inc
 
 
-
-include $(CEYLAN_ERLANG_TOP)/GNUmakerules.inc
+include $(CEYLAN_DOC_TOP)/GNUmakerules-docutils.inc
 
