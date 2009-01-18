@@ -47,8 +47,8 @@ The core potential of a creature is described by following *primary attributes*:
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Intelligence| Readiness of comprehension.               | INT               | I.Q.              |
 |             | Affects most Arcane aptitudes (notably    |                   |                   |
-|             | Mage ones), decoding and languages skills |                   |                   |
-|             |  etc.                                     |                   |                   |
+|             | Mage ones), decoding and languages skills,|                   |                   |
+|             | etc.                                      |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Wisdom      | Knowledge, and the capacity to make due   | WIS               | Discernment,      |
 |             | of it.                                    |                   | judgment          |
