@@ -155,12 +155,19 @@ Some creatures may tend to steal the possessions of other creatures.
 There are all-purpose kleptomaniacs (they will try to rob all kinds of objects) and specialized ones (ex: only foods interest them).
 
 
+
 Spellcasting By Gestures
 ________________________
+
+See the `Gesture Spellcasting`_ section.
+
 
 
 Spellcasting By Incantations
 ____________________________
+
+See the `Incantations Spellcasting`_ section.
+
 
 
 Stacking Objects
