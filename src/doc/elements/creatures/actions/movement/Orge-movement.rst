@@ -2,9 +2,15 @@
 Movement
 ========
 
+Movements of creatures are free and dynamically evaluated: there are no precomputed paths.
+
+Creatures will be constrained not to wander outside the limits of the overall game world thanks to impassable obstacles completely surrounding the allowed area (ex: water, mountain, etc.). 
+
+Le joueur sera empêché de sortir de cette zone par des obstacles intégrés dans le monde du jeu, notamment physiques (ex: mer, montagne, etc.)
 
 Movements of a given type (ex: walking) are conditioned by the terrain being traversable for that movement type.
-If yes, and if scenery elements (ex: furnitures, creature, etc.) allow it, then movement is possible.
+
+If a terrain is traversable, and if scenery elements (ex: furnitures, creature, etc.) allow it, and if creature is able to move (ex: not petrified), then movement is possible.
 
 In this case the speed of a creature for a movement type is determined by:
 
