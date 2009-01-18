@@ -1,3 +1,7 @@
+
+:raw-latex:`\pagebreak`
+
+
 Armor
 -----
 
@@ -9,8 +13,8 @@ The effect regarding protection provided by belts and spurs is not taken into ac
 
 
 
-Pieces of Armor
-...............
+Armor Repository
+................
 
 
 Cloak
