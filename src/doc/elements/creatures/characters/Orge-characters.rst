@@ -6,7 +6,6 @@
 .. include:: Orge-character-creation.rst
 .. include:: Orge-progression.rst
 
-.. include:: Orge-social-places.rst
 .. include:: Orge-skills.rst
 
 .. include:: Orge-character-reputation.rst
