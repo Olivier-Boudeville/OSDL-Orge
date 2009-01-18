@@ -72,4 +72,5 @@ In Orge, the game world is divided into square cells, and eight orientations are
 
 .. include:: Orge-creatures.rst
 .. include:: Orge-objects.rst
+.. include:: Orge-places.rst
 
