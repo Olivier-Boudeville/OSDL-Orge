@@ -34,5 +34,5 @@ See also a summary of `what can be done with the game model <http://creativecomm
 
 The initial plan was to release specifically the Orge implementation under the `GNU General Public License <http://www.gnu.org/licenses/gpl.html>`_ (GPL). However the GPL focuses only on software being released, thus it would have allowed a third-party to run commercially Orge, on server-side (hence with no software to release), which was not wanted.
 
-.. comment::  GNU AGPLv3 (http://en.wikipedia.org/wiki/Affero_General_Public_License) might be used, but I was unable to find a clear analysis. What I understood led me to think it is too permissive for my needs.
+.. comment  GNU AGPLv3 (http://en.wikipedia.org/wiki/Affero_General_Public_License) might be used, but I was unable to find a clear analysis. What I understood led me to think it is too permissive for my needs.
 
