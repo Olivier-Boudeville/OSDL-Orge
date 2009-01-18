@@ -21,6 +21,8 @@ CEYLAN_ROOT := $(LOANI_REPOSITORY_ROOT)/ceylan
 CEYLAN_TRUNK := $(CEYLAN_ROOT)/Ceylan/trunk
 
 CEYLAN_ERLANG_TOP := $(CEYLAN_TRUNK)/src/code/scripts/erlang
+CEYLAN_DOC_TOP    := $(CEYLAN_TRUNK)/src/doc
+
 
 # Non-Orge OSDL:
 OSDL_ROOT := $(ORGE_TOP)/../..
