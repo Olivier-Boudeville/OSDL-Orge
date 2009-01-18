@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Stone Petrification`` (english) / ``Pétrification lapidaire`` (french)
+ - fantasy setting: ``Stone Petrification`` (english) / ``Pétrification lapidaire`` (french)
 
 
 

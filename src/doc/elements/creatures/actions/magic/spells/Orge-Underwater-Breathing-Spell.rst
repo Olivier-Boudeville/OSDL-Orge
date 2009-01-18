@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Underwater Breathing`` (english) / ``Respiration Sous-Marine`` (french)
+ - fantasy setting: ``Underwater Breathing`` (english) / ``Respiration Sous-Marine`` (french)
 
 
 

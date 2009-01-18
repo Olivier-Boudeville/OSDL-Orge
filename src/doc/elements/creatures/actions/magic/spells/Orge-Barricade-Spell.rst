@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Barricade`` (english) / ``Barricade`` or ``Cadenasse`` (french)
+ - fantasy setting: ``Barricade`` (english) / ``Barricade`` or ``Cadenasse`` (french)
 
 
 Spell Effects 

@@ -22,3 +22,5 @@ Lights up an area for all creatures (i.e. including monsters and al, not only fo
 
 Available only in the Mage path, through incantation or gesture spellcasting.
 
+See also: `Aurora Borealis Spell`_, `Celestial Light Spell`_ and `Will-o'-the-Wisp Spell`_.
+

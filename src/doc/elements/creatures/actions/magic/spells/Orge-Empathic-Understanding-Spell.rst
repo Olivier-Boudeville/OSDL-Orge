@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Empathic Understanding`` (english) / ``Compréhension Empathique`` (french)
+ - fantasy setting: ``Empathic Understanding`` (english) / ``Compréhension Empathique`` (french)
 
 
 

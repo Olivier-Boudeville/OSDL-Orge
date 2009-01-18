@@ -42,7 +42,6 @@ Mostly to be used in a single player context.
 
 Available in all paths, through all spellcasting methods relevant for that path.
 
-See also: `Resume Game Spell`_.
 
 
 Spell Characteristics

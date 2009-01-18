@@ -12,7 +12,7 @@ _______________________
 
 This spell could be named:
 
- - fantasy setting: ``Call Of the Beast`` or ``Bestial Summoning`` (english) /  ``Appel de la Bête``, ``Invocation Bestiale`` or ``Invocation d'une Bête Astrale``(french)
+ - fantasy setting: ``Call Of the Beast`` or ``Bestial Summoning`` (english) /  ``Appel de la Bête``, ``Invocation Bestiale`` or ``Invocation d'une Bête Astrale`` (french)
 
 
 

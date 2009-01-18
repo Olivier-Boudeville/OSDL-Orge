@@ -12,16 +12,16 @@ _______________________
 
 This spell could be named:
 
- - fantasy setting: ``Hax Pax Max Deus Adimax`` or ```` (english) / ```` or ```` (french)
+ - fantasy setting: ``Hax Pax Max Deus Adimax`` or ``Celestial Invocation`` (english) / `Hax Pax Max Deus Adimax``` or ``Invocation céleste`` (french)
 
 
 
 Spell Effects 
 _____________
 
-Conjuration of creatures sent from the arcane realm of the main deity the caster believes in.
+This spell invokes creatures sent from the arcane realm corresponding to the main deity the caster believes in.
 
-The nature of that creatures depends a lot of the precise deity elected by the caster.
+The nature and number of that creatures depends a lot of the precise deity elected by the caster and on the force of his spell.
 
 `More infos <http://www.askoxford.com/concise_oed/hocuspocus>`_.
 

@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - fantasy setting: ``Mass Healing`` or ``Mass Well-Being``(english) / ``Soin pour tous`` (french)
+ - fantasy setting: ``Mass Healing`` or ``Mass Well-Being`` (english) / ``Soin pour tous`` (french)
 
 
 

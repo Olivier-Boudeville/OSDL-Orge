@@ -5,6 +5,20 @@
 Divine Incarnation Spell
 ........................
 
+
+Suggested In-Game Names
+_______________________
+
+
+This spell could be named:
+
+ - fantasy setting: ``Divine Incarnation`` (english) / ``Incarnation divine`` (french)
+
+
+
+Spell Effects 
+_____________
+
 The caster implores the main deity he believes in to incarnate itself in him, to embody temporarily and act instead of him, on his behalf.
 
 If the spell succeeds, the reification of a full-blown deity is often devastating.

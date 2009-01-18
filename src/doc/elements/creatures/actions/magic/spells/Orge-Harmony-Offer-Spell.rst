@@ -12,7 +12,7 @@ _______________________
 
 This spell could be named:
 
- - ``Harmony Offer`` (english) / ``Concorde Proposée`` (french)
+ - fantasy setting: ``Harmony Offer`` (english) / ``Concorde Proposée`` (french)
 
 
 

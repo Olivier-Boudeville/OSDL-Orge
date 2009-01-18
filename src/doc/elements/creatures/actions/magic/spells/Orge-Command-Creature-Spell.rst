@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Command Creature`` or ``Strong Mind Control`` (english) / ``Commande des Esprits Majeurs`` (french)
+ - fantasy setting: ``Command Creature`` or ``Strong Mind Control`` (english) / ``Commande des Esprits`` (french)
 
 
 

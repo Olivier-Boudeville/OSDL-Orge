@@ -25,5 +25,5 @@ The creature may move while levitating, if a force is applied to it (ex: there i
 
 Available in the Cleric path, through all spellcasting methods.
 
-See also `Lighter Than Air Spell`_.
+See also: `Lighter Than Air Spell`_.
 

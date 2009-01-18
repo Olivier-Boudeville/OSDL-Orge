@@ -25,5 +25,5 @@ Most high-ranking clerics are always surrounded by such aura, although the usage
 
 Available only in the Cleric path, for all spellcasting approaches, i.e. through incantation, gesture, rune, bardic verse or pure mental spellcasting.
 
-See also: `Basic Shield Spell`_
+See also: `Basic Shield Spell`_.
 

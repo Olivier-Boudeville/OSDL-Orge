@@ -240,8 +240,8 @@ For example, if wanting to be able to cast high-end fireballs (obviously in the 
 
 
 
-Incantations
-::::::::::::
+Incantations Spellcasting
+:::::::::::::::::::::::::
 
 Generally, spells are cast thanks to an incantation, which consists on the strong and clear declamation of the verbal transcription of the series of arcane symbols corresponding to that spell. However arcane powers are based on mental operations, and uttering is only one way among others of casting a spell.
 

@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Call Of Myocastor Coypus`` (english) / ``Convocation de Myocastor Coypus`` (french)
+ - fantasy setting: ``Call Of Myocastor Coypus`` (english) / ``Convocation de Myocastor Coypus`` (french)
 
 
 

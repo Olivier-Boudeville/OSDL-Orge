@@ -12,7 +12,7 @@ _______________________
 
 This spell could be named:
 
- - fantasy setting: ``Induced Sleep`` or ``SandMan Song`` (english) / ``Léthargie induite`, ``Marchand de sable`` or ``Chanson lénifiante`` (french)
+ - fantasy setting: ``Induced Sleep`` or ``SandMan Song`` (english) / ``Léthargie induite``, ``Marchand de sable`` or ``Chanson lénifiante`` (french)
 
 
 

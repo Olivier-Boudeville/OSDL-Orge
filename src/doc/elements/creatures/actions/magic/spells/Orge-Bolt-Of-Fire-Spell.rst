@@ -12,7 +12,7 @@ _______________________
 
 This spell could be named:
 
- - fantasy setting: ``Bolt of Fire`` or ``Firebolt`` (english) / ``Eclair de Feu`` or ``Griffe Infernale`` (french)
+ - fantasy setting: ``Bolt of Fire`` or ``Firebolt`` (english) / ``Eclair de Feu`` or ``Griffe Infernale`` (french)
 
 
 

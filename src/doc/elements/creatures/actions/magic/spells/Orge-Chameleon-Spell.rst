@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Chameleon`` (english) / ``Caméléon`` (french)
+ - fantasy setting: ``Chameleon`` (english) / ``Caméléon`` (french)
 
 
 

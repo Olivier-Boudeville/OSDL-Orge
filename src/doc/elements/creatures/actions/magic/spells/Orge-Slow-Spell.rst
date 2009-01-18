@@ -22,5 +22,5 @@ The target will be able to perform less actions per unit of time, and will be mo
 
 Available only in the Cleric path, through gesture spellcasting.
 
-See also: `Haste`_.
+See also: `Haste Spell`_.
 

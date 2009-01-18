@@ -10,6 +10,8 @@ As already mentioned, a given spell will be far harder - if not impossible - to 
 The spells that are the most appropriate to cast in the context of each combination of arcane path and spellcasting method are listed below.
 
 
+:raw-latex:`\pagebreak`
+
 
 In the Mage Path
 ................
@@ -131,6 +133,8 @@ ____________________________
 
 
 
+
+:raw-latex:`\pagebreak`
 
 
 In the Cleric Path
@@ -296,6 +300,8 @@ ____________________________
 
 
 
+:raw-latex:`\pagebreak`
+
 
 In the Bard Path
 ................
@@ -353,7 +359,8 @@ ________________
  - Save Game
  - Sonic Blast
  - Sorcerer Destabilization
-
+ - Will-o'-the-Wisp
+ 
 
 For Pure Mental SpellCasting
 ____________________________

@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Counterfeit``, ``Clonal Illusion``, ``False Duplicate``, ``Faked Twin`` or ``Doppelgänger`` (english) / ``Contrefaçon``, ``Jumeau Falsifié`` or ``Doppelgänger`` (french)
+ - fantasy setting: ``Counterfeit``, ``Clonal Illusion``, ``False Duplicate``, ``Faked Twin`` or ``Doppelgänger`` (english) / ``Contrefaçon``, ``Jumeau Falsifié`` or ``Doppelgänger`` (french)
 
 
 Spell Effects 

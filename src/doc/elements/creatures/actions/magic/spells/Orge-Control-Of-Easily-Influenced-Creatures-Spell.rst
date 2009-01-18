@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Control Of Easily Influenced Creatures`` or ``Weak Mind Control`` (english) / ``Contrôle des Créatures Influençables`` or ``Commande des Esprits Mineurs`` (french)
+ - fantasy setting: ``Control Of Easily Influenced Creatures`` or ``Weak Mind Control`` (english) / ``Contrôle des Créatures Influençables`` or ``Commande des Esprits Mineurs`` (french)
 
 
 

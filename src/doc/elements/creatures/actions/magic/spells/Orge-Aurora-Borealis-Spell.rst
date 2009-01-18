@@ -29,4 +29,5 @@ Available only in the Mage path (one of the very few ways of generating lights i
 
 See also: `Celestial Light Spell`_.
 
+See also: `Spectacular Lighting Spell`_, `Celestial Light Spell`_ and `Will-o'-the-Wisp Spell`_.
 

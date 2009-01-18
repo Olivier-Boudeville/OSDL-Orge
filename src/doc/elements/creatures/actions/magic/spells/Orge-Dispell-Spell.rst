@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Dispell`` (english) / ``Dispersion des Effets`` (french)
+ - fantasy setting: ``Dispell`` (english) / ``Dispersion des Effets`` (french)
 
 
 

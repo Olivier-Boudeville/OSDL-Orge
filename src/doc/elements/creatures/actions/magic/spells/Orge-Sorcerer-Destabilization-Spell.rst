@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Sorcerer Destabilization`` (english) / ``Déstabilisation du Sorcier`` (french)
+ - fantasy setting: ``Sorcerer Destabilization`` (english) / ``Déstabilisation du Sorcier`` (french)
 
 
 

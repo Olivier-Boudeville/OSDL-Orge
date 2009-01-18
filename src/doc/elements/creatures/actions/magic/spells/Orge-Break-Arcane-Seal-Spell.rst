@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Break Arcane Seal`` (english) / ``Rupture de Sceau Magique`` or ``Sésame`` (french)
+ - fantasy setting: ``Break Arcane Seal`` (english) / ``Rupture de Sceau Magique`` or ``Sésame`` (french)
 
 
 

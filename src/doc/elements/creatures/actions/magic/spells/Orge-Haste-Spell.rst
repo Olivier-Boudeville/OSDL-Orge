@@ -22,5 +22,5 @@ The target will be able to perform more actions per unit of time, and will be le
 
 Available only in the Cleric path, through gesture spellcasting.
 
-See also: `Slow`_.
+See also: `Slow Spell`_.
 

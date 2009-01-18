@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Storm Of Blades`` (english) / ``Tempête de poignards`` (french)
+ - fantasy setting: ``Storm Of Blades`` (english) / ``Tempête de poignards`` (french)
 
 
 

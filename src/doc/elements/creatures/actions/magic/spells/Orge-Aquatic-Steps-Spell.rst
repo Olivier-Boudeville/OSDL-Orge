@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Aquatic Steps`` (english) / ``Marche Aquatique`` (french)
+ - fantasy setting: ``Aquatic Steps`` (english) / ``Marche Aquatique`` (french)
 
 
 

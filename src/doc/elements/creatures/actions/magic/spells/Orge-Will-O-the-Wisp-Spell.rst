@@ -25,9 +25,11 @@ This soft and illusive light has no determinable source, does not produce smoke 
 
 A lot of creatures are puzzled by these lights. This spell has often been used to divert and lure undead creatures.
 
-`More infos <http://en.wikipedia.org/wiki/Will_o'_the_wisp>`_
+`More infos <http://en.wikipedia.org/wiki/Will_o'_the_wisp>`_.
 
 Available only in the Bard path, through bardic verse spellcasting.
 
 The corresponding bardic verse is sad and touching.
+
+See also: `Aurora Borealis Spell`_, `Celestial Light Spell`_ and `Spectacular Lighting Spell`_.
 

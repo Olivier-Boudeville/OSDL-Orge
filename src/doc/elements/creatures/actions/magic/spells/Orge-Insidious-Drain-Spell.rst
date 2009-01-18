@@ -10,7 +10,7 @@ _______________________
 
 This spell could be named:
 
- - ``Insidious Drain`` / ``Drain Insidieux``
+ - fantasy setting: ``Insidious Drain`` / ``Drain Insidieux``
   
 
 Spell Effects 

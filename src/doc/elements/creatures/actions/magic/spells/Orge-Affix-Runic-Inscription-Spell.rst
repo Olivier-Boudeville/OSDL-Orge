@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Affix Runic Inscription`` (english) / ``Calligraphie Runique`` or ``Apposition de rune```(french)
+ - fantasy setting: ``Affix Runic Inscription`` (english) / ``Calligraphie Runique`` or ``Apposition de rune```(french)
 
 
 

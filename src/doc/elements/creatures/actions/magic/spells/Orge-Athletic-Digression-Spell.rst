@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Athletic Digression`` (english) / ``Parenthèse Athlétique`` (french)
+ - fantasy setting: ``Athletic Digression`` (english) / ``Parenthèse Athlétique`` (french)
  
  
 

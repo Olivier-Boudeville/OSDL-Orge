@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - fantasy setting: ``Mass Curing`` or ``Mass Recovery``(english) / ``Guérison de tous`` (french)
+ - fantasy setting: ``Mass Curing`` or ``Mass Recovery`` (english) / ``Guérison de tous`` (french)
 
 
 

@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - fantasy setting: ``Unaccountable Disappearance`` or ``Vanish From Sight`` (english) / ``Disparition Inexplicable`` (french)
+ - fantasy setting: ``Unaccountable Disappearance`` or ``Vanish From Sight`` (english) / ``Disparition Inexplicable`` (french)
 
 
 

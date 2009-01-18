@@ -11,9 +11,9 @@ _______________________
 
 This spell could be named:
 
- - fantasy settings: ``Norn Contemplation`` (english) / ``Contemplation des Nornes``(french)
+ - fantasy settings: ``Norn Contemplation`` (english) / ``Contemplation des Nornes`` (french)
  
- - cyberpunk settings: ``Memory Cristal Dump`` (english) / ``Enregistrement en mémoire cristallographique``(french)
+ - cyberpunk settings: ``Memory Cristal Dump`` (english) / ``Enregistrement en mémoire cristallographique`` (french)
  
  
 

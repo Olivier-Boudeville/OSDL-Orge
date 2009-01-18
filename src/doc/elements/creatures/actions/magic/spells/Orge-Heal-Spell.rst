@@ -25,5 +25,5 @@ This spell does not cure diseases, remove wounds or poisons.
 
 Available in the Mage path, through incantation spellcasting, in the Cleric path, through rune spellcasting, and in the Bard path, through bardic verse spellcasting.
 
-See also: `Mass Healing Spell`, `Cure Minor Wounds Spell`_, and `Cure Major Wounds Spell`_.
+See also: `Mass Healing Spell`_, `Cure Light Wounds Spell`_, and `Cure Major Wounds Spell`_.
 
