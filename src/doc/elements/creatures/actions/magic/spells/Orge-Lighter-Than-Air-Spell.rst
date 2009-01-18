@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Lighter Than Air`` (english) / ``Lévitation Douce`` (french)
+ - fantasy setting: ``Lighter Than Air`` (english) / ``Lévitation Douce`` (french)
 
 
 
@@ -24,4 +24,7 @@ Only the caster is able to control, to some extent only, where the levitating ob
 
 Resisting this spell is fairly easy.
 
+Available in the Mage path, through gesture, rune or pure mental spellcasting.
  
+See also `Ascendant Spirit Spell`_.
+

@@ -13,7 +13,9 @@ _______________________
 This spell could be named:
 
  - fantasy setting: ``Reflective Coat`` (english) / ``Cape de réflexion`` (french)
+ 
  - cyberpunk setting: ``Reflection Shield`` (english) / ``Protection réflective`` (french)
+
 
 
 Spell Effects 
@@ -22,6 +24,9 @@ _____________
 Spells cast on the target of that spell have a chance of bouncing over it, and either to be lost or to hit other creatures, notably their original caster.
 
 The base probability of deflecting spells is then 15%, increased by 5% per level of Arcane Resistance skill of the caster of that Bounce Spell.
+
+Available only in the Cleric path, through incantation, gesture, rune or pure mental spellcasting.
+
 
 
 Spell Prerequisites

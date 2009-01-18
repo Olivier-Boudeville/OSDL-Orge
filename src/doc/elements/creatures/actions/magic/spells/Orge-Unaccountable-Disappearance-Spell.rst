@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Unaccountable Disappearance`` (english) / ``Disparition Inexplicable`` (french)
+ - fantasy setting: ``Unaccountable Disappearance`` or ``Vanish From Sight`` (english) / ``Disparition Inexplicable`` (french)
 
 
 
@@ -27,4 +27,6 @@ Chances of vanishing from an observer's point of view while being already in its
 A lot of actions (notably attacking or casting a spell) are very likely to break the invisibility.
 
 An attenuated form of this spell is the `Chameleon Spell`_.
+
+Available only in the Mage path, through incantation, gesture or rune spellcasting.
 

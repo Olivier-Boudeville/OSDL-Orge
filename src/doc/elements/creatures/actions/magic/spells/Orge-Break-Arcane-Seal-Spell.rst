@@ -20,5 +20,7 @@ _____________
 
 Tries to open items (chests, doors, etc.) locked by arcane means.
 
+Available in the Mage path, through incantation or gesture, and in the Cleric path, through gesture or rune spellcasting.
+
 See also: `Barricade Spell`_.
 

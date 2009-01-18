@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Transport Of Recollection`` (english) / ``Transport des Souvenirs`` (french)
+ - fantasy setting: ``Transport Of Recollection`` or ``Teleportation`` (english) / ``Transport des Souvenirs`` or ``Téléportation`` (french)
 
 
 
@@ -29,4 +29,6 @@ Some organizations thus built teleportation chambers, designed to offer safe pla
 The spell will fail if the location is too far. 
 
 There is always a slight chance of being teleported to another previously marked location, if any.
+
+Available only in the Mage path, through incantation or rune spellcasting.
 

@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Complete Petrification`` (english) / ``Pétrification Intégrale`` (french)
+ - ``Stone Petrification`` (english) / ``Pétrification lapidaire`` (french)
 
 
 
@@ -23,4 +23,6 @@ If the spell succeeds, the target creature is totally paralyzed for a given dura
 The creature is then surrounded by a brown glazing, looking a bit as if it was made of stone.
 
 The twofold effect has been found useful under various circumstances: this spell might be more versatile than expected.
+
+Available only in the Mage path, through incantation spellcasting.
 

@@ -12,8 +12,10 @@ _______________________
 
 This spell could be named:
 
- - ``Norn Absent-Mindedness`` / ``Distraction des Nornes``
- - ``Memory Cristal Freezing``
+ - fantasy setting: ``Norn Absent-Mindedness`` (english) / ``Distraction des Nornes`` (french)
+ 
+ - cyberpunk setting: ``Memory Cristal Freezing`` (english) / ``Attente en mémoire cristallographique``(french)
+
 
 
 Spell Prerequisites
@@ -37,6 +39,10 @@ When the spell is cast, a specific sound can be heard. When the spell vanishes, 
 This spell is maintained by the will of its caster, so he can stop the pause at will, at any time.
 
 Mostly to be used in a single player context.
+
+Available in all paths, through all spellcasting methods relevant for that path.
+
+See also: `Resume Game Spell`_.
 
 
 Spell Characteristics

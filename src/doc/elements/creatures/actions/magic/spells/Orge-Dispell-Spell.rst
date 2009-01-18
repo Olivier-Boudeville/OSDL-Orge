@@ -22,3 +22,5 @@ Tries to remove current active spells in the target area (ex: spells affecting a
 
 As a side-effect, may make undead creatures flee away.
 
+Available in the Mage path, through gesture spellcasting and in the Cleric path, through incantation spellcasting.
+

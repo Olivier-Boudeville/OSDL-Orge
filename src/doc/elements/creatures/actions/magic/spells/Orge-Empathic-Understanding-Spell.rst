@@ -20,3 +20,7 @@ _____________
 
 Thanks to this spell, the caster has an increased chance of understanding the feelings, the state of mind of a creature, sometimes without even knowing anything about its language.
 
+Often is applied to animals and monsters.
+
+Available only in the Bard path, through incantation or bardic verse spellcasting.
+

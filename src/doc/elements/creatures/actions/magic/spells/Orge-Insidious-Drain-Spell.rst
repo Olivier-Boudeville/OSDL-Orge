@@ -20,3 +20,7 @@ This spell impacts negatively a creature, regarding either its fatigue, health o
 
 Neither the caster nor the target controls which of the three resources will be affected.
 
+This spell is relatively discreet.
+
+Available only in the Cleric path, through incantation, gesture or pure mental spellcasting.
+

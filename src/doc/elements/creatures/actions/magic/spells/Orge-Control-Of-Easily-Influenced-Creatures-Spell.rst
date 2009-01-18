@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - ``Control Of Easily Influenced Creatures`` or ``Mind Control`` (english) / ``Contrôle des Créatures Influençables`` or ``Commande de l'esprit`` (french)
+ - ``Control Of Easily Influenced Creatures`` or ``Weak Mind Control`` (english) / ``Contrôle des Créatures Influençables`` or ``Commande des Esprits Mineurs`` (french)
 
 
 
@@ -25,4 +25,8 @@ The more powerful the caster is, the greatest the influence and duration are, an
 Trying to make a creature perform an action which is against its nature will most often break the influence (ex: trying to force a monster to commit suicide).
 
 This spell is close to charm and hypnosis.
+
+Available in the Mage path, through gesture spellcasting, in the Cleric path, through incantation spellcasting, and in the Bard path, through bardic verse spellcasting
+
+See also: `Kind Suggestion Spell`_, `Command Creature Spell`_ and `Unshackle Mind Spell`_.
 

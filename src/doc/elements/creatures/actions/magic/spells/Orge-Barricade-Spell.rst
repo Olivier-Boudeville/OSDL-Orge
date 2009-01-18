@@ -19,5 +19,7 @@ _____________
 
 Strongly seals an opening (e.g. a door, but also for example the lid of a chest) for a while.
 
+Available in the Mage path, through incantation, gesture or pure mental spellcasting, and in the Cleric path, through rune spellcasting.
+
 See also: `Break Arcane Seal Spell`_.
 

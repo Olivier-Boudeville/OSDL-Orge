@@ -18,9 +18,11 @@ This spell could be named:
 Spell Effects 
 _____________
 
-The target of this spell benefits from an increased ability not to be spotted when hiding. Camouflage and stealth operations like ambushes are then easier.
+The group targeted by this spell benefits from an increased ability not to be spotted when hiding. Camouflage and stealth operations like ambushes are then easier.
 
-Each action of the target, including moving, leads to the risk of being noticed.
+Each action of any member of the group, including moving, leads to the risk of being noticed. In this case the whole group looses its stealth bonus.
 
-A far stronger form of this spell is the `Unaccountable Disappearance Spell`_.
+Available only in the Bard path, through bardic verse spellcasting.
+
+A far stronger form (yet one-creature-only) of this spell is the `Unaccountable Disappearance Spell`_.
 

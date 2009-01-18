@@ -18,5 +18,7 @@ This spell could be named:
 Spell Effects 
 _____________
 
-A kind of rain of sharp strikes hurt all creatures in the target area.
+A kind of rain of sharp strikes hurt all creatures in the target area, dealing piercing damages.
+
+Available only in the Cleric path, through incantation spellcasting.
 
