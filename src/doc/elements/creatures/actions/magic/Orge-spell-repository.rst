@@ -30,7 +30,6 @@ For each spell, following informations are given:
 
 A template for spell description is available in ``Orge-spell-template.rst``.
 
-
 .. include:: Orge-Abrakadabra-Spell.rst
 .. include:: Orge-Acid-Cloud-Spell.rst
 .. include:: Orge-Acid-Missile-Spell.rst
@@ -87,13 +86,13 @@ A template for spell description is available in ``Orge-spell-template.rst``.
 .. include:: Orge-Little-Thumb-Spell.rst
 .. include:: Orge-Load-Game-Spell.rst
 .. include:: Orge-Magic-Missile-Spell.rst
+.. include:: Orge-Major-Summon-Spell.rst
 .. include:: Orge-Mass-Curing-Spell.rst
 .. include:: Orge-Mass-Healing-Spell.rst
 .. include:: Orge-Metamorphosis-Spell.rst
 .. include:: Orge-Migdal-Bavel-Spell.rst
 .. include:: Orge-Mindshield-Spell.rst
 .. include:: Orge-Minor-Summon-Spell.rst
-.. include:: Orge-Major-Summon-Spell.rst
 .. include:: Orge-Olympian-Rest-Spell.rst
 .. include:: Orge-Pacification-Spell.rst
 .. include:: Orge-Pause-Game-Spell.rst
@@ -104,6 +103,7 @@ A template for spell description is available in ``Orge-spell-template.rst``.
 .. include:: Orge-Purify-Water-Spell.rst
 .. include:: Orge-Rage-Spell.rst
 .. include:: Orge-Repel-Spirit-Spell.rst
+.. include:: Orge-Rune-Trap-Spell.rst
 .. include:: Orge-Save-Game-Spell.rst
 .. include:: Orge-Silence-Spell.rst
 .. include:: Orge-Slowed-Fall-Spell.rst
@@ -127,6 +127,7 @@ A template for spell description is available in ``Orge-spell-template.rst``.
 .. include:: Orge-Underwater-Breathing-Spell.rst
 .. include:: Orge-Unshackle-Mind-Spell.rst
 .. include:: Orge-Vibrant-Trails-Spell.rst
+.. include:: Orge-Wall-Of-Flame-Spell.rst
 .. include:: Orge-War-Blessing-Spell.rst
 .. include:: Orge-Will-O-the-Wisp-Spell.rst
 
