@@ -50,6 +50,7 @@ ________________
  - Transport Of Recollection
  - Unaccountable Disappearance 
  - Uncage
+ - Wall Of Flame 
  
  
 For Gesture Spellcasting
@@ -249,6 +250,7 @@ ________________
  - Protecting Aura
  - Purify Food
  - Purify Water
+ - Rune Trap
  - Save Game
  - Sudden Amnesia
  - Sudden Drain
@@ -257,7 +259,7 @@ ________________
  - Tutelary Intervention
  - Unshackle Mind
  - War Blessing
-
+ 
 
 For Bardic Verse
 ________________
