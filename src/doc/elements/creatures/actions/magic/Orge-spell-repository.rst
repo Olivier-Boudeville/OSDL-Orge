@@ -2,19 +2,14 @@
 .. comment To be included from Orge-magic.rst
 
 
- 
-.. WARNING:: Spoilers below. Players should not read these spell lists, as it would remove most of the pleasure in searching arcane combinations.
 
-
+Spell Repository
+----------------
 
 Note that some built-in spells are not specified here.
 
 Spells can lead as well to the preparation of potions.
 
-
-
-Spell Repository
-----------------
 
 For each spell, following informations are given:
 
@@ -29,6 +24,13 @@ For each spell, following informations are given:
  - rules to determine the **probability of success of the casting**
 
 A template for spell description is available in ``Orge-spell-template.rst``.
+
+
+.. comment Later, add maybe Path of Fire (if different enough from Wall Of Flame)
+
+
+.. WARNING:: Spoilers below. Players should not read these spell lists, as it would remove most of the pleasure in searching arcane combinations.
+
 
 .. include:: Orge-Abrakadabra-Spell.rst
 .. include:: Orge-Acid-Cloud-Spell.rst
