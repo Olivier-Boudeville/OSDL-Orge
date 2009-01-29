@@ -8,17 +8,26 @@ Orge Objects
 Each object is determined by:
 
  - a name
- - a textual description
- - a size (volume), expressed in litres, notably to evaluate bulkiness
- - a base value (if applicable), expressed in credits and in world currency as well. This base value corresponds to the mean found value for that object in the game world, to be modulated by the actual merchant
- - a wear level, which determines how much the object is worn-out. This is notably useful for armors and weapons
 
+ - a textual description
+
+ - a size (volume), expressed in litres, notably to evaluate bulkiness in inventories
+
+ - a base value (if applicable), expressed in credits and in world currency as well. This base value corresponds to the mean found value for that object in the game world, to be modulated by the actual merchant
+
+ - a wear level, which determines how much the object is worn-out. This is notably useful for armors and weapons
 
 Moreover, objects may modify the probability of success of different actions.
 
 For example, someone having a halberd, or even knowing how to use it, will have increased chances of dismounting a cavalryman. 
 
- 
+Finally, some objects, either obviously or in a concealed manner, are magical, and by default their properties are not known.
+
+If most of them can be useful to adventurers (some of them might even be blessed), others have no real interest, and a few of them are harmful, notably when they are cursed.
+
+Often, in Orge games, power-less usual objects are far more frequent than special objects: getting for example a long sword of above-average quality should be a rare event.
+
+
 
 Object Quality
 --------------
