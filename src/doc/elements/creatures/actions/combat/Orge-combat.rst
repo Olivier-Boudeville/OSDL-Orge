@@ -513,16 +513,20 @@ It may fail or succeed.
 Attack Outcomes
 ---------------
 
-If a defensive action failed, or if the defender chose to do nothing, then the attack succeeded and its effects are to take place.
+If a defensive action failed, or if the defender does nothing (either by choice or by constraint), then the attack succeeded and its effects are to take place.
 
 Depending on the attacker weapon and the defender protection, it may or may not be hurt.
+
+Note that a creature being unable to defend at all (ex: being unconscious or attacked during sleep) will incur tremendous damages that will be likely to be fatal.
 
 The protection results from the character itself (its own damage resistances) and from its armor (inducing damage resistance modifiers).
 
 An attack - successful or not - is resolved utimately to changes in:
 
  - physical and mental fatigue, experienced by the attacker and the defender
+ 
  - skill progress, experienced by both as well (ex: chop for the attacker, parry for the defender)
+ 
  - hit points, experienced by both as well (ex: defender is hurt, and attacker drained life or performed a critical failure)
 
 See also: `Damage Resistance`_.
