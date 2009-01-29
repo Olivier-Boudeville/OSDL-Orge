@@ -85,6 +85,7 @@ digraph orge_skill_tree {
 	"Physical\nDevelopment" -> "Climbing"
 	"Physical\nDevelopment" -> "Gymnastics"
 	"Physical\nDevelopment" -> "Athletics"
+	"Physical\nDevelopment" -> "Fast\nRecovery"
     	
 	"Athletics" -> "Running"
 	"Athletics" -> "Jumping"
@@ -175,7 +176,6 @@ digraph orge_skill_tree {
 	"Specialized\nCombat\nTechnics" -> "Defense"
 	"Specialized\nCombat\nTechnics" -> "Non\nLethal\nCombat"
 	"Specialized\nCombat\nTechnics" -> "Special\nAttacks"
-	"Specialized\nCombat\nTechnics" -> "Battle\nDisciplines"
 	"Specialized\nCombat\nTechnics" -> "Group\nCombat"
 
 	"Combat\nManoeuvers" -> "Patrol"
@@ -243,6 +243,7 @@ digraph orge_skill_tree {
 	
 	"Arcane\nTechnics" -> "Incantation"
 	"Arcane\nTechnics" -> "Gesture\nSpellcasting"
+	"Arcane\nTechnics" -> "Bardic Verse\nSpellcasting"
 	"Arcane\nTechnics" -> "Rune\nCarving"
 	"Arcane\nTechnics" -> "Pure\nMental\nSpellcasting"
 
