@@ -2,9 +2,9 @@
 Reputation
 ----------
 
-Reputation is a far more interesting indicator than (intrinsic) alignment, as the latter is seldom known outside the character and has little use in interactions: they deal mostly with the appearance rather than with the essence.
+Reputation is a far more interesting indicator than (intrinsic) alignment, as the latter is seldom known outside the character, and has little use in interactions: they deal mostly with the appearance rather than with the essence.
 
-Reputation corresponds to the alignment of a characters, as *perceived* by third-parties. It depends mostly on the character's history, sayings and actings.
+Reputation corresponds to the alignment of a character, as *perceived* by third-parties. It depends mostly on the character's history, sayings and actings, and by whom and where it is evaluated.
 
 
 Factions
@@ -39,7 +39,10 @@ One can use the services of a bard, in order to write and interpret songs convey
 This includes:
 
  - secret (cryptic) messages, targeting any accomplice in the audience
+ 
  - panegyrics, to enhance the reputation of someone, quite often the silent partner itself
+ 
  - satiristic songs, to deplete reputations (rarely the one of the backer, obviously)
 
 Efficient bards are quite expensive though and, if seduced, tortured or bribed, may reveal the name of their employer.
+
