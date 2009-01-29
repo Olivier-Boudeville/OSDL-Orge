@@ -1,4 +1,7 @@
 
+:raw-latex:`\pagebreak`
+
+
 Abilities & Traits
 ------------------
 
@@ -20,6 +23,7 @@ The vast majority of abilities and traits are innate, they are natural to a char
 | Empathy              | The creature may be able to feel some         | Strength of emotion                |5 CCP  |
 |                      | emotions of close creatures.                  | perception increased by            |       |
 |                      |                                               | 80%                                |       |
+|                      |                                               |                                    |       |
 +----------------------+-----------------------------------------------+------------------------------------+-------+
 | Telepathy            | The creature may be able to project           | Strength of emotion projectiond    |5 CCP  |
 |                      | emotions of close creatures.                  | increased by 80%                   |       |
@@ -36,20 +40,31 @@ The vast majority of abilities and traits are innate, they are natural to a char
 | Leadership           | The creature can rally more easily the other  | + 25% in Rallying_ action          |4 CCP  |
 |                      | creatures of its species.                     | + 15% in Charisma checks           |       |
 +----------------------+-----------------------------------------------+------------------------------------+-------+
+| Infravision          | The creature benefits from a better vision    |                                    |4 CCP  |
+|                      | in the dark.                                  |                                    |       |
+|                      | See also: `Cat's Eyes Spell`_.                |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
+
 
 
 +----------------------+-----------------------------------------------+------------------------------------+-------+
 | Balanced Abilities   | Description                                   | Effect                             | Cost  |
 | and Traits           |                                               |                                    |       |
 +======================+===============================================+====================================+=======+
+| Lycanthropy          | The creature transforms into a wolf-like      |                                    |       |
+|                      | beast, without being able to control when.    |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
+| Rejection of Money   | The creature does not accept to use on systems|                                    |       |
+|                      | based on money, to the very best it can       |                                    |       |
+|                      | barter.                                       |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
 |                      |                                               |                                    |       |
 +----------------------+-----------------------------------------------+------------------------------------+-------+
 
 
-
 +----------------------+-----------------------------------------------+------------------------------------+-------+
 | Negative Abilities   | Description                                   | Effect                             | Cost  |
-| andTtraits           |                                               |                                    |       |
+| and Traits           |                                               |                                    |       |
 +======================+===============================================+====================================+=======+
 | Stuttering           | The creature has a tendency to stammer,       | - 10% in Spellcasting By           |-4 CCP |
 |                      | especially in critical situations.            | Incantations                       |       |
@@ -62,10 +77,28 @@ The vast majority of abilities and traits are innate, they are natural to a char
 |                      |                                               | Incantations                       |       |
 |                      |                                               | - other adventure-related effects  |       |
 +----------------------+-----------------------------------------------+------------------------------------+-------+
+| Fear of the dark     | The creature has a tendency to panic when     |                                    |       |
+|                      | lighting becomes low.                         |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
+| Claustrophobia       | The creature cannot stand being in small      |                                    |       |
+|                      | enclosed spaces.                              |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
+| Alcoholism           | The creature cannot control its need for      |                                    |       |
+|                      | alcohol, which became an addiction.           |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
+| Easily Drunk         | The creature gets drunk after having ingested |                                    |       |
+|                      | only a small quantity of alcohol.             |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
+| Topophobia           | The creature cannot stand being in various    |                                    |       |
+|                      | locations, like stepping in some sacred       |                                    |       |
+|                      | places of some religions.                     |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
+| Allergy              | The creature is allergic to a factor, like    |                                    |       |
+|                      | some kind of food or some material.           |                                    |       |
++----------------------+-----------------------------------------------+------------------------------------+-------+
 
+
+  
 
 .. [#] See for example "gelatinous cubes" in some games.
-
-
-
 
