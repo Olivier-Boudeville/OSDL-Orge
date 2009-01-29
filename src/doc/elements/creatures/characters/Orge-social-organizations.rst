@@ -2,6 +2,18 @@
 Social Organizations
 ====================
 
+Most organizations are hierarchical and make use of ranks. 
+
+Their openness varies greatly, some mandates conditions of their own like fulfilling a quest (ex: thief or murder challenge), or rely on co-optation.
+
+The progress of a character inside the organization is notably rewarded by:
+
+ - fame: reputation and honours
+ - fortune: money, valuable objects
+ - special rights, like free or allowed access to specific places (libraries, secure storage, private house or inn), or possibility to purchase or craft specific objects
+ 
+A lot of organizations are gathered in a private place, official (ex: church of a given saint) or not (ex: headquarters of the Thieves'Guild).
+
 
 Guilds
 ------
