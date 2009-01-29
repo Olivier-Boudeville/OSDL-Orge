@@ -10,3 +10,4 @@ Magic
 .. include:: Orge-spells.rst
 .. include:: Orge-spellcasting.rst
 .. include:: Orge-spell-repository.rst
+
