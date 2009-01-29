@@ -194,6 +194,15 @@ nn:raw-latex:`\includegraphics[scale=0.75]{modifier-abacus.png}`
 We can see that in most situations it is perfectly safe to stick to ``m = pnew - 50%``.
 
 
+When an actions fails
+---------------------
+
+If a critical failure occurs, the creature performing the action might be crippled, loosing an eye, an arm, a leg, etc.
+
+Conversely, efficient healing methods exist, for example in some temples.
+
+
+
 Let's illustrate with a simple example
 --------------------------------------
 
