@@ -8,17 +8,37 @@ Contrary to characteristics (primary/ssecondary attributes), which are rather st
 These *state attributes* are:
 
   - current age
-  - health
+  - health and wounds
   - location in virtual world
   - belongings
+  - fatigue
+  - mana points
+  - thirst level
+  - hunger level
 
-Other states of altered consciousness are:
+States of altered consciousness are:
 
  - Blessed/Cursed: the character probability to hit and damaged dealt are increased/decreased
+ 
  - Shielded/Exposed: damages inflicted to the character are reduced/increased     
  - Hasted/Slowed: the character can perform more/less actions per unit of time, notably in combat, where it can gain/loose attacks
+ 
  - Charmed: some special abilities or spells can partly take control of a character; this state can be hardly concealed to other characters, but the charmed character will act in some way according to the will of its controller, which results often in it attacking its allies
- - Scared: a scared character will instantly break combat and try to escape to its best - although terror is often a poor adviser; the character will flee all enemies, fearsome or not   
+ 
+ - Scared: a scared character will instantly break combat and try to escape to its best - although terror is often a poor adviser; the character will flee all enemies, fearsome or not  
+ 
+ - Drunk: too much alcohol ingested
+ 
+ - Drug: too much drug smoken or injected (includes poison)
+ 
+ - Possessed: includes hypnosis, sleep-walking (somnambulism) and magic control
+
+ - Unconscious: includes knocked-out
+
+ - Sleeping 
+ 
+ - Mad: includes illness (mental disease)
+ 
  
 This model is declared in class_Creature_, with the `creature_fatigue_model` record.
 
@@ -26,6 +46,14 @@ See the `Fatigue`_ section for further details.
 
 
 Health Modifiers
+................
+
+They depend on the overall health of the creature, but also of any wounds it suffers from.
+
+For example, if attempting a long jump, the fact of having a leg sprained implies a decreased probability of success.
+
+In general, wounds have a huge impact on action outcomes, so one should try to recover from them as soon as possible.
+
 
 .. include:: Orge-damage-resistance.rst
 
@@ -64,11 +92,7 @@ Once established, the persona should be summarized in a few sentences that will 
 Quite a lot of details are interesting here: the physical description of the character that cannot be conveyed by the graphics, and its motivations, ethics, background, oddities, etc.
 
 Both physical and psychological portraits should be updated from time to time during the character's life, to reflect the consequences of what it experienced.  
-
-
-
-
-Life base expectancy, in years
+Life base expectancy, expressed in years, is determined at creature creation.
 
 
 Belongings
@@ -78,7 +102,5 @@ Each AI-controlled creature - character (NPC) or not (monsters and alike) must h
 
 For example, a swamp lizzard is not expected to wear an armor of plates or to collect silver coins, and if a rogue attacked with slashing damages, once dead the corresponding weapon (ex: a sword) must be found on his body.
 
+However body and belongings might disappear in some cases (ex: the thief jumped in the deep well).
 
-
-
- 
