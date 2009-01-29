@@ -17,7 +17,7 @@ In this case the speed of a creature for a movement type is determined by:
  - the environment, including the terrain (ex: Road Terrain)
  - the species of the moving creature
  - the characteristics of the creature, including its Movement Ability
- - the state of the creature, including its fatigue, itself modulated notably by the carried weight 
+ - the state of the creature, including its physical fatigue, itself modulated notably by the carried weight and by its health and wounds, and its mental fatigue
 
 After a movement, the fields of perception of the creature are updated.
   
@@ -34,6 +34,8 @@ The supported Movement Types are:
 Some creature have different `gaits <http://en.wikipedia.org/wiki/Gait>`_. 
 For example, horses have for Ground movements: Walk, Trotting, Cantering, Galloping.
 
+A special case of movement is the performing of jumps.
+ 
  
 Movement Rate
 -------------
