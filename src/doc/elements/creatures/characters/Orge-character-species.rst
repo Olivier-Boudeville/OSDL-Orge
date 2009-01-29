@@ -1,3 +1,7 @@
+
+:raw-latex:`\pagebreak`
+
+
 Species
 -------
 
@@ -69,7 +73,8 @@ There are seven of them:
 +-------------+-------------------------------------------+
 
 
-Other species can be added by the GM, either fully original or based on the built-in species (ex: half-elves, or half-orcs, etc.)
+Other species can be added by the GM, either fully original (ex: Undeads, Lizzards, etc.) or based on the built-in species (ex: Half-Elves, Dark Elves, High Elves, or Half-Orcs, etc.).
+
 
 
 Species Characteristics
