@@ -1,5 +1,8 @@
 
 
+:raw-latex:`\pagebreak`
+
+
 .. role:: raw-html(raw)
    :format: html
    
@@ -49,12 +52,12 @@ To inspect the data in the tables of the Orge database, one just has to launch, 
 Conventions
 -----------
 
-Each table field has to respect a specified datatype. A datatype can define base constraints, that will be enforced at all times between transactions.
+Each table field has to respect a specified datatype. A datatype can define base constraints, that will be enforced at all times, between transactions.
 
-Per-field additional constraints can be defined as well, this includes:
+Per-field additional constraints can be defined as well. This includes:
  
- * mandatory: the field has to be set (this is the default)
- * optional: the field may be not set
+ - mandatory: the field has to be set (this is the default)
+ - optional: the field may be not set
 
 
 Identifiers
@@ -67,13 +70,14 @@ This number, the information identifier, is implemented by a simple unsigned int
 
 The information identifier is a primary key, on which an index is created for faster look-up.
 
-The identifiers for Orge users are set by the Orge database, whereas the identifiers for connections are set by the Orge TCP server.
+The identifiers of Orge users are set by the Orge Database, whereas the identifiers for connections are set by the Orge TCP Server.
 
 
 Strings
 .......
 
-A list of characters (including alphanumerical and accentued ones) with punctuation marks.
+
+A string is a list of characters (including alphanumerical and accentued ones) with punctuation marks.
 
 The length of a string can be limited to avoid buffer overflow. For example, ``String[37]`` means that up to 37 characters can be stored in this string, whereas ``String`` implies an unlimited length.
 
@@ -137,7 +141,7 @@ An Orge user is described by the following fields:
 | Security Answer        | String[30]                        | None        | Optional                 |
 +------------------------+-----------------------------------+-------------+--------------------------+
 
-The field ``Controlled Characters`` lists the simulated characters that the Orge user can control. This field can contain only one character identifier, or a fixed-sized tuple or a list containing character identifiers, depending on the chosen account settings for that Orge instance.
+The field ``Controlled Characters`` lists the simulated characters that the Orge user can control. This field can contain only one character identifier, or a fixed-sized tuple, or a list containing character identifiers, depending on the chosen account settings for that Orge instance.
 
 The corresponding Erlang ``record`` is defined in orge_database_manager.erl_.
  
@@ -190,7 +194,4 @@ A connection is described by the following fields:
 +------------------------+-----------------------------------+-------------+--------------------------+
 
 A connection is geolocated from its IP address, see `Geolocation`_ for more details.
-
-
-
 
