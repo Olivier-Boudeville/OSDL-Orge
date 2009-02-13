@@ -44,6 +44,8 @@ OSDL RPG Game Engine
 
 
 
+.. comment Use regularly the check-rst-includes.sh script to ensure no file is left not included or is included twice.
+
 
 
 :raw-latex:`\pagebreak`
