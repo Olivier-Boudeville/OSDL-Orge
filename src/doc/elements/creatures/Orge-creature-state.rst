@@ -104,3 +104,13 @@ For example, a swamp lizzard is not expected to wear an armor of plates or to co
 
 However body and belongings might disappear in some cases (ex: the thief jumped in the deep well).
 
+As a consequence, if a creature - monster or sentient, NPC or player - dies, any other creature - monster or sentient, NPC or player - may take and make use of any belonging the dead creature was carrying.
+
+Therefore some equipments should not be carried when fighting against some monsters, lest they win the confrontation and gain access to weapons that make them very, very tough.
+
+Possessions can be dropped, concealed, stored in one's house or put in a bank account, instead of being carried. No totally reliable solution exists, though: objects can be found or robbed from all places. Walking along with friends offers some kind of security.
+
+The temptation of wearing nothing but the bare minimum (so that nothing is lost in case of a bad encounter) is not really an option: no resistance against damage or low temperature would be enjoyed, naked or lightly clothed characters are usually rejected by most social standards, etc.
+
+
+

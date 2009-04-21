@@ -6,6 +6,8 @@ Reputation is a far more interesting indicator than (intrinsic) alignment, as th
 
 Reputation corresponds to the alignment of a character, as *perceived* by third-parties. It depends mostly on the character's history, sayings and actings, and by whom and where it is evaluated.
 
+Murdering other people is one of the most effective ways of making one's reputation drop, and for a long time.
+
 
 Factions
 ........
@@ -17,6 +19,8 @@ For example, when slaughtering the member of a strongly united community, these 
 The main regret is that these systems do not take into account the fact that they may or may not be witnesses. Bad deeds not seen should affect alignments, but not reputations.
 
 See also: `Creature Relationships`_.
+
+
 
  
 Means of Influencing a Reputation

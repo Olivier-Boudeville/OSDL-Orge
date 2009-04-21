@@ -62,7 +62,6 @@ On the other hand, the first character should be able to ride more effectively a
 Skill Development
 _________________
 
-
 Some rules apply to skill development:
 
  - for each skill, a ``Basic Practise Level`` (BPL) is defined. This is the minimum *Specific Skill Level* that must be obtained before being able to develop any specialized skill of that skill. For example, if the BPL for horse-riding is 4, a character cannot be trained to warhorse-riding until it is at least horse-riding level 4  
@@ -188,6 +187,8 @@ Gained skill points depend also on the intrinsic difficulty of that particular c
 
 Note that the discussion is based on whether a challenge is difficult or not, not on whether succeeding can be interesting or not.
 
+Finally, for a creature there is no point in performing the same action again and again (either manually or automatically thanks to macros): the creature will soon be exhausted and moreover the repetitions will be less and less effective.
+ 
 See also: `Age vs Skills Trade-Off`_.
 
 
