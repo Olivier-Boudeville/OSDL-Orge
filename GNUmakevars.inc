@@ -5,10 +5,10 @@ PROJECT_VERSION := 0.1
 
 
 # LOANI-repository root:
-LOANI_REPOSITORY_ROOT=$(ORGE_TOP)/../../..
+LOANI_REPOSITORY_ROOT = $(ORGE_TOP)/../../..
 
 # LOANI-installations root:
-LOANI_INSTALLATIONS_ROOT=$(LOANI_REPOSITORY_ROOT)/../LOANI-installations
+LOANI_INSTALLATIONS_ROOT = $(LOANI_REPOSITORY_ROOT)/../LOANI-installations
 
 
 # egeoip root (for IP geolocation):
@@ -22,6 +22,8 @@ CEYLAN_TRUNK := $(CEYLAN_ROOT)/Ceylan/trunk
 
 CEYLAN_ERLANG_TOP := $(CEYLAN_TRUNK)/src/code/scripts/erlang
 CEYLAN_DOC_TOP    := $(CEYLAN_TRUNK)/src/doc
+
+COMMON_TOP = $(CEYLAN_ERLANG_TOP)/common
 
 
 # Non-Orge OSDL:
@@ -136,5 +138,6 @@ NO_DEFAULT_COOKIE_WANTED="true"
 
 THIRD_PARTY_OPT = "$(TCP_FIREWALL_OPT)"
 
-include $(CEYLAN_ERLANG_TOP)/GNUmakevars.inc
+	
+include $(COMMON_TOP)/GNUmakesettings.inc
 
