@@ -1,14 +1,14 @@
 
 
-:raw-latex:`\pagebreak`
-
-
 .. role:: raw-html(raw)
    :format: html
    
 .. role:: raw-latex(raw)
    :format: latex
 
+
+
+:raw-latex:`\pagebreak`
 
 
 .. _orge_tcp_server.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/raw-tcp/src/orge_tcp_server.hrl?view=markup
@@ -56,23 +56,24 @@ Orge Servers
 	:local:
 
 
+
 Overview
 --------
 
 This section presents some informations regarding the hardware and software infrastructure recommended to run a server-side Orge instance.
 
-An Orge server is the part of the Orge system which is linking the simulated world to remote peers. It is neither responsible for the world simulation nor for the client-side processings; it is the interface in-between.
+An Orge server is the part of the Orge system which is linking the simulated world to remote peers. It is neither responsible for the world simulation nor for the client-side processing; it is the interface in-between.
 
 It allows to inject events and retrieve informations from the Orge virtual world, which otherwise would live its life in a black box.
 
 An Orge server must be able to handle multiple clients interacting concurrently with the same universe. 
 
-A logical Orge server can be made of several software servers, instanciated on the same computer or in a set of networked computers (ex: a cluster). It allows to share the load (memory, network and processing power) and to have communicating gateways between a set of simulated worlds.
+A logical Orge server can be made of several software servers, instantiated on the same computer or in a set of networked computers (ex: a cluster). It allows to share the load (memory, network and processing power) and to have communicating gateways between a set of simulated worlds.
 
 
 Some basic client/server concerns must be dealt with:
 
-	- the authentification of clients
+	- the authentication of clients
 	
 	- the update of the Orge code without stopping the simulation (hot code reload with preservation of the server state)
 
@@ -83,7 +84,7 @@ Notable constraints are:
 	
 	- commands affecting the server should be transactional (either completely performed on the server, or completely ignored by it)
 	
-	- clients have to be controlled, regarding their number (maximum number of clients at a time) and their behaviour (flow control to avoid denial of service)
+	- clients have to be controlled, regarding their number (maximum number of clients at a time) and their behavior (flow control, to avoid denial of service)
 	
 	- there should be a way of propagating and synchronizing resources (ex: media content) between the server baseline versions and each client, as client-side deprecated or incomplete versions have to be updated to match the server ones
 
@@ -112,10 +113,11 @@ Furthermore each server can be based on:
 
 	- pure custom developments : there are called "raw" servers (ex: ``raw-tcp``)
 	
-	- reuse of OTP behaviours (ex: ``gen_server``, ``gen_fsm``, etc.)	
+	- the reuse of OTP behaviors (ex: ``gen_server``, ``gen_fsm``, etc.)	
 	
 	
 .. Note:: The term *clients* will be used quite often. It must be of course understood here in a client/server context, not as "customers".
+
 
 
 Sources 	
@@ -143,6 +145,9 @@ The recommended scheme to run an Orge server is to host it on a gateway (ex: a d
 :raw-latex:`\includegraphics[scale=0.6]{Orge-testbed.png}`
 
 
+
+:raw-latex:`\pagebreak`
+
 Server Hardware
 ...............
 
@@ -156,7 +161,7 @@ However we can run our Orge testbed on a Pentium II gateway, running at 300 MHz 
 
 One element whose importance is often underestimated is the power supply. Investing in a reliable one instead in a bulk one can save you much trouble [#]_. We rely on a `Enermax <http://www.enermax.com>`_ Liberty, and so far it works well. 
 
-Erlang is cross-platform and can run on numerous architectures, but we would recommend to stick to the x86 one for increased safety and lower hardware prices.
+Erlang is cross-platform and can run on numerous architectures, but we would recommend to stick to the x86 one for increased safety and lower hardware costs.
 
 Similarly, if 32-bit and 64-bit architectures are both fully supported, for the moment we would however prefer the former to the latter. This is not due to the fear of bugs that could remain in more recent 64-bit ports; the reason is just the increased memory footprint of data in actual 64-bit mode: each pointer used internally occupies twice the size it would occupy in 32-bit. Orge servers tend to be more RAM-bound than CPU-bound.
 
@@ -168,7 +173,6 @@ Similarly, if 32-bit and 64-bit architectures are both fully supported, for the 
 Ideal Configuration
 ___________________
 
-
 .. _estimation: dell-server-example.pdf
 
 What could be an ideal configuration to run an Orge server? At mid-2008, it would be:
@@ -177,11 +181,11 @@ What could be an ideal configuration to run an Orge server? At mid-2008, it woul
 
   - 16 GB of RAM, as virtual worlds need quite a lot data to be described, especially in higher level languages like Erlang
   
-  - 3 hard drives, 400GB SAS, in a `RAID-5 <http://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_5>`_ array, for data persistance (it leads to 800GB of usable redondant disk space)
-   
+  - 3 hard drives, 400GB SAS, in a `RAID-5 <http://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_5>`_ array, for data persistence (it leads to 800GB of usable redundant disk space); if being able to afford a solid-state disk (`SSD <http://en.wikipedia.org/wiki/Solid-state_drive>`_), it should be used first for the system, second for the application data (here maybe in the context of a RAID array)
+    
   - redundant power supply
   
-  - two gigabit ethernet network interfaces
+  - two gigabit Ethernet network interfaces
 
 It would cost roughly 5,000 $ (3,200 euros), based on this estimation_ from DELL. Quite expensive for hobbyists of course, but rather affordable for professionals.
 
@@ -216,13 +220,12 @@ Other temporary solutions could be :
 
 	- one of the newer inexpensive dedicated offers based on low-end but dedicated servers, like the ones provided (at least in France) by `OVH <http://www.ovh.com>`_ and `Dedibox <http://www.dedibox.fr>`_.
 
-	- a guaranteed portion of a powerful virtualized (shared) server, like the very cheap and flexible `Gandi <http://www.gandi.net/hebergement/?lang=en>`_ offer
+	- a guaranteed portion of a powerful virtualized (shared) server, like the very cheap and flexible `Gandi <http://www.gandi.net/hebergement/?lang=en>`_ offer, knowing that some free 2-month testing could be done during the summer
    
 
 
 Optional: Uninterruptible Power Supply
 ______________________________________
-
 
 To avoid a cause of downtime in the in-home hosting scheme, using some kind of `Uninterruptible Power Supply <http://en.wikipedia.org/wiki/Uninterruptible_power_supply>`_ (UPS) is advised.
 
@@ -273,7 +276,7 @@ Do not forget to link all the necessary devices for operation to the UPS supply 
 
 More advanced configurations allow to:
 
-	- be notified of abnormal situations (by mail, SMS, etc.)
+	- be notified of abnormal situations (we use mail, but other means like SMS and al can be used as well)
 	
 	- trigger a clean server shutdown if the batteries run too low during an outage
 
@@ -284,7 +287,7 @@ ____________________
 
 Running a virtual world involves manipulating a large volume of data. As all data will not fit in RAM, and should be preserved from all kinds of crashes (ex: for user informations, states of simulated elements, etc.), they must somehow be stored in non-volatile storage. Yet they must remain readily available, within a few moments.
 
-As long as solid-state disks will not be generalized (still low capacity, low transfer rates, high prices, etc.), we have to rely on hard disks. Sadly, failures occur quite frequently with them, and jumping back to the latest backup is not really an option: it would be too long to perform, and archives cannot be done frequently enough not to loose significant durations of player interactions.
+As long as solid-state disks will not be generalized (still low capacity, questionable durability, high prices, etc.), we have to rely on hard disks. Sadly, failures occur quite frequently with them, and jumping back to the latest backup is not really an option: it would be too long to perform, and archives cannot be done frequently enough not to loose significant durations of player interactions.
 
 So we end up adding a layer of reliability to hard disks, thanks to RAID arrays. Getting a performance gain is not the first goal here.
 
@@ -295,7 +298,7 @@ For most configurations, a RAID 5 looks like a good compromise between reliabili
 Low-budget Orge servers can run on software RAID. Beside purchasing the right disks [#]_, one should consider determining which partitions should be mirrored (data only, or all, including problematic cases as ``/boot``), on which actual connectivity (disks may or, preferably, may not share a bus).
 
 
-.. [#] At least three hard disks are needed for RAID 5, preferably from different manufacters to avoid simutaneous failures, with same size and similar performances. A fourth disk can be useful as a spare disk, to reduce the vulnerability after a failure occurred.
+.. [#] At least three hard disks are needed for RAID 5, preferably from different manufacturers to avoid simultaneous failures, with same size and similar performances. A fourth disk can be useful as a spare disk, to reduce the vulnerability after a failure occurred.
 
 Beyond the set-up of the RAID array, some prior training is welcome to know exactly what should be done to recover after the crash of a disk, lest the data of the newly inserted spare disk overwrites the surviving ones, instead of the other way round.
  
@@ -341,6 +344,10 @@ Once again, some tools help, in order to:
 	       0       3        9        0      active sync   /dev/hda9
 	       1      22        3        1      active sync   /dev/hdc3
 		
+		
+As we will see later, the very first content to be held by such a RAID array would be the application-specific dynamic data.
+
+
 
 
 Optional: Backup System
@@ -348,12 +355,15 @@ _______________________
 
 Once in a while, a full backup of the simulation state should be performed, to resist to "disasters" such as fire, flood, crackers, burglary, etc.
 
-This can be done either direcly by writing the data to a dedicated hard disk that will be then removed and stored in a secure place, or, more usually, by burning a removable media.
+This can be done either directly by writing the data to a dedicated hard disk that will be then removed and stored in a secure place, or, more usually, by burning a removable media.
  
 Knowing that a dual layer Blu-ray Disc can store 50 GB (almost six times the capacity of a dual layer DVD) and that they are already affordable (and their discs too), most virtual worlds, once their state is efficiently compressed (ex: using ``bzip2 --best`` or `LZMA <http://en.wikipedia.org/wiki/Lempel-Ziv-Markov_chain_algorithm>`_), should be archived that way.
 
 
 
+
+
+:raw-latex:`\pagebreak`
 
 Network Needs
 .............
@@ -363,23 +373,22 @@ Network Needs
 Network Connection
 __________________
 
-
 When not relying on third-party hosting, the connection of the Orge server to the Internet thanks to an ISP is often the weakest part of the setup.
 
 The very basic needs regarding this connection are:
  
   - it must be permanent, so that clients can connect to the persistent server at any time (no dial-up, of course)
   
-  - it must be based on a static (fixed) IP address: otherwise, even if a DNS updater assigns dynamically a changing IP to your server DNS name, new clients will keep on accessing outdated DNS informations for a while (until the update has been widely propagated in the worlwide DNS) whereas current clients would have to change IP immediately without notice. This would be complex and unreliable
+  - it must be based on a static (fixed) IP address: otherwise, even if a DNS updater assigns dynamically a changing IP to your server DNS name, new clients will keep on accessing outdated DNS informations for a while (until the update has been widely propagated in the worldwide DNS) whereas current clients would have to change IP immediately without notice. This would be complex and unreliable
   
-  - IPv4 or IPv6 do not really matter; and one IP address is enough
+  - IPv4 or IPv6 do not really matter; and one IP address should be enough
   
   - a high bandwidth is needed, in both directions, and preferably symmetrical [#]_. Hopefully traffic will be unlimited, otherwise even high thresholds could be reached
   
   - the higher quality of service, the better. This includes low lag, permanent monitoring, redundancy, guaranteed high availability, etc.
 
 
-.. [#] Upstream bandwidth is at least as important as the downstream one when running Orge servers, whereas connections like ADSL are asymmetrical by nature (ex: download bandwith more than 5 times greater than upload one).
+.. [#] Upstream bandwidth is at least as important as the downstream one when running Orge servers, whereas connections like ADSL are asymmetrical by nature (ex: download bandwidth more than 5 times greater than upload one).
 
 
 The choice of a good ISP is thus fundamental. There are benchmarks available for the major ones.
@@ -388,7 +397,7 @@ Once the ISP is chosen, one should properly configure one's connection: beyond e
 
 A careful examination of the settings might allow to tune the connection a bit, regarding reverse DNS, ping fastpath, etc.
 
-Storing its settings and its measured performances (by the ISP and by third-party tests) is surely a good practise. 
+Storing its settings and its measured performances (by the ISP and by third-party tests) is surely a good practice. 
 
 For example for an ADSL connection::
 
@@ -430,6 +439,9 @@ which results in these measures::
 
 
 
+An ideal connectivity would be a dedicated optical fiber.
+
+
 
 
 Network Addresses & DNS
@@ -441,7 +453,6 @@ _______________________
 Domain Name
 ***********
 
-
 One key point of running a persistent server on the Internet is to have it respond to a name in addition to an IP, so that an additional indirection level is possible (changing ISP should be transparent for the clients) and so that humans can share more easily the way of accessing to the Orge server (i.e. its URL).
 
 The first thing is thus to register a domain name. As they are inexpensive (about 15 euros per year, depending on the chosen extension), this is a must. For example, we are making use of ``esperide.com``, that we reserved with great satisfaction thanks to the already praised `Gandi.net <http://www.gandi.net/>`_ company.
@@ -451,8 +462,7 @@ The first thing is thus to register a domain name. As they are inexpensive (abou
 DNS Registering
 ***************
 
-
-Once one bought a domain name, he must associate DNS informations to it, so that the various Internet traffic (web, mail, etc.) is routed to the desired IP address. 
+Once one bought a domain name, one must associate DNS informations to it, so that the various Internet traffic (web, mail, etc.) is routed to the desired IP address. 
 
 Most of the time the company you bought your domain name from provides these DNS services. This is the case of Gandi.net, but we prefer currently using the - free - services of another DNS service, `ZoneEdit <http://zoneedit.com/>`_. 
 
@@ -460,7 +470,7 @@ We chose them because:
 
   - their services remain free until 200 MB of DNS transfer is met during a year (1 million DNS queries), which should seldom occur due to DNS caching from clients
   
-  - their DNS web interface is one of the simpliest to configure (most others are rather tricky)
+  - their DNS web interface is one of the simplest to configure (most others are rather tricky)
   
   - they are believed to be among the most robust DNS providers on the Internet, and they are probably located not in Europe only
 
@@ -468,10 +478,13 @@ We chose them because:
 Should we exceed 1 million DNS queries a year, we would probably switch back to Gandi DNS.
 
 
-Another interesting feature is to have the reverse DNS configured. This setting must be checked with your ISP, not with your domain name or DNS service providers. It allows to associate your IP address to your domain name, instead of having it associated to a domain of your ISP. Thus for example when a user will ping the IP address of one of your game servers, the reverse lookup will lead him to your official site rather than the one of your ISP.
+Another interesting feature is to have the reverse DNS configured. This setting must be checked with your ISP, not with your domain name or DNS service providers. It allows to associate your IP address to your domain name, instead of having it associated to a domain of your ISP. Thus for example when a user will ping the IP address of one of your game servers, the reverse lookup will lead him to your official site rather than to the one of your ISP.
 
 
 
+
+
+:raw-latex:`\pagebreak`
 
 Server Software
 ...............
@@ -480,18 +493,15 @@ Server Software
 Operating System
 ________________
 
-
 Orge is implemented in Erlang, which is, as already mentioned, supported by numerous platforms.
 
 The operating system we would elect is the GNU/Linux one, for stability, ease of use and administration, performances and available support.
 
-For the Orge server, among the various distributions, the latest `Debian stable version <http://www.debian.org/releases/stable/>`_
- seems to be a very good choice.
+For the Orge server, among the various distributions, the latest `Debian stable version <http://www.debian.org/releases/stable/>`_ seems to be a very good choice.
 
-For the monitoring client, choice is less crucial, but we would favour an `Ubuntu <http://www.ubuntu.com/products/whatisubuntu/desktopedition>`_
- distribution, for ease of installation and user-friendliness.
+For the monitoring client, choice is less crucial, but we would favor an `Ubuntu <http://www.ubuntu.com/products/whatisubuntu/desktopedition>`_ distribution, for ease of installation and user-friendliness.
 
-Having a server directly exposed to the Internet requires a properly configured firewall, as discussed below, but also the use of the safest software. This includes favouring stable versions over cutting-edge ones, but also, somewhat contrarily,  integrating quickly any available security update.
+Having a server directly exposed to the Internet requires a properly configured firewall, as discussed below, but also the use of the safest software. This includes favoring stable versions over cutting-edge ones, but also, somewhat contrarily,  integrating quickly any available security update.
 
 A simple automatic updater of stable versions and security patched ones is easy to set-up on Debian-based distributions, see for example our `debian-updater.sh <http://ceylan.svn.sourceforge.net/viewvc/ceylan/Ceylan/trunk/src/code/scripts/shell/debian-updater.sh?view=markup>`_ script, to be placed for example in ``/etc/cron.weekly``.
 
@@ -500,12 +510,11 @@ A simple automatic updater of stable versions and security patched ones is easy 
 Disk Settings
 _____________
 
-
 Running an Orge server implies reserving some storage space for the application and its data.
 
 The disk itself (speed, interface type, model, etc.) is a significant parameter, and its configuration matters a lot (see the ``hdparm`` tool).
 
-The needed space should be ideally placed on dedicated partitions, using carefully selected filesystem types. Knowing we are to deal mostly with few large files and that integrity is essential, we would go preferably, instead of the `ReiserFS <http://en.wikipedia.org/wiki/ReiserFS>`_ filesystem and others, for:
+The needed space should be ideally placed on dedicated partitions, using carefully selected filesystem types. Knowing we are to deal mostly with a few large files and that integrity is essential, we would go preferably, instead of the `ReiserFS <http://en.wikipedia.org/wiki/ReiserFS>`_ filesystem and others, for:
 
 	- the `Ext3 <http://en.wikipedia.org/wiki/Ext3>`_ filesystem, with the ``Journal`` level of journaling, as opposed to less reliable ``Ordered`` and ``Writeback`` levels [#]_
 	
@@ -519,8 +528,7 @@ The needed space should be ideally placed on dedicated partitions, using careful
 Storage For The Orge System Itself
 __________________________________
 
-
-As not all software resources are to be installed directly in the system tree (most Orge prerequesites should better be configured and installed by hand with proper versions), some space must be left for these software elements.
+As not all software resources are to be installed directly in the system tree (most Orge prerequisites should better be configured and installed by hand with proper versions), some space must be left for these software elements.
  
 If ever they were lost due to a disk failure, they could be recreated quite easily, so having them on a RAID partition and/or being archived is less necessary than it would be for simulation data [#]_.
 
@@ -543,8 +551,7 @@ As the sources of these data are most probably stored elsewhere, the loss of the
 Application Dynamic Data
 ________________________
 
-
-This is obviously the core of the data that should not be lost. Redundancy though RAID storage and regular backups are a must here.
+This is obviously the core of the data that should *not* be lost. Redundancy though RAID storage and regular backups are a must here.
 
 These data are mainly composed of:
 	
@@ -552,7 +559,7 @@ These data are mainly composed of:
 
 	- user settings (ex: logins/passwords)
 	
-	- simulation-specific Orge persistance files, i.e. generally snapshots of the full game state
+	- simulation-specific Orge persistence files, i.e. generally snapshots of the full game state
 
 
 Depending on size, richness, number and depth of simulated elements, history, etc., the simulation data can grow quite a lot. 
@@ -566,9 +573,9 @@ Users, Groups And Permissions
 _____________________________
 
 
-Apart the administration tasks already mentioned (network configuration, system updates, etc.), no root access is stricly needed to set-up or run an Orge server. For example, Orge servers can run in non-privileged ports.
+Apart the administration tasks already mentioned (network configuration, system updates, etc.), no root access is strictly needed to set-up or run an Orge server. For example, Orge servers can run in non-privileged ports.
 
-For managibility as well as security reasons, creating user and group that are Orge-specific is strongly recommended.
+For manageability as well as security reasons, creating user and group that are Orge-specific is strongly recommended.
 
 This can be done that way::
 
@@ -579,7 +586,7 @@ This can be done that way::
 	Creating home directory `/home/orge' ...                                    
 
 
-Some checkings can be made::
+Some checking can be made::
 	
 	> id orge
 	uid=107(orge) gid=107(orge) groups=107(orge)
@@ -600,7 +607,7 @@ This setting forbids login with the ``orge`` user and access to a shell by using
 
 As nevertheless it may be convenient to be logged as ``orge``, one can issue ``chsh orge`` to specify a real shell or use directly ``adduser`` with the ``--shell`` option. This way, ``root`` (only) can switch, once logged, to the ``orge`` user. The recommended way is to use, from ``root``, ``su orge`` rather than ``su - orge``, to ensure any shell configuration file (ex: ``/home/orge/.bashrc``) will be parsed.
 
-In this example we will be installing Orge in ``/home/orge/``, using as prefix```/home/orge/software``.
+In this example we will be installing Orge in ``/home/orge/``, using as prefix ``/home/orge/Software``.
 
 
 
@@ -610,12 +617,12 @@ ________
 
 We are using the `Netfilter <http://www.netfilter.org/>`_ firewall, also known as ``iptables``.
 
-We provide a complete and fully commented iptable configuration script, customized for the hosting of Orge servers, `iptables.rules-Gateway.sh <http://ceylan.svn.sourceforge.net/viewvc/ceylan/Ceylan/trunk/src/code/scripts/shell/iptables.rules-Gateway.sh?view=markup>`_.
+We provide a complete and fully commented iptable configuration script, customized for the hosting of Orge servers, `iptables.rules-Gateway.sh <http://ceylan.svn.sourceforge.net/viewvc/ceylan/Ceylan/trunk/src/code/scripts/shell/iptables.rules-OrgeServer.sh?view=markup>`_.
 
 The ``Orge section`` is the part we are interested in here [#]_:
 
-  - a TCP port (4369) is left open for the ``epmd`` daemon
-  - a TCP port range (51000 to 51999) is left open for dynamically created Erlang connections (thus here no more than 1000 concurrent connections are allowed), knowing that the interpreter too must be given this range (thanks to the ``inet_dist_listen_min/max`` kernel option)
+  - a TCP port (4369) *could* be left open for the ``epmd`` daemon, although it is seldom necessary and it creates a security risk
+  - a TCP port range (51000 to 51999) is left open for dynamically created Erlang connections to clients (thus here no more than 1000 concurrent connections are allowed), knowing that the interpreter too must be given this range (thanks to the ``inet_dist_listen_min/max`` kernel options)
   
 
 .. [#] More informations about Erlang and firewalling issues can be found in this `article <http://www.bluishcoder.co.nz/2005/11/distributed-erlang-and-firewalls.html>`_.
@@ -630,11 +637,11 @@ With the basic default configuration, an Orge server has to open various ports, 
 Main TCP listening port
 ***********************
 
-This port handles all incoming client connections, which will result in the creation of a short-lived per-client TCP socket, dedicated notably to administration (ex: client authentification) and data streaming (ex: downloading of newer simulation resources).
+This port handles all incoming client connections, which will result in the creation of a short-lived per-client TCP socket, dedicated notably to administration (ex: client authentication) and data streaming (ex: downloading of newer simulation resources).
 
 This main TCP listening port is set by default to ``9512``, see orge_tcp_server.hrl_.
 
-It is autorized by the firewall thanks to::
+It is authorized by the firewall thanks to::
 
 	# For the listening socket of TCP Orge server:
 	iptables -A INPUT -p tcp --dport 9512 -m state --state NEW -j ACCEPT
@@ -651,7 +658,7 @@ All these per-client TCP sockets are in a port range (default: ``51000-51999``, 
 	# For client TCP Orge server sockets:
 	iptables -A INPUT -p tcp --dport 51000:51999 -m state --state NEW -j ACCEPT
 
-Thus by default up to ``51999-51000+1 = 1000`` connected TCP clients are allowed at a time. Note however that many more clients can interact with the simulated world, as nominal communications (not administration, not streaming) are performed over UDP ports, with no specific upper bound set in the client number.
+Thus by default up to ``51999-51000+1 = 1000`` connected TCP clients are allowed at a time. Note however that many more clients can interact with the simulated world, as nominal communications (not administration, not streaming) are to be performed over UDP ports, with no specific upper bound set in the client number.
 
 
 
@@ -677,12 +684,11 @@ The ``netstat`` tool can be used to check local open ports.
 Security
 ________
 
-
 At the lowest level, security is obtained thanks to the kernel, the corresponding distribution, and the aforementioned firewall settings.
 
 At the highest level, the Orge database allows to authenticate each Orge user thanks to identifiers, and to report through supervision traces every abnormal connection attempt.
 
-In-between lies the Erlang environment, with strict laws regarding the interconnecion of virtual machines and processes.
+In-between lies the Erlang environment, with strict laws regarding the interconnection of virtual machines and processes.
 
 
 
@@ -695,19 +701,22 @@ The recommended way is to set the same Erlang cookie in the Orge server(s) and e
 
 This can be done that way [#]_::
 
-.. [#] Of course other cookie sentences should be used instead.
-
  echo 'This is my Orge cookie.' > ~/.erlang.cookie
  chmod 400 ~/.erlang.cookie
+
+.. [#] Of course other cookie sentences should be used instead.
  
  
-Then that cookie shall be transferred (ex: thanks to ssh) to every computer to be connected with. Check that the owner and permissions are correct::
+Then that cookie shall be transferred (ex: thanks to ssh) to every computer to be connected with. Check that the owner and permissions are correct (``600``)::
 
 	-r-------- 1 orge orge
 
 The cookie can be checked from an Erlang shell: use ``erlang:get_cookie().``.
 
-An host file (see ``net_adm:host_file``) can be used as well::
+
+.. comment What are the links with the paragraph below?
+
+An host file (see ``net_adm:host_file``) can be used as well, to specify candidate nodes::
 
   > cat  ~/.hosts.erlang
   'aranor.esperide.com'.
@@ -724,14 +733,14 @@ This is a convenient way of manipulating an Erlang shell remotely.
 
 See `Interconnecting Erlang Nodes <http://www.ejabberd.im/interconnect-erl-nodes>`_ for further details.
 
-Another maybe more interesting solution is to use SSH to log-in to the server, create a local shell and use it to communicate (locally) with the server one.
+Another maybe more interesting solution is to use SSH to log-in to the server, create a local shell and use it to communicate (locally) with the server one. This removes the need of having the firewall letting the ``epmd`` port opened.
 
 
 
 Tool Versions
 _____________
 
-Both Orge servers and monitoring clients should run the lastest stable release of Erlang and Orge.
+Both Orge servers and monitoring clients should run the latest stable release of Erlang and Orge.
 
 More precisely, the following set of software and data should be kept up to date:
 
@@ -740,7 +749,7 @@ More precisely, the following set of software and data should be kept up to date
 	- the latest custom stable build of the Orge server
 	- the `egeoip` module and the GeoLite database, for IP geolocation
 
-Erlang and other prerequesites should be configured, compiled and installed specifically for the Orge needs, with relevant settings. See the `Installation Thanks To LOANI`_ section.
+Erlang and other prerequisites should be configured, compiled and installed specifically for the Orge needs, with relevant settings. See the `Installation Thanks To LOANI`_ section.
 
 
 Installation Thanks To LOANI
@@ -766,12 +775,12 @@ This leads to something like following output::
 
  This is the Lazy OSDL Automatic Net Installer, dedicated to the lazy and the fearless.
 
- Its purpose is to have OSDL and all its pre requesites installed with the minimum of time and effort. Some time is nevertheless needed, since some downloads may have to be performed, and the related build is CPU-intensive, so often a bit long. Therefore, even with a powerful computer and broadband access, some patience will be needed.
- Retrieving all pre requesites, pipe-lining when possible.
+ Its purpose is to have OSDL and all its pre requisites installed with the minimum of time and effort. Some time is nevertheless needed, since some downloads may have to be performed, and the related build is CPU-intensive, so often a bit long. Therefore, even with a powerful computer and broadband access, some patience will be needed.
+ Retrieving all pre requisites, pipe-lining when possible.
  Target package list is <Erlang egeoip Geolite >.
  Some tools already available (Erlang Geolite), others will be downloaded (egeoip).
  	   <---- egeoip retrieved [from SVN]
- All pre requesites available.
+ All pre requisites available.
  	   ----> Erlang      : extracting [OK] configuring [OK] building [OK] installing [OK]
  	   ----> egeoip      : extracting [OK] configuring [OK] building [OK] installing [OK]
 	   ----> Geolite     : extracting [OK] configuring [OK] building [OK] installing [OK]
@@ -804,6 +813,10 @@ A simple shell configuration file is generated by LOANI, and can be applied to t
 
 
 
+
+:raw-latex:`\pagebreak`
+
+
 Managing An Orge Server Instance
 --------------------------------
  
@@ -811,7 +824,7 @@ Managing An Orge Server Instance
 Administration
 ..............
 
-A special Orge client exists for server administration: the ``orge_admin`` module.
+A specific Orge client exists for server administration: the ``orge_admin`` module.
 
 It allows to start/stop an Orge instance, or to connect/disconnect users, etc. 
 
@@ -820,7 +833,6 @@ It allows to start/stop an Orge instance, or to connect/disconnect users, etc.
 Monitoring Data
 ...............
  
-
 Connections to the Orge server - whether they are successful or not - are traced and stored in the Orge database.
 
 Several informations about each incoming client are gathered:
@@ -828,8 +840,9 @@ Several informations about each incoming client are gathered:
  - the client IP address
  - the reverse DNS corresponding to this IP address
  - the login associated with this connection
+ - some geolocation-based information
  
-See `Schema For Monitored Events`_ for more details.
+.. comment See `Schema For Monitored Events`_ for more details.
 
 
 
@@ -844,8 +857,7 @@ However usually an administrator wants to be able to have access to traces in re
 Trace Monitoring
 ________________
 
-
-A running Orge server records traces of the main events of interest regarding its operation. Distributed traces are collected (in the case where the Orge server is running on several nodes), and stored locally, in a file respecting a given trace format. To do so, a collection of WOOPER classes - ``TraceEmitter``, ``TraceAggregator``, ``TraceSupervisor`` - are readily available.
+A running Orge server records traces of the main events of interest regarding its operation. Distributed traces are collected (in the case where the Orge server is running on several nodes), and stored locally, in a file respecting a given trace format. To do so, a collection of WOOPER classes - ``TraceEmitter``, ``TraceAggregator``, ``TraceSupervisor`` - are readily available, in the ``trace package``.
 
 A specific Java parser has been developed so that the `LogMX <http://www.logmx.com/>`_ log file visualizer can interpret directly these traces, and this visualizer become automatically managed by the ``TraceSupervisor``.
 
@@ -856,6 +868,10 @@ An additional feature is provided by Orge: while letting the reference trace fil
 A typical use-case is an Orge admin connecting simply from its laptop to an Orge server, analyzing all the traces once synchronized, and disconnecting when having finished, without further interferences to the server. 
 
 
+.. Note:: For this to work, the firewall must not block the ``epmd`` port.
+
+
+ 
 Geolocation
 ___________
 
