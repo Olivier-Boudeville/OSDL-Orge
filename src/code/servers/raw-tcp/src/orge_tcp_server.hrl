@@ -23,15 +23,17 @@
 
 
 
-% The default module for client management.
+% The default module for client management:
 -define(default_client_management_module,orge_client_manager).
 
-% The default TCP/IP port this TCP server will listen to new connections:
+
+% The default TCP/IP port this TCP server will listen to for new connections:
 % (higher than 1024 thus non-privileged, and not recorded in /etc/services)
 -define(default_listening_orge_tcp_server_port,9512).
 
+
 % The default maximum number of pending connections on the listening socket:
--define(default_backlog,20).
+-define(default_backlog,100).
 
 
 
