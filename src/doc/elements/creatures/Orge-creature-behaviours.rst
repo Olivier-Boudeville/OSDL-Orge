@@ -70,5 +70,7 @@ The point of view of a creature on its own species may be not neutral.
 Animosities result in species-specific charisma modifiers during interactions, equal to the corresponding Inter-species Affinity Modifier.
 
 
+The behaviour of a creature may be at least partly dictated by its environment (ex: hunting during the night).
+
 See also: `Reputation`_.
 
