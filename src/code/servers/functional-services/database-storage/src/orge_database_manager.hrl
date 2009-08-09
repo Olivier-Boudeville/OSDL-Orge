@@ -27,22 +27,56 @@
 % Describes the Mnesia entry type (fields) for Orge user settings:
 -record( orge_user_settings, 
 	{
+	
+		% The first name of the user (ex: "John")
 		first_name,
+		
+		% The last name of the user (ex: "Wood")
 		last_name,
+		
+		% The date of birth of the user (ex: {17,5,1971}): 
 		date_of_birth,
+		
+		% The first line of the address of the user (ex: "1, Main Street"):
 		address_line_1,
+		
+		% The second line of the address of the user (ex: "Second floor"):
 		address_line_2,
+		
+		% The city in the address of the user (ex: "Bleston"):
 		city,
+		
+		% The state/province in the address of the user (ex: "Oregon"):
 		state,
+		
+		% The country in the address of the user (ex: "USA"):
 		country,
+		
+		% The postal code of the address of the user (ex: "92310"):
 		postal_code,
-		home_telephone,
-		mobile_telephone,
+		
+		% The phone number of the user, at home (ex: "+33146890265"): 
+		home_phone,
+		
+		% The mobile number of the user (ex: "+33616833723"): 
+		mobile_phone,
+		
+		% The e-mail address of the user (ex: "john.wood@example.com"):
 		email_address,
+		
+		% The Orge login of the user (ex: "lonewolf_71"):
 		account_login,
+		
+		% The Orge passwor of the user (ex: "suzannarocks"):
 		account_password,
+		
+		% The user-specified question that the user, and only him, should 
+		% be able to answer (ex: "What is my favorite meal?"):
 		security_question,
+		
+		% The corresponding answer (ex: "French fries with garlic"):
 		security_answer
+		
 	}
 ).
  
