@@ -23,26 +23,28 @@
 
 
 % Orge database manager.
-% Stores most of the main persistant informations regarding connections,
+% Stores most of the main persistent information regarding connections,
 % users, and simulated elements.
 -module(orge_database_manager).
 
--export([start/1,start_link/1,start/2,start_link/2,
-	user_settings_to_string/1,user_to_string/1,login_status_to_string/1]).
+
+-export([ start/1, start_link/1, start/2, start_link/2,
+	user_settings_to_string/1, user_to_string/1, login_status_to_string/1 ]).
 
 
 
 % Implementation notes.
 
-% This database manager uses Mnesia to store the various informations 
-% specified in OrgeDatabase.rst.
+% This database manager uses Mnesia to store the information specified in
+% OrgeDatabase.rst.
 %
 % To each table corresponds a dedicated record definition, and the two are
 % named identically (useful with mnesia:write/1, for example).
-% The first attribute of the record is always the primary key, most of the 
-% time chosen to be an arbitrary identifer (more precisely: a counter).
 %
-% Access to the database will be transaction-based.
+% The first attribute of the record is always the primary key, most of the 
+% time chosen to be an arbitrary identifier (more precisely: a counter).
+%
+% Accesses to the database will be transaction-based.
 %
 % The user table (orge_user) will be created in RAM and on disk as well.
 % The connection table (orge_connection) will be created in RAM and on disk as
@@ -52,8 +54,10 @@
 % Necessary to call QLC query language functions:
 -include_lib("stdlib/include/qlc.hrl").
 
+
 % For orge_user_settings and al:
 -include("orge_database_manager.hrl").
+
 
 % For emit_*:
 -include("traces.hrl").
@@ -61,8 +65,12 @@
 
 % Internal record that stores the current state of the Orge database:
 -record( database_state, {
+
+	% The identifier that will be assigned to the next new user:
 	current_user_id
+	
 } ).
+
 
 
 % Shortcut macros, for convenience: 
@@ -78,22 +86,28 @@
 % (correspond to a non-nested orge_user_settings record, plus other fields).
 % A Orge user can only have one Orge account.
 % The identifier is a counter set by the database manager, starting from 1.
-% account_status: in [active,suspended,deleted].
 -record( orge_user, 
 	{
 	
 		% Internal fields:
+		
+		% The identifier of that user (unsigned integer); this is a counter
+		% set by the database manager, starting from 1:
 		identifier,
+		
+		% Timestamp corresponding to the creation time of this account:
 		account_creation_time,
+		
+		% Current status of the account, in [active,suspended,deleted]:
 		account_status,
 
-% Character record: flags telling whether the controlling player authorized
-% this character to be reinjected in-game, as NPC or monster.
-% Each character should have an  textual physical and psychological description,
-% of a few lines.
+		% Character record: flags telling whether the controlling player
+		% authorized this character to be reinjected in-game, as NPC or monster.
+		% Each character should have an  textual physical and psychological
+		% description, of a few lines.
 		characters,
 		
-		% orge_user_settings fields:
+		% orge_user_settings expanded fields:
 		first_name,
 		last_name,
 		date_of_birth,
@@ -115,12 +129,8 @@
 ).
 
 
+
 % Describes the Mnesia internal entry type (fields) for Orge connections.
-% The connection identifier is a counter set by the Orge server, starting from
-% 1.
-% login_status is in: [not_tried_yet, access_granted, bad_login, bad_password,
-% timeout, marshalling_failed, already_connected, account_not_active].
-% user_identifier is either an orge_user identifier, or undefined.
 % login is the specified user login (if any)
 % password is the specified user password (if any)
 % ip_address is a {N1,N2,N3,N4} IPv4 address.
@@ -129,31 +139,61 @@
 % Note: depending on the login_status, some fields will be left to undefined.
 -record( orge_connection, 
 	{
+	
+		% The connection identifier is a counter set by the Orge server,
+		% starting from 1:
 		identifier,
+		
+		% Current status of the login, in [not_tried_yet, access_granted,
+		% bad_login, bad_password, timeout, marshalling_failed,
+		% already_connected, account_not_active]:
 		login_status,
+		
+		% The user identifier is either an orge_user identifier, or undefined:
 		user_identifier,
+		
+		% Login is the specified user login (if any):
 		login,
+		
+		% Password is the specified user password (if any):
 		password,
+		
+		% The IPv4 address of the peer {N1,N2,N3,N4}:
 		ip_address,
+		
+		% The port is an unsigned integer:
 		port,
+		
+		% Connection start time is either a timestamp or undefined:
 		start_time,
+		
+		% Connection stop time is either a timestamp or undefined:
 		stop_time,
+		
+		% The supposed country of the peer, as geolocated:
 		geolocated_country,
+		
+		% The supposed region of the peer, as geolocated:
 		geolocated_region,
+		
+		% The supposed city of the peer, as geolocated:
 		geolocated_city,
+		
+		% The supposed postal code of the peer, as geolocated:
 		geolocated_postal_code
+		
 	}
 ).
 
 
 
 % List of all the tables of interest in the Orge database:
--define(table_list,[orge_user,orge_connection]).
+-define( table_list, [ orge_user, orge_connection ] ).
 
 
 
 % Starts an Orge database and returns its PID.
-% InitMode can be:
+% InitMode is an atom that can be:
 %   - from_scratch: to start a fresh new (blank) database
 %   - from_previous_state: to start a previously existing database, read from
 % file
@@ -162,33 +202,23 @@ start(InitMode) ->
 
 
 % Starts a linked Orge database and returns its PID.
-% InitMode can be:
-%   - from_scratch: to start a fresh new (blank) database
-%   - from_previous_state: to start a previously existing database, read from
-% file
+% See start/1 for parameter documentation.
 start_link(InitMode) ->
 	spawn_link( fun() -> init(InitMode,no_listener) end ).
 
 
 
-% Starts an Orge database and returns its PID. 
+% Starts an Orge database, notifies a listener and returns the database PID. 
 % Will notify specified listener whenever the database will be up and
 % running.
-% InitMode can be:
-%   - from_scratch: to start a fresh new (blank) database
-%   - from_previous_state: to start a previously existing database, read from
-% file
+% See start/1 for the documentation of other parameters.
 start(InitMode,ListenerPid) ->
 	spawn( fun() -> init(InitMode,ListenerPid) end ).
 
 
-% Starts a linked Orge database and returns its PID. 
-% Will notify specified listener whenever the database will be up and
-% running.
-% InitMode can be:
-%   - from_scratch: to start a fresh new (blank) database
-%   - from_previous_state: to start a previously existing database, read from
-% file
+% Starts a linked Orge database, notifies a listener and returns the 
+% database PID. 
+% See start_link/1 for the documentation of other parameters.
 start_link(InitMode,ListenerPid) ->
 	spawn_link( fun() -> init(InitMode,ListenerPid) end ).
 
@@ -199,11 +229,15 @@ start_link(InitMode,ListenerPid) ->
 
 
 % init returns the first database state.
-init(from_scratch,ListenerPid) ->
+init( from_scratch, ListenerPid ) ->
+
 	?emit_info([ "Starting Orge database, created from scratch." ]),
+	
 	start_geolocation_service(),
+	
 	% Includes only this node:
 	DatabaseNodes = get_database_nodes(),
+	
 	% Ignore failure if no schema was already existing:
 	case mnesia:delete_schema( DatabaseNodes ) of 
 	
@@ -220,34 +254,51 @@ init(from_scratch,ListenerPid) ->
 				[Reason] ) ])
 	
 	end,
+	
 	?emit_trace( [ "Creating database schema." ] ),
     ok = mnesia:create_schema( DatabaseNodes ),
+	
 	?emit_trace( [ "Starting database." ] ),
     ok = mnesia:start(),
+	
 	create_tables_on( DatabaseNodes ),
 	notify_ready(ListenerPid),
 	?emit_trace( [ "Orge database ready." ] ),
+	
+	% Current user ID is 1 here:
 	loop( #database_state{ current_user_id=1 } );
 	
-init(from_previous_state,ListenerPid) ->	
+init( from_previous_state, ListenerPid ) ->	
+
 	?emit_info([ "Starting Orge database from previous state." ]),
-	ok = mnesia:start(),
+	
 	start_geolocation_service(),
+
+	ok = mnesia:start(),
+	
 	TargetTables = ?table_list,
+	
  	?emit_debug([ io_lib:format( 
 		"Waiting for the loading of following tables: ~w.",
 		[TargetTables] ) ]),
+		
 	% Hangs until all tables in the list are accessible, or until the
 	% time-out occurs (milliseconds):
-	ok = mnesia:wait_for_tables(TargetTables, 4000),
+	ok = mnesia:wait_for_tables( TargetTables, _TimeOut = 4000),
+	
 	notify_ready(ListenerPid),
+	
 	?emit_trace( [ "Orge database ready." ] ),
+	
+	% FIXME: should start at latest, not 1:
 	loop( #database_state{ current_user_id=1 } ).
+
 
 
 start_geolocation_service() ->
 	?emit_trace( [ "Starting IP geolocation service." ] ),
 	{ok,_Pid} = egeoip:start().
+
 
 
 notify_ready(no_listener) ->
@@ -260,7 +311,9 @@ notify_ready(ListenerPid) ->
 	
 % The database main loop.
 loop( DatabaseState ) ->
+
 	?emit_debug([ "Database waiting for requests." ]),
+	
 	receive
 	
 		% User-related actions.
@@ -317,6 +370,7 @@ loop( DatabaseState ) ->
 	end.
 
 
+
 % Registers specified Orge user settings, where NewUserSettings is an 
 % orge_user_settings record, in one transaction.
 % The caller is notified of the result of the operation: user_registered or
@@ -331,7 +385,7 @@ register_user(DatabaseState,NewUserSettings,CallerPid) ->
 			NewUser = update_from_settings( 
 				#orge_user{  
 					identifier = ThisUserId,
-					account_creation_time = utils:get_timestamp(),
+					account_creation_time = basic_utils:get_timestamp(),
 					account_status = active,
 					characters = none
 				}, NewUserSettings ),	
@@ -480,6 +534,7 @@ get_user_from_login( AccountLogin ) ->
 	end	.
 
 
+
 % Returns either no_connection, or the orge_connection record corresponding
 % to specified Orge connection identifier. 	
 get_connection( ConnectionId ) ->
@@ -494,6 +549,25 @@ get_connection( ConnectionId ) ->
 			Connection	
 			
 	end	.
+
+
+
+% Returns the active orge_connection record corresponding to specified Orge
+% connection identifier, otherwise throws an exception. 
+get_active_connection( ConnectionId ) ->
+	case manage_query( qlc:q([ X || X <- mnesia:table(orge_connection),
+			X#orge_connection.identifier =:= ConnectionId,
+			X#orge_connection.login_status =:= active ]) ) of 
+		
+		[] ->
+			throw( {no_active_connection,ConnectionId} );
+			
+		% At most one entry should match:	
+		[Connection] ->
+			Connection	
+			
+	end	.
+
 
 
 % Returns either not_connected, or the orge_connection record corresponding
@@ -568,12 +642,14 @@ update_from_settings( OrgeUser, OrgeUserSettings ) ->
 	}.
 	
 	
-% Manages a QLC query.	
+	
+% Manages generically a QLC query.	
 manage_query(Q) ->
     F = fun() -> qlc:e(Q) end,
     {atomic, Val} = mnesia:transaction(F),
     Val.
  	
+	
 
 % Returns a textual description of specified Orge user settings record.
 user_settings_to_string(OrgeUserSettings) ->
@@ -616,8 +692,8 @@ user_to_string(OrgeUser) ->
 		" account login is '~s', account password is '~s', "
 		"security question is '~s', security answer is '~s'",
 		[ 
-			utils:integer_to_string( ?user.identifier ),
-			utils:timestamp_to_string( 
+			basic_utils:integer_to_string( ?user.identifier ),
+			basic_utils:timestamp_to_string( 
 				?user.account_creation_time ),
 			?user.characters,
 			?user.account_status,
@@ -680,11 +756,11 @@ connection_to_string(OrgeConnection) ->
 untried_connection_to_string(OrgeConnection) ->
 	io_lib:format( "Unregistered connection #~s at ~s from host ~s.",
 		[ 
-			utils:integer_to_string( 
+			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
-			utils:timestamp_to_string( 
+			basic_utils:timestamp_to_string( 
 				OrgeConnection#orge_connection.start_time ),
-			utils:ipv4_to_string( OrgeConnection#orge_connection.ip_address,
+			basic_utils:ipv4_to_string( OrgeConnection#orge_connection.ip_address,
 				OrgeConnection#orge_connection.port	)
 		] ).
 
@@ -697,23 +773,23 @@ connection_granted_to_string(OrgeConnection) ->
 		
 		Timestamp ->
 			io_lib:format( "stopped at ~s", 
-				[ utils:timestamp_to_string(Timestamp) ] )
+				[ basic_utils:timestamp_to_string(Timestamp) ] )
 	
 	end,
 	io_lib:format( "Successful connection #~s of Orge user #~s "
 		"(login: '~s', password: '~s'), from host ~s, started at ~s, ~s.",
 		[ 
-			utils:integer_to_string( 
+			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
-			utils:integer_to_string(
+			basic_utils:integer_to_string(
 				OrgeConnection#orge_connection.user_identifier ),
 			OrgeConnection#orge_connection.login,
 			OrgeConnection#orge_connection.password,
-			utils:ipv4_to_string( 
+			basic_utils:ipv4_to_string( 
 				OrgeConnection#orge_connection.ip_address,
 				OrgeConnection#orge_connection.port
 			),
-			utils:timestamp_to_string( 
+			basic_utils:timestamp_to_string( 
 				OrgeConnection#orge_connection.start_time ),
 			StopSentence
 		] ).
@@ -723,15 +799,15 @@ connection_bad_login_to_string(OrgeConnection) ->
 	io_lib:format( "Failed connection #~s due to bad login '~s' "
 		"(with specified password '~s') from host ~s at ~s.",
 		[ 
-			utils:integer_to_string( 
+			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
 			OrgeConnection#orge_connection.login,
 			OrgeConnection#orge_connection.password,		
-			utils:ipv4_to_string( 
+			basic_utils:ipv4_to_string( 
 				OrgeConnection#orge_connection.ip_address,
 				OrgeConnection#orge_connection.port
 			),
-			utils:timestamp_to_string( 
+			basic_utils:timestamp_to_string( 
 				OrgeConnection#orge_connection.start_time )
 		] ).
 
@@ -740,15 +816,15 @@ connection_bad_password_to_string(OrgeConnection) ->
 	io_lib:format( "Failed connection #~s due to bad password '~s' "
 		"for known login '~s' from host ~s at ~s.",
 		[ 
-			utils:integer_to_string( 
+			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
 			OrgeConnection#orge_connection.password,		
 			OrgeConnection#orge_connection.login,
-			utils:ipv4_to_string( 
+			basic_utils:ipv4_to_string( 
 				OrgeConnection#orge_connection.ip_address,
 				OrgeConnection#orge_connection.port
 			),
-			utils:timestamp_to_string( 
+			basic_utils:timestamp_to_string( 
 				OrgeConnection#orge_connection.start_time )
 		] ).
 
@@ -756,11 +832,11 @@ connection_bad_password_to_string(OrgeConnection) ->
 connection_timeout_to_string(OrgeConnection) ->
 	io_lib:format( "Time-out for connection #~s at ~s from host ~s.",
 		[ 
-			utils:integer_to_string( 
+			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
-			utils:timestamp_to_string( 
+			basic_utils:timestamp_to_string( 
 				OrgeConnection#orge_connection.start_time ),
-			utils:ipv4_to_string( 
+			basic_utils:ipv4_to_string( 
 				OrgeConnection#orge_connection.ip_address,
 				OrgeConnection#orge_connection.port	)
 		] ).
@@ -769,11 +845,11 @@ connection_timeout_to_string(OrgeConnection) ->
 connection_marshalling_failed_to_string(OrgeConnection) ->
 	io_lib:format( "Failed marshalling for connection #~s at ~s from host ~s.",
 		[ 
-			utils:integer_to_string( 
+			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
-			utils:timestamp_to_string( 
+			basic_utils:timestamp_to_string( 
 				OrgeConnection#orge_connection.start_time ),
-			utils:ipv4_to_string( 
+			basic_utils:ipv4_to_string( 
 				OrgeConnection#orge_connection.ip_address,
 				OrgeConnection#orge_connection.port	)
 		] ).
@@ -784,17 +860,17 @@ connection_already_existing_to_string(OrgeConnection) ->
 		" for Orge user #~s (login: '~s', password: '~s'), from host ~s, "
 		"at ~s.",
 		[ 
-			utils:integer_to_string( 
+			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
-			utils:integer_to_string(
+			basic_utils:integer_to_string(
 				OrgeConnection#orge_connection.user_identifier ),
 			OrgeConnection#orge_connection.login,
 			OrgeConnection#orge_connection.password,		
-			utils:ipv4_to_string( 
+			basic_utils:ipv4_to_string( 
 				OrgeConnection#orge_connection.ip_address,
 				OrgeConnection#orge_connection.port
 			),
-			utils:timestamp_to_string( 
+			basic_utils:timestamp_to_string( 
 				OrgeConnection#orge_connection.start_time )
 		] ).
 
@@ -804,17 +880,17 @@ connection_no_active_account_to_string(OrgeConnection) ->
 		" for Orge user #~s (login: '~s', password: '~s'), from host ~s, "
 		"at ~s.",
 		[ 
-			utils:integer_to_string( 
+			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
-			utils:integer_to_string(
+			basic_utils:integer_to_string(
 				OrgeConnection#orge_connection.user_identifier ),
 			OrgeConnection#orge_connection.login,
 			OrgeConnection#orge_connection.password,		
-			utils:ipv4_to_string( 
+			basic_utils:ipv4_to_string( 
 				OrgeConnection#orge_connection.ip_address,
 				OrgeConnection#orge_connection.port
 			),
-			utils:timestamp_to_string( 
+			basic_utils:timestamp_to_string( 
 				OrgeConnection#orge_connection.start_time )
 		] ).
 		
@@ -1030,14 +1106,16 @@ check_validity_of_security_challenge( _SecurityQuestion, _SecurityAnswer ) ->
 
 % Checks specified login request, logs it appropriately in database and 
 % performs the login if successful.
-try_login( Login ,Password, ConnectionId, ClientNetId ) ->
+try_login( Login, Password, ConnectionId, ClientNetId ) ->
+
 	% First, check that login is known and that password matches:
 	case get_user_from_login(Login) of
 	
 		not_found ->
 			record_bad_login(Login,Password,ConnectionId,ClientNetId);
 			
-		% Only AccountStatus is not already bound:
+		% An orge_user entry has been found for Login, and Password, already
+		% bound, matches here:
 		#orge_user{ identifier=UserId, account_password=Password,
 				account_status = AccountStatus } ->
 			
@@ -1050,10 +1128,12 @@ try_login( Login ,Password, ConnectionId, ClientNetId ) ->
 					case get_running_connection_for(UserId) of
 			
 						not_connected ->
+							% OK, connection can then proceed:
 							record_access_granted( Login, Password,
 								ConnectionId, ClientNetId, UserId );
 													
 						_Connection ->
+							% Failure, as already connected:
 							record_already_connected( Login, Password,
 								ConnectionId, ClientNetId, UserId )
 					
@@ -1068,7 +1148,7 @@ try_login( Login ,Password, ConnectionId, ClientNetId ) ->
 					
 		_Other ->
 			% We have here a match, but with a different password:
-			record_bad_password( Login ,Password, ConnectionId, ClientNetId )
+			record_bad_password( Login, Password, ConnectionId, ClientNetId )
 			
 	end.
 	
@@ -1087,10 +1167,12 @@ record_access_granted( Login, Password, ConnectionId,
 		password = Password,
 		ip_address = ClientIP,
 		port = ClientPort,
-		start_time = utils:get_timestamp(),
+		start_time = basic_utils:get_timestamp(),
 		stop_time = undefined
 	},
+	
 	LocatedConnection = add_geolocation_infos(NewConnection),
+	
 	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
@@ -1106,8 +1188,10 @@ record_access_granted( Login, Password, ConnectionId,
 	end.	
 
 
+
 % Records that connection and returns an atom describing its status.
 record_bad_login( Login, Password, ConnectionId, {ClientIP,ClientPort} ) ->
+
 	NewConnection = #orge_connection{
 		identifier = ConnectionId,
 		login_status = bad_login,
@@ -1116,10 +1200,12 @@ record_bad_login( Login, Password, ConnectionId, {ClientIP,ClientPort} ) ->
 		password = Password,
 		ip_address = ClientIP,
 		port = ClientPort,
-		start_time = utils:get_timestamp()
+		start_time = basic_utils:get_timestamp()
 		%stop_time
 	},
+	
 	LocatedConnection = add_geolocation_infos(NewConnection),
+	
 	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
@@ -1138,6 +1224,7 @@ record_bad_login( Login, Password, ConnectionId, {ClientIP,ClientPort} ) ->
 	
 % Records that connection and returns an atom describing its status.
 record_bad_password( Login, Password, ConnectionId, {ClientIP,ClientPort} ) ->
+
 	NewConnection = #orge_connection{
 		identifier = ConnectionId,
 		login_status = bad_password,
@@ -1146,10 +1233,12 @@ record_bad_password( Login, Password, ConnectionId, {ClientIP,ClientPort} ) ->
 		password = Password,
 		ip_address = ClientIP,
 		port = ClientPort,
-		start_time = utils:get_timestamp()
+		start_time = basic_utils:get_timestamp()
 		%stop_time
 	},
+
 	LocatedConnection = add_geolocation_infos(NewConnection),
+
 	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
@@ -1164,6 +1253,7 @@ record_bad_password( Login, Password, ConnectionId, {ClientIP,ClientPort} ) ->
 	
 	end.	
 
+
 	
 % Records that connection and returns an atom describing its status.
 record_timeout( ConnectionId, {ClientIP,ClientPort} ) ->
@@ -1175,10 +1265,12 @@ record_timeout( ConnectionId, {ClientIP,ClientPort} ) ->
 		%password
 		ip_address = ClientIP,
 		port = ClientPort,
-		start_time = utils:get_timestamp()
+		start_time = basic_utils:get_timestamp()
 		%stop_time
 	},
+	
 	LocatedConnection = add_geolocation_infos(NewConnection),
+	
 	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
@@ -1194,6 +1286,7 @@ record_timeout( ConnectionId, {ClientIP,ClientPort} ) ->
 	end.	
 
 
+
 % Records that connection and returns an atom describing its status.
 % Garbled identifiers could be stored maybe.
 record_marshalling_failure(ConnectionId,{ClientIP,ClientPort}) ->
@@ -1205,10 +1298,12 @@ record_marshalling_failure(ConnectionId,{ClientIP,ClientPort}) ->
 		%password
 		ip_address = ClientIP,
 		port = ClientPort,
-		start_time = utils:get_timestamp()
+		start_time = basic_utils:get_timestamp()
 		%stop_time
 	},
+	
 	LocatedConnection = add_geolocation_infos(NewConnection),
+	
 	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
@@ -1224,10 +1319,12 @@ record_marshalling_failure(ConnectionId,{ClientIP,ClientPort}) ->
 	
 	end.	
 
+
 	
 % Records that connection and returns an atom describing its status.
 record_already_connected( Login, Password, ConnectionId, 
 		{ClientIP,ClientPort}, UserId ) ->
+		
 	NewConnection = #orge_connection{
 		identifier = ConnectionId,
 		login_status = already_connected,
@@ -1236,10 +1333,12 @@ record_already_connected( Login, Password, ConnectionId,
 		password = Password,
 		ip_address = ClientIP,
 		port = ClientPort,
-		start_time = utils:get_timestamp()
+		start_time = basic_utils:get_timestamp()
 		%stop_time
 	},
+	
 	LocatedConnection = add_geolocation_infos(NewConnection),
+	
 	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
@@ -1253,11 +1352,13 @@ record_already_connected( Login, Password, ConnectionId,
 			internal_error	
 	
 	end.	
+	
 
 
 % Records that connection and returns an atom describing its status.
 record_account_non_active( Login, Password,	ConnectionId, 
 		{ClientIP,ClientPort}, UserId ) ->
+		
 	NewConnection = #orge_connection{
 		identifier = ConnectionId,
 		login_status = account_not_active,
@@ -1266,10 +1367,12 @@ record_account_non_active( Login, Password,	ConnectionId,
 		password = Password,
 		ip_address = ClientIP,
 		port = ClientPort,
-		start_time = utils:get_timestamp()
+		start_time = basic_utils:get_timestamp()
 		%stop_time
 	},
+	
 	LocatedConnection = add_geolocation_infos(NewConnection),
+	
 	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
@@ -1286,15 +1389,20 @@ record_account_non_active( Login, Password,	ConnectionId,
 	end.	
 	
 	
+	
 % Updates that connection and returns an atom describing its status.
 record_end_of_session(ConnectionId) ->
-	% Check that session exists and is recorded as active:
-	Connection = get_connection(ConnectionId),
-	% Update its entry (no login_status change):
+
+	% Checks that session exists and is recorded as active:
+	Connection = get_active_connection(ConnectionId),
+	
+	% Updates its entry (no login_status change):
 	NewConnection = Connection#orge_connection { 
-		stop_time = utils:get_timestamp()
+		stop_time = basic_utils:get_timestamp()
 	},
+	
 	LocatedConnection = add_geolocation_infos(NewConnection),
+	
 	F = fun() -> mnesia:write( LocatedConnection ) end,
 	case mnesia:transaction(F) of
 	
@@ -1308,12 +1416,15 @@ record_end_of_session(ConnectionId) ->
 			internal_error	
 	
 	end.	
+	
 
 
 % Updates connection records with IP geolocation informations.
 add_geolocation_infos(Connection) ->
-	TargetAddress = utils:ipv4_to_string( 
+
+	TargetAddress = basic_utils:ipv4_to_string( 
 		Connection#orge_connection.ip_address ),
+		
 	case egeoip:lookup( TargetAddress ) of
 	
 		{ ok, {geoip,_CountryCode, _OtherCountryCode, CountryName, Region, City,
@@ -1328,6 +1439,7 @@ add_geolocation_infos(Connection) ->
 		{ error, Reason } ->
 			?emit_error([ io_lib:format( "Geolocation of ~s failed: ~w",
 				[TargetAddress,Reason] ) ]),
+			% Returning as is:	
 			Connection
 			
 	end.				
