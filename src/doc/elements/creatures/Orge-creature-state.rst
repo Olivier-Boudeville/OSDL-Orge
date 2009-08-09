@@ -38,11 +38,14 @@ States of altered consciousness are:
  - Sleeping 
  
  - Mad: includes illness (mental disease)
- 
+
+
+Note also that the state (and behaviour) of creatures may depend on the context, on the environment they are in: for example, some species may experience morale failure if temperature is too low, or may be well adapted to the dark and thus have a tendency to lurk mostly at night, etc.
  
 This model is declared in class_Creature_, with the `creature_fatigue_model` record.
 
 See the `Fatigue`_ section for further details.
+
 
 
 Health Modifiers
