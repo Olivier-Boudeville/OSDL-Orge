@@ -5,6 +5,8 @@
 A Focus on Conflicts & Combats
 ==============================
 
+Conflicts may happen either in a controlled manner (ex: in the context of a duel), or not (ex: assassination in the wilderness).
+
 
 Combat Design Guidelines
 ------------------------
@@ -65,7 +67,6 @@ The initiative is evaluated each round, as various events can affect the creatur
 
 Action Phase
 ............
-
 
 During its turn, as long as its action points allow it, a creature may perform any combination of following actions:
 
