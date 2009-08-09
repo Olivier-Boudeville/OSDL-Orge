@@ -34,15 +34,21 @@
 
 % Implementation notes.
 
-% TO-DO: The client manager should buffer a bit sendings, so that gen_tcp:send
-% does not eat all the CPU.
+
+% TO-DO:
+%
+%  - the client manager could buffer a bit sendings, lest gen_tcp:send
+% eats too much CPU?
+%  - client and server should check that their versions are compatible
+%
 
 
--export([init/4]).
+-export([ init/4 ]).
 
 
 % For manager_state:
 -include("orge_client_manager.hrl").
+
 
 % For default_identifier_separator:
 -include("orge_tcp_server.hrl").
@@ -53,18 +59,48 @@
 
 
 
+% The version of this client manager:
+-define(manager_version,0.1).
+
+
+% The oldest client version that this client manager supports:
+-define(oldest_supported_client_version,?manager_version).
+
+
+
 % Internal record that stores the current state of the server-side manager of 
 % a client connection:
-% client_host is {IPv4,Port}.
 -record( manager_state, {
+
+	% Stores any login used by a client:
 	client_login,
+	
+	% Address and port for the connected client ({IPv4,Port}):
 	client_host,
+
+	% Version of this manager:
+	manager_version,
+	
+	% Oldest supported client version:
+	oldest_supported_client_version,
+	
+	% Timestamp to record when this manager started:
 	starting_time,
+	
+	% The client socket returned by accept:
 	client_socket,
+	
+	% The Pid of the Orge server that spawned this manager:
 	server_pid,
+	
+	% The identifier of that connection (actually its number):
 	connection_identifier,
-	database_pid          
+	
+	% The Pid of the Orge database:
+	database_pid 
+	        
 } ).
+
 
 
 % Shortcut macro, for convenience: 
@@ -72,29 +108,75 @@
 
 
 
-% Inits the client socket.
-init(ServerPid,ListenSocket,ConnectionIdentifier,DatabasePid) ->
+% Inits the client socket for that client manager.
+init( ServerPid, ListenSocket, ConnectionIdentifier, DatabasePid ) ->
 
 	?emit_debug([ io_lib:format( 
-		"Client manager ~w waiting for next connection #~s.", 
-			[self(),utils:integer_to_string(ConnectionIdentifier)] ) ]),
+		"Client manager ~w waiting for next connection #~B.", 
+			[self(),ConnectionIdentifier] ) ]),
 			
-	% This process will be the one controlling the client socket once created:	
+	% This process will be the one controlling the client socket once created;
+	% accept will block until a connection is made:	
 	case gen_tcp:accept(ListenSocket) of
 	
 		{ok,ClientSocket} ->
-			?emit_debug([ "Connection accepted." ]),
-			{ok,ClientHost} = inet:peername(ClientSocket),
+		
+			% Allows the server to handle next connections ASAP:
 			ServerPid ! {self(),accepted},
+			
+			?emit_debug([ io_lib:format( "Connection ~B accepted.",
+				[ConnectionIdentifier] ) ]),
+			
+			inet:setopts( ClientSocket, [
+				
+				% Received Packet is delivered as a binary:
+				binary, 
+
+				% FIXME Using 'once' allows for flow control:	
+				%{active,once},
+				{active,true},
+
+				% A constant size header will specify the number of bytes in the
+				% packets:
+				{packet,?default_packet_header_size},
+				
+				% Allows the local reuse of the port number:
+				{reuseaddr,true},
+				
+				% Enables periodic transmission on the socket, to avoid the
+				% connection is considered broken if idle too long:
+				{keepalive,true}
+				
+			]),
+
+			{ok,ClientHost} = inet:peername(ClientSocket),
+			
+			% TO-DO: store some reverse-DNS information with 'host':
+			% > host 82.225.152.215
+			% 215.152.225.82.in-addr.arpa domain name pointer esperide.com.
+			% if grep pointer else "unknown"...
+			% host 82.225.152.215|sed 's|.*pointer ||1' | sed 's|.$||1'
+			
 			ManagerState = #manager_state{
 				client_login = not_tried_yet,
 				client_host = ClientHost,
-			    starting_time = utils:get_timestamp(),
+				manager_version = ?manager_version,
+				oldest_supported_client_version =
+					?oldest_supported_client_version,
+			    starting_time = basic_utils:get_timestamp(),
 				client_socket = ClientSocket,
 				server_pid = ServerPid,
 				connection_identifier = ConnectionIdentifier,
 				database_pid = DatabasePid
 			},
+			% TO-DO:
+			% VersionState = check_versions( ManagerState ),
+			
+			% Useful to introduce random delays:
+			% (seeding necessary otherwise always the same values)
+			{A1,A2,A3} = now(),
+			random:seed( A1, A2, A3 ),
+			
 			control_access( ManagerState );
 			
 		{error,closed} ->
@@ -123,6 +205,7 @@ control_access( ManagerState ) ->
 			% No recursive call here.
 		
 		{tcp,ClientSocket,Data} ->
+			% Thanks to initial header, we received here a full packet.
 			% First message from client must be login informations.
 			%?emit_debug([ io_lib:format( 
 			%	"Client manager received following TCP message: ~w.", 
@@ -150,6 +233,7 @@ control_access( ManagerState ) ->
 								"password '~s': bad (unregistered) login.",
 								 [Login,Password] ) ]),
 							gen_tcp:send( ClientSocket,	<<?access_denied>> ),
+							gen_tcp:close( ?getState.client_socket ),
 							?getState.server_pid ! {self(),closed};
 							% No loop here.	
 							
@@ -160,6 +244,7 @@ control_access( ManagerState ) ->
 								"incorrect password.",
 								 [Login,Password] ) ]),
 							gen_tcp:send( ClientSocket,	<<?access_denied>> ),
+							gen_tcp:close( ?getState.client_socket ),
 							?getState.server_pid ! {self(),closed};
 							% No loop here.	
 							
@@ -170,6 +255,7 @@ control_access( ManagerState ) ->
 								"but account already in use.",
 								 [Login,Password] ) ]),
 							gen_tcp:send( ClientSocket,	<<?already_connected>>),
+							gen_tcp:close( ?getState.client_socket ),
 							?getState.server_pid ! {self(),closed};
 							% No loop here.	
 														
@@ -180,6 +266,7 @@ control_access( ManagerState ) ->
 								"but account not active.",
 								 [Login,Password] ) ]),
 							gen_tcp:send( ClientSocket,	<<?access_denied>>),
+							gen_tcp:close( ?getState.client_socket ),
 							?getState.server_pid ! {self(),closed};
 							% No loop here.								
 				
@@ -189,6 +276,7 @@ control_access( ManagerState ) ->
 								"password '~s': internal error.",
 								 [Login,Password] ) ]),
 							gen_tcp:send( ClientSocket,	<<?access_denied>>),
+							gen_tcp:close( ?getState.client_socket ),
 							?getState.server_pid ! {self(),closed}
 							% No loop here.	
 
@@ -203,8 +291,12 @@ control_access( ManagerState ) ->
 					?getState.database_pid ! { declare_marshalling_failed,
 						?getState.connection_identifier, 
 						?getState.client_host },	
+					
+					% Waits for a random duration between 1 and 2 seconds:
+					timer:sleep( 1000 + random:uniform(1000) ),
 							
 					gen_tcp:send( ClientSocket, <<?ill_formatted_identifiers>>),
+					gen_tcp:close( ?getState.client_socket ),
 						
 					?getState.server_pid ! {self(),closed}
 					% No loop here.
@@ -231,8 +323,8 @@ control_access( ManagerState ) ->
 		?getState.database_pid	! { declare_timeout, 
 			?getState.connection_identifier, ?getState.client_host },
 			
-		gen_tcp:send(?getState.client_socket,<<?timed_out>>), 
-		
+		gen_tcp:send( ?getState.client_socket, <<?timed_out>> ), 
+		gen_tcp:close( ?getState.client_socket ),
 		?getState.server_pid ! {self(),closed}
 		% No loop here.
 				
@@ -250,7 +342,9 @@ loop( ManagerState ) ->
 		orge_server_shutdown ->
 			?emit_info([ "Received a shutdown notification from server, "
 				"notifying the client and stopping now." ]),
-			gen_tcp:send( ClientSocket, <<?shutdown_notification>> );
+			gen_tcp:send( ClientSocket, <<?shutdown_notification>> ),
+			gen_tcp:close( ?getState.client_socket ),
+			?getState.server_pid ! {self(),closed};
 			% No loop here.
 		
 		{tcp_closed,ClientSocket} ->
@@ -279,21 +373,24 @@ loop( ManagerState ) ->
 	end.
 
 
+
 on_server_shutdown(ManagerState) ->
 	?emit_info([ "Received a shutdown notification from server, "
 		"notifying client and stopping now." ]),
-	gen_tcp:send( ?getState.client_socket, <<?shutdown_notification>> ).
+	gen_tcp:send( ?getState.client_socket, <<?shutdown_notification>> ),
+	gen_tcp:close( ?getState.client_socket ).
+	
 	
 	
 % Checks that specified login/password are correct,and not already in use.
 % Registers in all cases the connection in database.	
-declare_identifiers(ManagerState,Login,Password) ->
+declare_identifiers( ManagerState, Login, Password ) ->
 	ConnectionId = ?getState.connection_identifier,
 	{ClientIP,ClientPort} = ?getState.client_host,
 	?emit_debug([ io_lib:format( "Received login '~s' and password '~s', "
 		"checking database from connection ~B for ~s.", 
 		[ Login, Password, ConnectionId,
-			utils:ipv4_to_string(ClientIP,ClientPort) ] ) ]),
+			basic_utils:ipv4_to_string(ClientIP,ClientPort) ] ) ]),
 		
 	?getState.database_pid	! { try_login, {Login,Password}, ConnectionId,
 		?getState.client_host, self() },
@@ -304,4 +401,3 @@ declare_identifiers(ManagerState,Login,Password) ->
 			
 	end.
 		
-	
