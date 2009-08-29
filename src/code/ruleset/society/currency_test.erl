@@ -27,11 +27,12 @@
 -module(currency_test).
 
 
--define(Tested_modules,[currency]).
+-define(Tested_modules, [currency] ).
 
 
-% For all facilities common to all tests:
--include("test_constructs.hrl").
+% For trace facilities:
+-include("traces_for_tests.hrl").
+
 
 
 convertCoinsToCredits( GoldCoinCount, SilverCoinCount, CopperCoinCount ) ->
@@ -50,6 +51,7 @@ convertCreditsToCoins( Credits ) ->
 		[ Credits, Gold, Silver, Copper ] ) ]),
 	{Gold,Silver,Copper}.	 
 	
+
 
 % Run the tests.
 run() ->
