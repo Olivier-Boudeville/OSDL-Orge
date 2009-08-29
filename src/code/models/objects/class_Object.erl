@@ -27,22 +27,28 @@
 
 
 % Determines what are the mother classes of this class (if any):
--define(wooper_superclasses,[class_Describable,class_TraceEmitter]).
+-define(wooper_superclasses,[ class_Describable, class_TraceEmitter ]).
 
 
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters,Description,Size,Weight,MaximumWearLevel,
-	BaseCreditValue).
+-define(wooper_construct_parameters, Description, Size, Weight,
+	MaximumWearLevel, BaseCreditValue ).
+
 
 % Life-cycle related exported operators:
--define(wooper_construct_export,new/5,new_link/5,
-	synchronous_new/5,synchronous_new_link/5,construct/6,delete/1).
+-define( wooper_construct_export, new/5, new_link/5, 
+	synchronous_new/5, synchronous_new_link/5,
+	synchronous_timed_new/5, synchronous_timed_new_link/5,
+	remote_new/6, remote_new_link/6, remote_synchronous_new/6,
+	remote_synchronous_new_link/6, remote_synchronous_timed_new/6,
+	remote_synchronous_timed_new_link/6, construct/6, delete/1 ).
+
+
 
 % Method declarations.
--define(wooper_method_export,getSize/1,setSize/2,getWeight/1,setWeight/2,
-	getBaseCreditValue/1,setBaseCreditValue/2,
-	isUsable/1,isReparable/1,increaseWearOf/2,
-	toString/1).
+-define(wooper_method_export, getSize/1, setSize/2, getWeight/1, setWeight/2,
+	getBaseCreditValue/1, setBaseCreditValue/2,
+	isUsable/1, isReparable/1, increaseWearOf/2, toString/1).
 
 
 
@@ -53,8 +59,10 @@
 % Must be included before class_Describable header:
 -define(TraceEmitterCategorization,"Orge.Object").
 
+
 % Allows to use macros for trace sending:
 -include("class_TraceEmitter.hrl").
+
 
 
 
@@ -62,6 +70,8 @@
 %
 % getDescription/1, setDescription/2 inherited from class_Describable.erl.
 
+
+	
 	
 % Constructs a new object instance:
 %  - Description is a textual description of this object
@@ -80,8 +90,10 @@ construct(State,?wooper_construct_parameters) ->
 	
 	% wear_level is 'Current Wear Level' (CWL).
 	ReadyState = ?setAttributes( TraceState, [ 
-		{size,Size}, {weight,Weight},
-		{wear_level,0},{max_wear_level,MaximumWearLevel},
+		{size,Size}, 
+		{weight,Weight},
+		{wear_level,0},
+		{max_wear_level,MaximumWearLevel},
 		{base_credit_value,BaseCreditValue},
 		{trace_categorization,?TraceEmitterCategorization} ] ),
 
@@ -93,7 +105,7 @@ construct(State,?wooper_construct_parameters) ->
 	
 	
 	
-% Overriden destructor.
+% Overridden destructor.
 delete(State) ->
 	% Class-specific actions:
 	?info([ "Deleting object." ]),
@@ -104,6 +116,7 @@ delete(State) ->
 	class_Describable:delete(TraceState).
 	
 	
+
 	
 
 % Methods section.
@@ -115,6 +128,7 @@ delete(State) ->
 getSize(State) ->
 	?wooper_return_state_result( State,?getAttr(size) ).
 
+	
 	
 % Sets the description of this object.	
 % (oneway)
@@ -129,10 +143,12 @@ getWeight(State) ->
 	?wooper_return_state_result( State,?getAttr(weight) ).
 
 
+
 % Sets the weight of this object, as a floating-point number of kilograms.	
 % (oneway)
 setWeight(State,NewWeight) ->	
 	?wooper_return_state_only( ?setAttribute(State,weight,NewWeight) ).
+	
 	
 	
 
@@ -142,11 +158,13 @@ getBaseCreditValue(State) ->
 	?wooper_return_state_result( State,?getAttr(base_credit_value) ).
 
 
+
 % Sets the base value of this object, as an integer number of credits.
 % (oneway)
 setBaseCreditValue(State,NewValue) ->	
 	?wooper_return_state_only( 
 		?setAttribute(State,base_credit_value,NewValue) ).
+	
 	
 	
 % Tells whether this object can be effectively used, i.e. if it is actually
@@ -157,12 +175,14 @@ isUsable(State) ->
 	?wooper_return_state_result( State, is_usable(State) ).
 
 
+
 % Tells whether this object can be repaired, i.e. if it needs to, and is still
 % able to be repaired.
 % Returns true or false.
 % (const request)
 isReparable(State) ->
 	?wooper_return_state_result( State, is_reparable(State) ).
+	
 	
 	
 % Adds specified wear level to this object.
@@ -182,10 +202,12 @@ increaseWearOf(State,WearToAdd) ->
 	?wooper_return_state_only( ?setAttribute(State,wear_level,NewWearValue) ).
 	
 	
+	
 % Returns a textual description of the state of this object.
 % (const request)
 toString(State) ->
 	?wooper_return_state_result( State, state_to_string(State) ).
+
 
 
 
@@ -226,10 +248,12 @@ is_reparable(State) ->
 			
 	end.
 	
+	
 
 % Returns the wear percentage for this object.
 get_wear_percentage(State) ->
 	?getAttr(wear_level) / ?getAttr(max_wear_level).
+	
 	
 
 % Returns the wear state (atom) for this object.
@@ -257,6 +281,7 @@ get_wear_state(State) ->
 			
 	end.
 
+
 	
 % Returns a textual description of the wear state of this object.
 wear_state_to_string(State) ->
@@ -278,6 +303,7 @@ wear_state_to_string(State) ->
 			"Unreparable"
 					
 	end.
+	
 	
 	
 % Returns a textual description of the state of this object.
