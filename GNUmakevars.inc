@@ -15,17 +15,22 @@ LOANI_INSTALLATIONS_ROOT = $(LOANI_REPOSITORY_ROOT)/../LOANI-installations
 EGEOIP_ROOT = $(LOANI_INSTALLATIONS_ROOT)/egeoip
 
 
+# Previous setting was to use a full Ceylan install:
 # Ceylan sources supposed to be available at the same directory level as OSDL:
-CEYLAN_ROOT := $(LOANI_REPOSITORY_ROOT)/ceylan
+#CEYLAN_ROOT := $(LOANI_REPOSITORY_ROOT)/ceylan
+#CEYLAN_TRUNK := $(CEYLAN_ROOT)/Ceylan/trunk
+#CEYLAN_ERLANG_TOP := $(CEYLAN_TRUNK)/src/code/scripts/erlang
+#CEYLAN_DOC_TOP    := $(CEYLAN_TRUNK)/src/doc
 
-CEYLAN_TRUNK := $(CEYLAN_ROOT)/Ceylan/trunk
-
-CEYLAN_ERLANG_TOP := $(CEYLAN_TRUNK)/src/code/scripts/erlang
-CEYLAN_DOC_TOP    := $(CEYLAN_TRUNK)/src/doc
-
-COMMON_TOP = $(CEYLAN_ERLANG_TOP)/common
+# Now preferring using a dedicated Ceylan-Erlang install:
+CEYLAN_ERLANG_TOP := $(LOANI_REPOSITORY_ROOT)/Ceylan-Erlang
+CEYLAN_DOC_TOP    := $(CEYLAN_ERLANG_TOP)/common/doc
 
 
+# Will define COMMON_TOP and WOOPER_TOP:
+TRACES_TOP = $(CEYLAN_ERLANG_TOP)/traces
+
+	
 # Non-Orge OSDL:
 OSDL_ROOT := $(ORGE_TOP)/../..
 
@@ -93,9 +98,9 @@ DATABASE_STORAGE_INC  = -I$(DATABASE_STORAGE_SRC)
 
 
 INC += $(TCP_CLIENTS_INC) $(UDP_CLIENTS_INC)                \
-	   $(CREATURES_INC) $(OBJECTS_INC) $(SOCIETY_INC)       \
-	   $(TCP_SERVERS_INC) $(UDP_SERVERS_INC)                \
-	   $(CLIENT_MANAGEMENT_INC) $(DATABASE_STORAGE_INC)
+   $(CREATURES_INC) $(OBJECTS_INC) $(SOCIETY_INC)           \
+   $(TCP_SERVERS_INC) $(UDP_SERVERS_INC)                    \
+   $(CLIENT_MANAGEMENT_INC) $(DATABASE_STORAGE_INC)
 	    
 		             
 
@@ -139,5 +144,5 @@ NO_DEFAULT_COOKIE_WANTED="true"
 THIRD_PARTY_OPT = "$(TCP_FIREWALL_OPT)"
 
 	
-include $(COMMON_TOP)/GNUmakesettings.inc
+include $(TRACES_TOP)/GNUmakesettings.inc
 
