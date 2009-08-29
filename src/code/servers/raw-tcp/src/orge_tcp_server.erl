@@ -32,6 +32,8 @@
 %  - simple state management
 %  - database integration
 %
+% Does not use WOOPER, presumably for simpliciy and performances.
+%
 -module(orge_tcp_server).
 
 
@@ -52,7 +54,8 @@
 % by Joe Armstrong (chapter 16).
 %
 % WOOPER has not been used here to presumably speedup the processings, and 
-% as no need for OOP and inheritance is expected.
+% because no need was felt for OOP and inheritance.
+
 
 
 % The role of these servers is simply to break incoming data streams into
@@ -60,7 +63,9 @@
 % to clients.
 %
 % Servers are not expected to record informations about connections: this is
-% to be done by the Orge database.
+% to be done by the Orge database, except for the total connection count,
+% so that new client managers can be directly created by the server with
+% having to contact the database.
 %
 % Servers just keep track of the client managers they launch, as they control
 % their lifecycle.
@@ -72,35 +77,59 @@
 % identifiers (thanks to a manager counter) despite terminations of managers.
 %
 % An Orge TCP server uses one listening socket, and as many
-% per-connection sockets as clients.
-%
-%
-% TO-DO: 
-%
-%  - limit the maximum number of simultaneous connections?
-%  - create a pool of waiting managers?
-%  - if ?getState.connection_count >= maximum_simultaneous_connections
-% then do not spawn a new manager or listen to incoming, resume only when
-% on_client_disconnection is triggered
+% per-connection sockets as clients. A pool of waiting managers could be
+% used, instead of just one pending.
+
+
+% Previously, to limit the maximum number of simultaneous connections, on the
+% last allowed connection we stopped creating a new client manager, therefore
+% no accept() was not performed and any new client had to wait. However in that
+% case this client and the next ones ended in the backlog of the listening
+% socket, without the server even being able to be aware of it, and moreover
+% from the point of view of these clients the connection was accepted but no
+% answer was sent to their login request.
+% Now we accept the connection but immediately returns to the client that
+% the connection was refused due to a too large number of simultaneous clients.
+% Therefore we ensure we always flush the backlog of the listening socket, 
+% and the client manager, when its accept() is performed, ask the server
+% whether the connection can be accepted.
 
 
 % For server defaults:
--include("orge_tcp_server.hrl").
+-include( "orge_tcp_server.hrl").
 
 
 % For emit_*:
--include("traces.hrl").
+-include( "traces.hrl").
 
 
 
 % Exported API section.
 
 -export([ create/3, create_link/3, create/4, create_link/4, 
-	state_to_string/1 ]).
+	get_server_defaults/0, state_to_string/1 ]).
 
 
 % The version of this TCP server:
--define(server_version,0.1).
+-define( server_version, {0,1,0} ).
+
+
+
+% The maximum number of simultaneous active connections:
+-define( default_maximum_simultaneous_connections, 10000 ).
+
+
+
+% Default Orge host.
+-define(default_orge_host,"myorgehost.net").
+
+
+% Default Orge node name.
+-define(default_orge_node,"orge_tcp_server_exec").
+
+
+% Default Orge cookie.
+-define(default_orge_cookie,'my-orge-secret-cookie').
 
 
 
@@ -110,7 +139,7 @@
 	% Atom corresponding to the name of this server:
 	server_name,
 	
-	% List corresponding to the hostname this server runs on:
+	% String corresponding to the hostname this server runs on:
 	host,
 	
 	% Version of this server:
@@ -137,14 +166,15 @@
 	% The port of the listening TCP socket:
 	listening_port,
 	
-	% List of the client managers that are waiting:
+	% List of the client managers that are waiting (if using a manager pool):
 	waiting_managers = [],
 	
 	% List of the currently accepted connections (Pid of managers):
 	accepted_connections = [],
 	
 	% The upper limit (if any) in terms of simultaneous connections:
-	maximum_simultaneous_connections,
+	maximum_simultaneous_connections =
+		?default_maximum_simultaneous_connections,
 	
 	% Total number of connections managed (past and current):
 	connection_count = 0
@@ -168,7 +198,7 @@
 % requested (according to RegistrationType)
 %  - DatabaseInitializationMode tells whether the database should be created
 % empty (if 'from_scratch' is specified) or loaded from a previous instance
-% (of 'from_previous_state' is specified)
+% (if 'from_previous_state' is specified)
 %  - RegistrationType is in 'none', 'local_only', 'global_only',
 % 'local_and_global', depending on what kind of registration is requested 
 % for this server (might be useful as well to ensure it is a singleton)
@@ -179,15 +209,18 @@
 % (static)
 create( ServerName, DatabaseInitializationMode, RegistrationType ) ->
 
-	?emit_trace([ io_lib:format( "Starting a new Orge TCP server named ~s, "
+	send_trace( io_lib:format( "Starting a new Orge TCP server named ~s, "
 		"using the default module for client management.",
-		[ ServerName ] ) ]),
+		[ ServerName ] ) ),
 	
 	% Allows not to export the init function:
-	spawn( fun() -> init( ServerName, DatabaseInitializationMode,
-			RegistrationType )
-		end ).
+	spawn( 
+		fun() -> 
+			init( ServerName, DatabaseInitializationMode, RegistrationType )
+		end
+	).
 		
+
 
 % Creates a new linked Orge TCP server, with a default client management module.
 %
@@ -197,15 +230,17 @@ create( ServerName, DatabaseInitializationMode, RegistrationType ) ->
 % (static)
 create_link( ServerName, DatabaseInitializationMode, RegistrationType ) ->
 
-	?emit_trace([ io_lib:format( 
+	send_trace( io_lib:format( 
 		"Starting a new linked Orge TCP server named ~s, "
 		"using the default module for client management.",
-		[ ServerName ] ) ]),
+		[ ServerName ] ) ),
 			
 	% Avoids to export the init function:
-	spawn_link( fun() -> init( ServerName, DatabaseInitializationMode,
-			RegistrationType )
-		end ).
+	spawn_link( 
+		fun() -> 
+			init( ServerName, DatabaseInitializationMode, RegistrationType )
+		end
+	).
 
 
 
@@ -215,7 +250,7 @@ create_link( ServerName, DatabaseInitializationMode, RegistrationType ) ->
 
 % Creates a new Orge TCP server, using specified client management module.
 %
-% Same as create/3, except an additional parameter, ClientManagementModule,
+% Same as create/3, except for an additional parameter, ClientManagementModule,
 % which is the Erlang module that will manage the dialog with clients
 % (each incoming connection will be given a dedicated spawned process running
 % that code).
@@ -225,14 +260,17 @@ create_link( ServerName, DatabaseInitializationMode, RegistrationType ) ->
 create( ServerName, DatabaseInitializationMode, RegistrationType,
 		ClientManagementModule ) ->
 
-	?emit_trace([ io_lib:format( "Starting a new Orge TCP server named ~s, "
+	send_trace( io_lib:format( "Starting a new Orge TCP server named ~s, "
 		"with user-specified module for client management ~w.",
-		[ ServerName, ClientManagementModule ] ) ]),
+		[ ServerName, ClientManagementModule ] ) ),
 	
 	% Allows not to export the init function:
-	spawn( fun() -> init( ServerName, DatabaseInitializationMode,
-			RegistrationType, ClientManagementModule )
-		end ).
+	spawn( 
+		fun() -> 
+			init( ServerName, DatabaseInitializationMode, RegistrationType,
+				ClientManagementModule )
+		end
+	).
 		
 
 
@@ -245,15 +283,19 @@ create( ServerName, DatabaseInitializationMode, RegistrationType,
 create_link( ServerName, DatabaseInitializationMode, RegistrationType,
 		ClientManagementModule ) ->
 
-	?emit_trace([ io_lib:format(
+	send_trace( io_lib:format(
 		"Starting a new linked Orge TCP server named ~s, "
 		"with user-specified module for client management ~w.",
-		[ ServerName, ClientManagementModule ] ) ]),
+		[ ServerName, ClientManagementModule ] ) ),
 			
 	% Avoids to export the init function:
-	spawn_link( fun() -> init( ServerName, DatabaseInitializationMode,
-			RegistrationType, ClientManagementModule )
-		end ).
+	spawn_link(
+		fun() -> 
+			init( ServerName, DatabaseInitializationMode, RegistrationType,
+				ClientManagementModule )
+		end 
+	).
+
 
 
 
@@ -266,6 +308,7 @@ init( ServerName, DatabaseInitializationMode, RegistrationType ) ->
 		?default_listening_orge_tcp_server_port ).
 
 
+
 % Initializes the TCP server with specified name and module for client 
 % management, and enters its main loop, listening for incoming connections.
 % A default TCP listening port is used here.
@@ -275,9 +318,11 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 		ClientManagementModule, ?default_listening_orge_tcp_server_port ).
 
 
+
 % Initializes the TCP server with specified name, module for client 
 % management and TCP port, and enters its main loop, listening for incoming
 % connections.
+% 
 init( ServerName, DatabaseInitializationMode, RegistrationType,
 	ClientManagementModule, ListeningTCPPort ) 
 		when is_atom(ServerName)
@@ -288,22 +333,32 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 		
 	process_flag( trap_exit, true ),
 
+	{ _TargetHost, _TargetNode, TargetCookie } = get_server_defaults(),
+	
+	true = erlang:set_cookie( node(), TargetCookie ),
+	
 	ok = basic_utils:register_as( ServerName, RegistrationType ),
 
-	?emit_trace([ io_lib:format( "Orge server will listen to TCP port ~B, "
-		"with a maximum backlog of ~B.", 
-		[ListeningTCPPort,?default_backlog] ) ]),
+	send_trace( io_lib:format( "Orge server, ~s-registered as ~s, "
+		"using cookie ~w, will listen to TCP port ~B, "
+		"with a maximum backlog of ~B waiting connections.", 
+		[ RegistrationType, ServerName, TargetCookie, ListeningTCPPort,
+			?default_backlog ]
+	) ),
 		
-	?emit_trace([ io_lib:format( "Starting the Orge database, in '~w' mode.",
-		[DatabaseInitializationMode] ) ]),
+	send_trace( io_lib:format( "Starting the Orge database, in '~w' mode.",
+		[DatabaseInitializationMode] ) ),
 		
 	DatabasePid = orge_database_manager:start_link( 
-		DatabaseInitializationMode, self() ),
+		DatabaseInitializationMode, ?default_maximum_simultaneous_connections,
+			_Listener = self() ),
 			
 	receive
 	
-		orge_database_ready ->
-			?emit_trace([ "Orge database ready." ])
+		{orge_database_ready,InitialConnectionCount} ->
+			send_trace( io_lib:format( "Orge database ready, "
+				"will start at connection count #~B.", 
+				[InitialConnectionCount+1] ) )
 			
 	end,	
 	
@@ -333,7 +388,7 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 			
 		{ok,ListenSocket} ->
 			% Only successful case:
-			?emit_debug([ "Server now waiting for incoming connections." ]),
+			send_debug( "Server now waiting for incoming connections." ),
 
 			ServerState = #server_state{
 				server_name = ServerName,
@@ -348,28 +403,28 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 				listening_port = ListeningTCPPort,
 				waiting_managers = [],
 				accepted_connections = [],
-				connection_count = 0
+				connection_count = InitialConnectionCount
 			},
 			% A pool of more than one manager waiting for accept could
 			% also be used (one manager already waiting to accept should
 			% already be enough).
-			% Initial manager:
+			% Initial already-spawned manager:
 			NewState = create_client_manager( ServerState ),
+			io:format( "  ## The Orge Server is running now ##~n" ),
 			loop( NewState );
 				
 				
 		{error,eaddrinuse} ->
 				
-			?emit_fatal([ io_lib:format( "Error, port ~B already in use "
+			send_fatal( io_lib:format( "Error, port ~B already in use "
 				"(another Orge server instance already running?). "
-				"Stopping this server.",
-				[ListeningTCPPort] ) ]);
+				"Stopping this server.", [ListeningTCPPort] ) );
 
 
 		{error,OtherError} ->
 				
-			?emit_fatal([ io_lib:format( "Error, server could not be launched "
-				"(reason: ~w), stopping this server.", [OtherError] ) ])
+			send_fatal( io_lib:format( "Error, server could not be launched "
+				"(reason: ~w), stopping this server.", [OtherError] ) )
 
 	end.
 
@@ -384,9 +439,8 @@ init( ServerName, DatabaseInitializationMode, RegistrationType,
 % Creates a client manager waiting for any newly accepted connection.
 % Returns an updated state.
 create_client_manager( ServerState ) ->
-
 	
-	?emit_trace([ "Spawning a client manager for next future connection." ]),
+	send_trace( "Spawning a client manager for next future connection." ),
 
 	NewConnectionCount = ?getState.connection_count + 1,
 
@@ -399,7 +453,7 @@ create_client_manager( ServerState ) ->
 		_Args   = [ self(), ?getState.listening_socket, NewConnectionCount,
 			?getState.database_pid ] ),
 	
-	% Waiting managerS as a pool of pre-spawn managers could be used:	
+	% Waiting managerS, as a pool of pre-spawn managers could be used:	
 	?getState{ 
 		waiting_managers = [ NewClientManagerPid | ?getState.waiting_managers ],
 		connection_count = NewConnectionCount
@@ -412,9 +466,9 @@ create_client_manager( ServerState ) ->
 % under which the server is registered and all other informations).
 loop( ServerState ) ->
 	
-	?emit_trace([ "Orge server waiting for incoming connections." ]),
+	send_trace( "Orge server waiting for incoming connections." ),
 	
-	?emit_debug([ io_lib:format( "~s~n", [ state_to_string(ServerState) ] ) ]),
+	send_debug( io_lib:format( "~s~n", [ state_to_string(ServerState) ] ) ),
 	
 	receive
 	
@@ -445,13 +499,18 @@ loop( ServerState ) ->
 		{SenderPid,shutdown} ->
 			on_shutdown_request( ServerState, SenderPid );
 			% No loop( ServerState ) here!
-			
+		
+		{'EXIT',ManagerPid,normal} ->
+			send_debug( io_lib:format( "Manager ~w exited normally.",
+				[ManagerPid] ) ),
+			loop( ServerState );	
+				
 		Other ->
-			?emit_warning([ io_lib:format( 
-				"Following unexpected message was ignored: ~w.", 
-				[Other] ) ])
+			send_warning( io_lib:format( 
+				"Following unexpected message was ignored: ~w.", [Other] ) )
 				
 	end.
+
 
 
 % Declares a new Orge user for future logins.
@@ -464,6 +523,7 @@ on_user_registration( ServerState, NewUserSettings ) ->
 			{ServerState,RegistrationResult}
 	
 	end.
+	
 	
 			 			
 % Unregisters an Orge user, specified by login.
@@ -482,9 +542,9 @@ on_user_unregistration( ServerState, UserLogin ) ->
 % Returns an updated server state.
 on_client_connection( ServerState, ClientManagerPid ) ->
 
-	?emit_debug([ io_lib:format( 
-		"New connection: registering client manager ~w.", 
-		[ClientManagerPid] ) ]),
+	send_debug( io_lib:format( 
+		"New connection accepted by client manager ~w.", 
+		[ClientManagerPid] ) ),
 	
 	% Supposedly found:
 	NewState = ?getState{ waiting_managers = lists:delete( ClientManagerPid,
@@ -495,9 +555,8 @@ on_client_connection( ServerState, ClientManagerPid ) ->
 		accepted_connections =
 			[ ClientManagerPid | ?getState.accepted_connections ]
 	},
-	
-	% Prepare for next incoming connection:
-	create_client_manager(ManagerLessState).
+	create_client_manager( ManagerLessState ).
+
 
 
 % Returns an updated server state.
@@ -506,15 +565,16 @@ on_client_disconnection( ServerState, ClientManagerPid ) ->
 	case lists:member( ClientManagerPid, CurrentConnections ) of
 	
 		true ->
-			?emit_debug([ io_lib:format( "Closed connection: "
-				"removing client manager ~w.",[ClientManagerPid] ) ]),
+			send_debug( io_lib:format( "Closed connection: "
+				"removing client manager ~w.",[ClientManagerPid] ) ),
+				
 			?getState{ accepted_connections =
 				lists:delete( ClientManagerPid, CurrentConnections ) };
-				
+									
 		false ->
-			?emit_error([ io_lib:format( "Error, closed connection ~w "
-				"was not a registered one, nothing done.",
-				[ClientManagerPid] ) ]),
+			send_error( io_lib:format( "Error, closed connection "
+				"for manager ~w was not a registered one, nothing done.",
+				[ClientManagerPid] ) ),
 			ServerState	
 	
 	end.
@@ -524,9 +584,10 @@ on_client_disconnection( ServerState, ClientManagerPid ) ->
 % Manages a server shutdown.
 on_shutdown_request( ServerState, SenderPid ) ->
 
-	?emit_trace([ io_lib:format( 
+	send_trace( io_lib:format( 
 		"Received a shutdown request from ~w, notifying client managers.",
-		[SenderPid] ) ]),
+		[SenderPid] ) ),
+		
 	% Waiting managers will be notified by the closing of the listening socket.	
 	lists:foreach( 
 		fun(Manager) -> 
@@ -535,7 +596,7 @@ on_shutdown_request( ServerState, SenderPid ) ->
 		end, 
 		?getState.accepted_connections ),
 		
-	?emit_trace([ "Shutting down database." ]),
+	send_trace( "Shutting down database." ),
 	?getState.database_pid ! {stop,self()},
 	receive
 	
@@ -543,32 +604,125 @@ on_shutdown_request( ServerState, SenderPid ) ->
 			ok
 			
 	end,
-	?emit_info([ "Shutdown completed." ]),
+	send_info( "Database shutdown, server shutdown completed." ),
 	SenderPid ! orge_server_shutdown.
+	
+
+
+% Returns the default settings for an Orge server, either read from a .orge.rc
+% file at the root of the user directory, otherwise based on built-in
+% (hardcoded) values.
+get_server_defaults() ->
+
+	OrgeConfigFile = file_utils:join( file_utils:get_user_directory(),
+		".orge.rc" ),
+		
+	{Host,Node,Cookie} = case file_utils:is_existing_file( OrgeConfigFile ) of
+	
+		true ->
+			io:format( "Orge configuration file found in '~s'.~n",
+				[OrgeConfigFile] ),
+			{ok,LineElements} = file:consult(OrgeConfigFile),
+			filter_line_elements( LineElements );
+			
+		false ->
+			io:format( "No Orge configuration file found in '~s', using "
+				"built-in defaults.~n", [OrgeConfigFile] ),
+			{undefined,undefined,undefined}
+		
+	end, 
+		
+	FinalHost = case Host of 
+		undefined ->
+			?default_orge_host;
+			
+		OtherHost ->
+			OtherHost
+	end,
+	
+	FinalNode = case Node of 
+		undefined ->
+			?default_orge_node;
+			
+		OtherNode ->
+			OtherNode
+	end,
+	
+	FinalCookie = case Cookie of 
+		undefined ->
+			?default_orge_cookie;
+			
+		OtherCookie ->
+			OtherCookie
+	end,
+	{FinalHost,FinalNode,FinalCookie}.
+				
+
+filter_line_elements( LineElements ) ->
+	filter_line_elements( LineElements, {undefined,undefined,undefined} ).
+	
+	
+filter_line_elements( [], Acc ) ->
+	Acc;
+	
+	
+filter_line_elements( [ {orge_server_hostname,OrgeServerHostname} | T ], 
+		{_Host,Node,Cookie} ) when is_list(OrgeServerHostname) ->
+	filter_line_elements( T, {OrgeServerHostname,Node,Cookie} );
+	
+filter_line_elements( [ {orge_server_nodename,OrgeServerNodename} | T ], 
+		{Host,_Node,Cookie} ) when is_list(OrgeServerNodename) ->
+	filter_line_elements( T, {Host,OrgeServerNodename,Cookie} );
+	
+filter_line_elements( [ {orge_server_cookie,OrgeServerCookie} | T ], 
+		{Host,Node,_Cookie} ) when is_atom(OrgeServerCookie) ->
+	filter_line_elements( T, {Host,Node,OrgeServerCookie} );
+	
+filter_line_elements( [H|_T], _Acc ) ->
+	throw( {unexpected_configuration_entry,H} ).
 
 
 
 % Returns a textual description of the specified server state.
 state_to_string(ServerState) ->
-	io_lib:format( "State of TCP Orge server version ~.1f named ~s:~n"
-		"  + started on ~s at ~s~n"
-		"  + using database instance ~w~n"
+	DatabaseString = case ?getState.database_pid of
+	
+		undefined ->
+			"not currently using any Orge database";
+	
+		DatabasePid ->
+			DatabasePid ! {get_status,self()},
+			receive
+			
+				{ orge_database_status,StatusString } ->
+					StatusString
+					
+			end
+			
+	end,
+	
+	io_lib:format( "State of TCP Orge server version ~s named ~s:~n"
+		"  + started on ~s at ~s, which corresponds to an uptime of ~s~n"
+		"  + ~s~n"
 		"  + listening to TCP port ~w~n"
 		"  + current client management module: ~s~n"
 		"  + ~s~n"
 		"  + ~s~n"
 		"  + ~s~n",
 		[ 
-			?getState.server_version,
+			basic_utils:version_to_string(?getState.server_version),
 			?getState.server_name,
 			?getState.host,
-			basic_utils:get_textual_timestamp(?getState.starting_time), 
-			?getState.database_pid, 
+			basic_utils:get_textual_timestamp(?getState.starting_time),
+			basic_utils:get_textual_duration( ?getState.starting_time,
+				basic_utils:get_timestamp() ),
+			DatabaseString, 
 			?getState.listening_port, 
 			?getState.current_client_module,
 			code_updates_to_string(ServerState),
 			waiting_managers_to_string( ?getState.waiting_managers ),
-			accepted_connections_to_string( ?getState.accepted_connections )
+			accepted_connections_to_string( ?getState.accepted_connections,
+				?getState.maximum_simultaneous_connections )
 		] ).	
 
 
@@ -607,18 +761,65 @@ waiting_managers_to_string( ManagerList ) ->
 
 % Returns a textual description of current accepted connections.
 
-accepted_connections_to_string( [] ) -> 
-	"no connection accepted currently" ;
+accepted_connections_to_string( [], MaxConnectionCount ) -> 
+	io_lib:format( "no connection accepted currently, "
+		"upper limit for active ones being ~B", [MaxConnectionCount] ) ;
 
-accepted_connections_to_string( AcceptedConnections ) -> 
-	accepted_connections_to_string( AcceptedConnections, [] ).
+accepted_connections_to_string( AcceptedConnections, MaxConnectionCount ) -> 
+	accepted_connections_to_string( AcceptedConnections, [], 
+		MaxConnectionCount ).
 
 
-accepted_connections_to_string( [], Acc ) ->
-	 io_lib:format( "currently accepted connections:", [] ) 
-		++ lists:flatten( Acc ) ;
+accepted_connections_to_string( [], Acc, MaxConnectionCount ) ->
+	% Actually the number of running connections is determined by
+	% the database, not by this server based on accepted connections:
+	io_lib:format( 
+	 	"currently there are ~B connections out of a maximum of "
+		"~B running connections:", 
+		[length(Acc),MaxConnectionCount] ) ++ lists:flatten( Acc ) ;
 	
-accepted_connections_to_string( [H|T], Acc ) ->
+accepted_connections_to_string( [H|T], Acc, MaxConnectionCount ) ->
 	accepted_connections_to_string( T, 
-		[ io_lib:format( "~n      * ~w", [H] ) | Acc ] ).
+		[ io_lib:format( "~n      * ~w", [H] ) | Acc ], MaxConnectionCount ).
 	
+
+
+
+% Trace section.
+
+% Note: can be factorized in a header or in a module due to the
+% use of the defines.
+
+-define( trace_emitter_name, "TCP Server" ).
+-define( trace_emitter_categorization, "Orge" ).
+
+
+send_fatal( Message ) ->
+	?notify_fatal( Message, ?trace_emitter_name, 
+		?trace_emitter_categorization ).
+
+	
+send_error( Message ) ->
+	?notify_error( Message, ?trace_emitter_name, 
+		?trace_emitter_categorization ).
+	
+	
+send_warning( Message ) ->
+	?notify_warning( Message, ?trace_emitter_name, 
+		?trace_emitter_categorization ).
+	
+	
+send_info( Message ) ->
+	?notify_info( Message, ?trace_emitter_name, 
+		?trace_emitter_categorization ).
+	
+	
+send_trace( Message ) ->
+	?notify_trace( Message, ?trace_emitter_name, 
+		?trace_emitter_categorization ).
+	
+	
+send_debug( Message ) ->
+	?notify_debug( Message, ?trace_emitter_name, 
+		?trace_emitter_categorization ).
+
