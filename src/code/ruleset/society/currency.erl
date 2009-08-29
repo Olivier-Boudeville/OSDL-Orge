@@ -27,12 +27,13 @@
 -module(currency).
 
 
--export([coins_to_credits/1,coins_to_credits/2,coins_to_credits/3,
-	credits_to_coins/1]).
+-export([ coins_to_credits/1, coins_to_credits/2, coins_to_credits/3,
+	credits_to_coins/1 ]).
 
 
 
 % Note: always protects the macros with parentheses.
+
 
 % 1 copper coin corresponds to 1 credit:
 -define(copper_factor,1).
@@ -45,14 +46,15 @@
 
 
 
-coins_to_credits(CopperCoinCount) ->
+coins_to_credits( CopperCoinCount ) ->
 	CopperCoinCount * ?copper_factor.
 
-coins_to_credits(SilverCoinCount,CopperCoinCount) ->
+
+coins_to_credits( SilverCoinCount, CopperCoinCount ) ->
 	SilverCoinCount * ?silver_factor + coins_to_credits(CopperCoinCount).
 
 
-coins_to_credits(GoldCoinCount,SilverCoinCount,CopperCoinCount) ->
+coins_to_credits( GoldCoinCount, SilverCoinCount, CopperCoinCount ) ->
 	GoldCoinCount * ?gold_factor 
 		+ coins_to_credits(SilverCoinCount,CopperCoinCount).
 
