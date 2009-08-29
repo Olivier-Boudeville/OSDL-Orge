@@ -27,22 +27,31 @@
 
 
 % Determines what are the mother classes of this class (if any):
--define(wooper_superclasses,[class_Actor,class_Describable,class_Locatable]).
+-define(wooper_superclasses,[ class_Actor, class_Describable, 
+	class_Locatable ]).
 
 
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters,CreatureName,Description,Location,Age).
+-define(wooper_construct_parameters, CreatureName, Description, Location, Age ).
 
-% Life-cycle related exported operators:
--define(wooper_construct_export,new/4,new_link/4,
-	synchronous_new/4,synchronous_new_link/4,construct/5,delete/1).
+
+% Declaring all variations of WOOPER standard life-cycle operations:
+% (template pasted, two replacements performed to update arities)
+-define( wooper_construct_export, new/4, new_link/4, 
+	synchronous_new/4, synchronous_new_link/4,
+	synchronous_timed_new/4, synchronous_timed_new_link/4,
+	remote_new/5, remote_new_link/5, remote_synchronous_new/5,
+	remote_synchronous_new_link/5, remote_synchronous_timed_new/5,
+	remote_synchronous_timed_new_link/5, construct/5, delete/1 ).
+
+
 
 % Method declarations.
--define(wooper_method_export,act/1,getAge/1,setAge/2).
+-define(wooper_method_export, act/1, getAge/1, setAge/2 ).
 
 
 % Helper functions.
--export([state_to_string/1]).
+-export([ state_to_string/1 ]).
 
 
 % Allows to define WOOPER base variables and methods for that class:
@@ -52,14 +61,16 @@
 % Must be included before class_TraceEmitter header:
 -define(TraceEmitterCategorization,"Orge.Creature").
 
+
 % Allows to use macros for trace sending:
 -include("class_TraceEmitter.hrl").
 
 
 % For location:
--include("space.hrl").
+%-include("space.hrl").
 
 -include("class_Creature.hrl").
+
 
 
 % Implementation notes:
@@ -73,6 +84,7 @@
 %  - mental_recover_rate: mental FRR (Fatigue Recovery Rate)
 %
 
+	
 	
 % Constructs a new creature:
 %  - CreatureName, the name of the creature
@@ -92,16 +104,19 @@ construct(State,?wooper_construct_parameters) ->
 		"and whose location is ~s.",
 		[ CreatureName, Description, space:location_to_string(Location) ] ) ]),
 	
-	?setAttributes( LocatableState, [ {age,Age},
-		{physical_fatigue,0}, {max_physical_fatigue,0},
+	?setAttributes( LocatableState, [ 
+		{age,Age},
+		{physical_fatigue,0}, 
+		{max_physical_fatigue,0},
 		{physical_recover_rate,0}, 
-		{mental_fatigue,0}, {max_mental_fatigue,0},
+		{mental_fatigue,0}, 
+		{max_mental_fatigue,0},
 		{mental_recover_rate,0}, 
 		{trace_categorization,?TraceEmitterCategorization} ] ).
 	
 	
 	
-% Overriden destructor.
+% Overridden destructor.
 % Unsubscribing for TimeManager supposed already done, thanks to a termination
 % message. 
 delete(State) ->
@@ -116,14 +131,17 @@ delete(State) ->
 	
 	
 	
+	
 
 % Methods section.
+
 
 
 % Returns the age of this creature.
 % (request)
 getAge(State) ->
 	?wooper_return_state_result( State, ?getAttr(age) ).
+	
 	
 	
 % Sets the age of this creature.
@@ -136,6 +154,7 @@ setAge(State,NewAge) ->
 
 % Management section of the actor.
 			
+
 
 % The core of the test actor behaviour.
 % (oneway)
@@ -159,6 +178,6 @@ state_to_string(State) ->
 			class_Describable:get_description(State),
 			class_Locatable:describe_location(State),
 			?getAttr(age),
-			?getAttr(physical_fatigue),?getAttr(max_physical_fatigue),
-			?getAttr(mental_fatigue),?getAttr(max_mental_fatigue) ] ).
+			?getAttr(physical_fatigue), ?getAttr(max_physical_fatigue),
+			?getAttr(mental_fatigue), ?getAttr(max_mental_fatigue) ] ).
 	
