@@ -27,14 +27,16 @@
 -module(class_Object_test).
 
 
--define(Tested_modules,[class_Object]).
+-define(Tested_modules, [class_Object] ).
 
 
 % For all facilities common to all tests:
--include("test_constructs.hrl").
+%-include("test_constructs.hrl").
 
-% For location:
--include("space.hrl").
+% For trace facilities:
+-include("traces_for_tests.hrl").
+
+
 	
 
 % Run the tests.
@@ -46,8 +48,8 @@ run() ->
 			
 	Size = 0.8,
 			
-	MyObject = class_Object:new_link( "Bottle of Whisky", Size, 1.1, 
-		555, 120 ),	
+	MyObject = class_Object:synchronous_new_link( "Bottle of Whisky", Size, 
+		1.1, 555, 120 ),	
 	
 	MyObject ! {getSize,[],self()},
 	receive
