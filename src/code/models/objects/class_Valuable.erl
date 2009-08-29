@@ -30,20 +30,29 @@
 -define(wooper_superclasses,[]).
 
 
+
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters,BaseValue).
+-define(wooper_construct_parameters, BaseValue ).
+
 
 % Life-cycle related exported operators:
--define(wooper_construct_export,new/1,new_link/1,
-	synchronous_new/1,synchronous_new_link/1,construct/2,delete/1).
+-define( wooper_construct_export, new/1, new_link/1, 
+	synchronous_new/1, synchronous_new_link/1,
+	synchronous_timed_new/1, synchronous_timed_new_link/1,
+	remote_new/2, remote_new_link/2, remote_synchronous_new/2,
+	remote_synchronous_new_link/2, remote_synchronous_timed_new/2,
+	remote_synchronous_timed_new_link/2, construct/2, delete/1 ).
+
+
 
 % Method declarations.
--define(wooper_method_export,getCreditValue/1,setCreditValue/2).
+-define(wooper_method_export, getCreditValue/1, setCreditValue/2 ).
 
 
 
 % Allows to define WOOPER base variables and methods for that class:
 -include("wooper.hrl").
+
 
 
 % Must be included before class_TraceEmitter header:
@@ -62,7 +71,7 @@ construct(State,?wooper_construct_parameters) ->
 	
 	
 	
-% Overriden destructor.
+% Overridden destructor.
 % Unsubscribing for TimeManager supposed already done, thanks to a termination
 % message. 
 delete(State) ->
@@ -78,13 +87,16 @@ delete(State) ->
 	
 	
 
+
 % Methods section.
+
 
 
 % Returns the base value, in credits, of this instance.
 % (request)
 getCreditValue(State) ->
 	?wooper_return_state_result( State, ?getAttr(base_value) ).
+	
 	
 	
 % Sets the base value, in credits, of this instance.
@@ -97,4 +109,3 @@ setCreditValue(State,NewBaseValue) ->
 	
 % Section for helper functions (not methods).
 
-	
