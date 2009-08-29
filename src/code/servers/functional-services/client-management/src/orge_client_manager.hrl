@@ -27,38 +27,65 @@
 
 
 
-% Subection dedicated to access control.
+% Subsection dedicated to access control.
+
 
 % Default login/password separator:
 -define(default_identifier_separator,"|").
 
 
-% Sent by the server to a client to acknowledge a successful login:
+% Sent by a manager to its client to acknowledge a successful login:
 -define(access_granted,0).
 
 
-% Sent by the server to a client to notify it the identifiers could not be
+% Sent by a manager to its client to notify it the identifiers could not be
 % parsed (marshalling_failed):
 -define(ill_formatted_identifiers,1).
 
 
-% Sent by the server to a client to notify it the identifiers were not correct:
+% Sent by a manager to its client to notify it the identifiers were not correct:
 % (bad_login/bad_password)
 -define(access_denied,2).
 
 
-% Sent by the server to a client to notify it the corresponding account is 
+% Sent by a manager to its client to notify it the corresponding account is 
 % already in use:
 -define(already_connected,3).
 
 
-% Sent by the server to a client to notify it the identifiers were not received
+% Sent by a manager to its client to notify it the identifiers were not received
 % on time:
 -define(timed_out,4).
 
 
+% Sent by a manager to its client to notify it that no slot was left for this
+% connection.
+-define(no_slot_available,5).
 
-% Notifications from server/client manager to clients.
+
+
+% Sent by a manager to its client to notify it that the version it reported
+% is compatible with this server. 
+-define(compatible_version,0).
+
+
+% Sent by a manager to its client to notify it that the version it reported
+% is not compatible with (e.g. is too old for) this server. 
+-define(incompatible_version,1).
+
+
+
+
+% Notifications from a client to its manager.
+
+
+% Sent by a client to its manager to notify it of a normal client-side
+% termination.
+-define(normal_client_side_termination,1).
+
+
+
+% Notifications from server or client manager, to clients.
 
 -define(shutdown_notification,5).
 
