@@ -30,18 +30,20 @@
 % For orge_user record:
 -include("orge_database_manager.hrl").
 
--define(Tested_modules,[orge_database_manager]).
+-define(Tested_modules, [orge_database_manager] ).
 
 
 
-% For all facilities common to all tests:
--include("test_constructs.hrl").
+% For trace facilities:
+-include("traces_for_tests.hrl").
+
 
 compose_user_list([]) ->
 	"empty user list";
 
 compose_user_list(Users) ->
 	compose_user_list(Users,[]).
+	
 	
 
 compose_user_list([],Acc) ->
