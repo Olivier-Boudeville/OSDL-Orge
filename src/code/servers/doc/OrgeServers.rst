@@ -924,7 +924,7 @@ Connection Scenario
 
 First the Orge server is launched. Depending on the settings, it then reloads the previous state of the Orge database or recreates blank tables. Then it creates its listening socket and spawns a client manager which is to accept the first future client connection.
 
-When such a client connects, a specific socket is automatically created for it, then the client manager accepts that connection and notify the server which, in turn, creates one more client manager for the next connection.
+When such a client connects, a specific socket is automatically created for it, then the client manager accepts that connection and notifies the server which, in turn, creates one more client manager for the next connection.
 
 The first client then will send its login/password to its manager. Before even checking them, the manager will determine whether there is at least one available connection slot on the server, by requesting the database for the current active connections.
 
@@ -934,7 +934,7 @@ If yes, one slot will be reserved for that connection, and the login information
 
 If they are correct, then the client will be notified to continue by sending its version. The manager will compare with its own version, which must not be more recent than the one of the client. In case of success the access of the client will be granted.
 
-At this point the causes of failure are:
+At this point the main causes of failure are:
 
  - connection refused, if the Orge server is not available (ex: not running, filtered by a firewall, with no internet connection, not found in DNS, etc.)
  
