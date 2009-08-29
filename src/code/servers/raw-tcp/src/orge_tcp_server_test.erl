@@ -31,15 +31,15 @@
 -define(test_server_name,my_orge_tcp_test_server).
 
 
--define(Tested_modules,[orge_tcp_server]).
+-define(Tested_modules, [orge_tcp_server] ).
 
 
 % For orge_user_settings:
 -include("orge_database_manager.hrl").
 
 
-% For all facilities common to all tests:
--include("test_constructs.hrl").
+% For trace facilities:
+-include("traces_for_tests.hrl").
 
 
 	
@@ -49,8 +49,11 @@ run() ->
 	
 	?test_info([ "Creating a new Orge tcp_server." ]),
 	
-	ServerPid = orge_tcp_server:create_link( ?test_server_name, from_scratch,
-		local_only ),
+	DatabaseManagement = from_scratch,
+	%DatabaseManagement = from_previous_state,
+	
+	ServerPid = orge_tcp_server:create_link( ?test_server_name,
+		DatabaseManagement, local_only ),
 		
 	?test_info([ "Requesting server informations." ]),
 	ServerPid ! {self(),get_info},	
@@ -82,7 +85,9 @@ run() ->
 		
 	},
 
-	?test_info([ "Registering a first user." ]),
+	?test_info([ io_lib:format( "Registering a first user: ~s.",
+		[ orge_database_manager:user_settings_to_string(AlfSettings)] ) ]),
+		
 	ServerPid ! {register_user,AlfSettings,self()},
 	receive
 		
@@ -91,8 +96,9 @@ run() ->
 		
 	end,
 	
-	?test_info([ "Unregistering an unknown user." ]),
 	UnknownLogin = "Mr. Big",
+	?test_info([ io_lib:format( "Unregistering now an unknown user "
+		"whose login is: ~s.", [UnknownLogin] ) ]),
 	
 	ServerPid ! {unregister_user,UnknownLogin,self()},
 	receive
@@ -119,10 +125,11 @@ run() ->
 		account_password = "Iamy0urfather",
 		security_question = "What shall I do?",
 		security_answer = "Use the Force"
-		
 	},
 	
-	?test_info([ "Registering a second user." ]),
+	?test_info([ io_lib:format( "Registering a second user: ~s.",
+		[ orge_database_manager:user_settings_to_string(LukeSettings)] ) ]),
+		
 	ServerPid ! {register_user,LukeSettings,self()},
 	receive
 		
@@ -132,16 +139,8 @@ run() ->
 	end,
 	
 	
-	
-	receive
-	
-		Any ->
-			?test_info([ io_lib:format( "Test server received ~w", [Any] ) ])
-			
-	end,
-
-
-	?test_info([ "Unregistering first user." ]),
+	% Corresponds to LukeSettings:
+	?test_info([ "Unregistering now first user." ]),
 	ServerPid ! {unregister_user,"anakin",self()},
 	receive
 		
@@ -150,6 +149,54 @@ run() ->
 		
 	end,
 
+	IndianaSettings = #orge_user_settings{
+		first_name = "Indiana",
+		last_name = "Jones",
+		date_of_birth = "4/4/1957",
+		address_line_1 = "University of California",
+		address_line_2 = "",
+		city = "San-Francisco",
+		state = "California",
+		country = "USA",
+		postal_code = "ZIP 3239",
+		email_address = "indiana@arch.org",
+		account_login = "indiana",
+		account_password = "museum",
+		security_question = "Where does it belong?",
+		security_answer = "That belongs in a museum. "
+	},
+	
+	?test_info([ io_lib:format( "Registering a third user: ~s.",
+		[ orge_database_manager:user_settings_to_string(IndianaSettings)] ) ]),
+		
+	ServerPid ! {register_user,IndianaSettings,self()},
+	receive
+		
+		{registration_result,user_registered} ->
+			?test_info([ "Third user settings successfully registered." ])
+		
+	end,
+	
+	WaitForTest = true,
+	
+	case WaitForTest of
+	
+		true ->
+			io:format( "   Launching the table viewer and "
+				"waiting indefinitively.~n" ),
+			tv:start(),
+			receive
+			
+				Any ->
+					?test_warning([ io_lib:format( "Test ignored following "
+						"unexpected message: ~p.", [Any] ) ])
+					
+			end;
+			
+		false ->
+			ok	
+	
+	end,
 	
 	
 	?test_info([ "Requesting the server to shutdown." ]),
