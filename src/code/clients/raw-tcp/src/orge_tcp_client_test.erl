@@ -27,12 +27,11 @@
 -module(orge_tcp_client_test).
 
 
--define(Tested_modules,[orge_tcp_client]).
+-define(Tested_modules, [orge_tcp_client] ).
 
 
-
-% For all facilities common to all tests:
--include("test_constructs.hrl").
+% For trace facilities:
+-include("traces_for_tests.hrl").
 
 
 
@@ -46,10 +45,17 @@ run() ->
 		"with default settings (see orge_tcp_server_test.erl)." ]),
 
 	?test_info([ "Creating a first new Orge test TCP client." ]),
-	FirstClient = orge_tcp_client:start_link( "anakin", "Iamy0urfather", 
+	
+	% Would fail as in orge_tcp_server_test this account is unregistered:
+	%{FirstLogin,FirstPassword} = { "anakin", "Iamy0urfather" },
+	
+	% This one is valid:
+	{FirstLogin,FirstPassword} = { "alf", "hell0Brian" },
+	
+	FirstClient = orge_tcp_client:start_link( FirstLogin, FirstPassword,
 		ServerLocation ),
 	
-	?test_info([ "Checking this client succeeded in connecting." ]),
+	?test_info([ "Checking this first client succeeded in connecting." ]),
 	FirstClient ! {get_login_status,self()},
 	receive
 	
@@ -58,24 +64,24 @@ run() ->
 		
 	end,
 	
-	% Too long to implement on sockets:
-	%?test_info([ "Retrieving first user settings." ]),
-	%FirstClient ! {get_user_settings,self()},
-	%receive
-	%
-	%	{user_settings,FirstSettings} ->
-	%		?test_info([ io_lib:format( "Received first user settings: ~s.", 
-	%			[orge_database_manager:orge_user_settings_to_string(
-	%				FirstSettings)]	) ])
-	%	
-	%end,
+	%timer:sleep(10000),
 	
+	% Can be used to check that multiple connections are indeed refused:
+	%{SecondLogin,SecondPassword} = { "alf", "hell0Brian" },
 	
+	% Can be used to test a bad login:
+	%{SecondLogin,SecondPassword} = { "indie", "museum" },
+	
+	{SecondLogin,SecondPassword} = { "indiana", "museum" },
+	
+	% If the maximum number of connections for the server is 1, then
+	% no more client managers will be spawned and the next call will hang,
+	% as no accept will be done.  
 	?test_info([ "Creating a second new Orge test TCP client." ]),
-	SecondClient = orge_tcp_client:start_link( "alf", "hell0Brian", 
+	SecondClient = orge_tcp_client:start_link( SecondLogin, SecondPassword, 
 		ServerLocation ),
 	
-	?test_info([ "Checking this client succeeded in connecting." ]),
+	?test_info([ "Checking this second client succeeded in connecting." ]),
 	SecondClient ! {get_login_status,self()},
 	receive
 	
@@ -84,33 +90,27 @@ run() ->
 		
 	end,
 	
-	%?test_info([ "Retrieving second user settings." ]),
-	%SecondClient ! {get_user_settings,self()},
-	%receive
-	%
-	%	{user_settings,SecondSettings} ->
-	%		?test_info([ io_lib:format( "Received second user settings: ~s.", 
-	%			[orge_database_manager:orge_user_settings_to_string(
-	%				SecondSettings)]	) ])
-	%	
-	%end,
+	%timer:sleep(10000),
 	
-	%?test_info([ "Trying to log twice with the account of first client "
-	%	"(should fail)." ]),
-	%SameAsFirstClient = orge_tcp_client:start_link( "anakin", "Iamy0urfather", 
-	%	ServerLocation ),
+	?test_info([ "Trying to log twice with the account of first client "
+	   "(should fail)." ]),
+	SameAsFirstClient = orge_tcp_client:start_link( FirstLogin, FirstPassword, 
+	   ServerLocation ),
 	
-	%?test_info([ "Checking this client failed in connecting." ]),
-	%SameAsFirstClient ! {get_login_status,self()},
-	%receive
-	%
-	%	{login_failed,already_logged} ->
-	%		?test_info([ "Second login spotted and rejected as expected." ])
-	%				
-	%end,
+	?test_info([ 
+		"Checking whether the first client failed in connecting twice." ]),
+		
+	SameAsFirstClient ! {get_login_status,self()},
+	receive
+	
+	   {login_failed,already_connected} ->
+		   ?test_info([ "Double login spotted and rejected as expected." ])
+	
+	after 100 ->
+		ok			   
+	end,
 		
 		
-	
 	
 	%timer:sleep(2000),
 	
