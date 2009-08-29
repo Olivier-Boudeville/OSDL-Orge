@@ -22,19 +22,20 @@
 % Author: Olivier Boudeville (olivier.boudeville@esperide.com)
 
 
-% Unit tests for the Creature class implementation.
-% See the class_Creature module.
--module(class_Creature_test).
+% Unit tests for the Valuable class implementation.
+% See the class_Valuable module.
+-module(class_Valuable_test).
 
 
--define(Tested_modules,[class_Creature]).
+-define(Tested_modules, [class_Valuable] ).
 
 
 % For all facilities common to all tests:
--include("test_constructs.hrl").
+%-include("test_constructs.hrl").
 
-% For location:
--include("space.hrl").
+% For trace facilities:
+-include("traces_for_tests.hrl").
+	
 	
 
 % Run the tests.
@@ -42,14 +43,12 @@ run() ->
 
 	?test_start,
 		
-	?test_info([ "Creating a new Creature." ]),
+	?test_info([ "Creating a new Valuable." ]),
 	
-	MyLocation = #location{ x = 1, y = 2, z = 3 },
 		
-	MyCreature = class_Creature:new( "Test creature", 
-		"I am a very ugly creature", MyLocation ),		
+	MyValuable = class_Valuable:synchronous_new_link( _BaseValue = 32 ),		
 	
-	MyCreature ! delete,
+	MyValuable ! delete,
 
 	?test_stop.
 
