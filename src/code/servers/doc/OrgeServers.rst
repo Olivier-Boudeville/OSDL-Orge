@@ -614,7 +614,6 @@ In this example we will be installing Orge in ``/home/orge/``, using as prefix `
 Firewall
 ________
 
-
 We are using the `Netfilter <http://www.netfilter.org/>`_ firewall, also known as ``iptables``.
 
 We provide a complete and fully commented iptable configuration script, customized for the hosting of Orge servers, `iptables.rules-Gateway.sh <http://ceylan.svn.sourceforge.net/viewvc/ceylan/Ceylan/trunk/src/code/scripts/shell/iptables.rules-OrgeServer.sh?view=markup>`_.
@@ -918,3 +917,77 @@ This Orge client is developed in Erlang, and can satisfy two goals:
  - provide a MUD-like interface, for narrow-band access and nostalgic players (if any)
  - help debugging the Orge Heavy (C++/OpenGL/OSDL) Client
 
+
+
+Connection Scenario
+...................
+
+First the Orge server is launched. Depending on the settings, it then reloads the previous state of the Orge database or recreates blank tables. Then it creates its listening socket and spawns a client manager which is to accept the first future client connection.
+
+When such a client connects, a specific socket is automatically created for it, then the client manager accepts that connection and notify the server which, in turn, creates one more client manager for the next connection.
+
+The first client then will send its login/password to its manager. Before even checking them, the manager will determine whether there is at least one available connection slot on the server, by requesting the database for the current active connections.
+
+If no, the manager will send back to the client that no slot could be assigned and will close the connection, regardless of the login informations.
+
+If yes, one slot will be reserved for that connection, and the login informations will be checked.
+
+If they are correct, then the client will be notified to continue by sending its version. The manager will compare with its own version, which must not be more recent than the one of the client. In case of success the access of the client will be granted.
+
+At this point the causes of failure are:
+
+ - connection refused, if the Orge server is not available (ex: not running, filtered by a firewall, with no internet connection, not found in DNS, etc.)
+ 
+ - too many pending connections to the listening socket (unlikely due to the allowed backlog and the early spawn of an additional waiting manager)
+
+ - no connection slot obtained (too many current active clients)
+ 
+ - incorrect sending of identifiers: unknown login, bad password, user already connected, wrong marshalling, time-out occurred (the client is not always exactly told on purpose about the exact cause of failure)
+
+ - incompatible (too old) client version
+ 
+
+
+How To Monitor Remotely an Orge Server
+......................................
+ 
+An Orge server is preferably monitored based on its traces and its database state.
+
+Both can be consulted remotely if an Erlang connection (not a raw TCP/IP one, as for clients) can be established to the target server.
+
+Generally, for safety reasons, this is prevented by the server firewall (netfilter), which blocks the epmd port: Erlang authorization scheme, which is based on cookies, might be deemed not secure enough.
+
+Therefore the first step is then to log-in to the server (generally by SSH), and then to unblock the epmd port with ``iptables``.
+
+Then, from the remote computer, both the Orge server traces and Orge database state are available.
+
+Server traces 
+
+The database state can be read (and modified) thanks to the TV application:
+
+erl -setcookie Orge -name listener -remsh 'orge_tcp_server_run@myhost.mydomain.org'
+tv:start().
+
+erl -setcookie Orge -name listener@myhost.mydomain.org
+net_adm:ping('orge_tcp_server_run@myhost.mydomain.org').
+tv:start().
+
+Select File -> Nodes (or hit Ctrl-N) and choose the node corresponding to the remote server. Select View -> Mnesia Tables (or hit Ctrl-M) to have a full access to all the Orge tables.
+
+
+
+Finally, the epmd port shall be blocked again, with ``iptables``.  
+
+
+
+
+How To Update the Orge Server Without Stopping It
+.................................................
+
+Three main pieces of software can be updated server-side:
+	
+	- the TCP server itself, which is not expected to be updated frequently as its role is limited and its implementation remains simple
+	- the client manager, which is probably the most changing part of the server-side architecture; two options: either update all current managers on-the-fly, or simply run the updated code only on new connections
+	- the database manager, whose frequency is not known yet
+	
+	 
