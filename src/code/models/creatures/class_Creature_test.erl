@@ -27,14 +27,18 @@
 -module(class_Creature_test).
 
 
--define(Tested_modules,[class_Creature]).
+-define(Tested_modules, [class_Creature] ).
 
 
 % For all facilities common to all tests:
--include("test_constructs.hrl").
+%-include("test_constructs.hrl").
+
+% For trace facilities:
+-include("traces_for_tests.hrl").
+
 
 % For location:
--include("space.hrl").
+%-include("space.hrl").
 	
 
 % Run the tests.
@@ -44,9 +48,10 @@ run() ->
 		
 	?test_info([ "Creating a new Creature." ]),
 	
-	MyLocation = #location{ x = 1, y = 2, z = 3 },
+	%MyLocation = #location{ x = 1, y = 2, z = 3 },
+	MyLocation = fixme,
 		
-	MyCreature = class_Creature:new( "Test creature", 
+	MyCreature = class_Creature:synchronous_new_link( "Test creature", 
 		"I am a very ugly creature", MyLocation ),		
 	
 	MyCreature ! delete,
