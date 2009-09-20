@@ -1,4 +1,4 @@
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2009 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -33,12 +33,90 @@
 -export( [ exec/0 ] ).
 	
 	
+
+
+get_words( _LanguageManagerPid, _Variation, 0, Acc ) ->
+	Acc;
+	
+get_words( LanguageManagerPid, Variation, WordCount, Acc ) ->
+	LanguageManagerPid ! {generate,Variation,self()},
+	receive
+	
+		{wooper_result,Word} ->
+			get_words( LanguageManagerPid, Variation, WordCount-1, [Word|Acc] )
+	
+	end.
+	
+
+
+evaluate_probabilities( _LanguageManagerPid, _Variation, [] ) ->
+	ok;
+	
+evaluate_probabilities( LanguageManagerPid, Variation, [Word|T] ) ->
+	LanguageManagerPid ! {evaluate,[Word,Variation],self()},
+	receive
+	
+		{wooper_result,Probability} ->
+			?emit_info([ io_lib:format( "The probability that the word '~s' "
+				"belongs to the variation '~w' is ~.1f %.", 
+				[Word,Variation,Probability*100] ) ]),
+			evaluate_probabilities( LanguageManagerPid, Variation, T )
+	
+	end.
+	
+	
+
 exec() ->
 
 	?traces_start,
 	?init_trace_supervisor,
-	
-	?emit_info([ "Creating a new Orge language learner." ]),
 
-	?traces_stop.
+	Language = "modern-greek",
+	Variations = [ 'female-names', 'male-names', surnames ],
+	Options = [ generate_original_only ],
 	
+	?emit_info([ io_lib:format( "Testing a language manager for language '~s',"
+		" with variations ~w and options ~w.", 
+		[ Language, Variations, Options ] ) ]),
+	
+	FirstLanguageManagerPid = class_LanguageManager:synchronous_new_link(
+		Language, Variations, Options ),
+	
+	FirstLanguageManagerPid ! {learn,[],self()},
+	receive
+	
+		{wooper_result,learning_success} ->
+			?emit_info([ "Learning succeeded." ]);
+			
+		{wooper_result,{learning_failure,Reason}} ->
+			?emit_info([ io_lib:format( "Learning failed, reason: ~p.",
+				[Reason] ) ])
+			
+	end,
+
+	WordCount = 20,
+
+	FirstTestVariation = 'female-names',
+	
+	?emit_info([ io_lib:format(	"Requesting the generation of ~B words "
+		"from the '~s' variation.", [WordCount,FirstTestVariation] ) ]),
+		 
+	FirstWords = get_words( FirstLanguageManagerPid, FirstTestVariation,
+		WordCount, [] ),
+	
+	?emit_info([ io_lib:format(	"Generated following words: ~s.",
+		[ basic_utils:string_list_to_string(FirstWords)] ) ]),
+	
+	evaluate_probabilities( FirstLanguageManagerPid, FirstTestVariation, 
+		FirstWords ),
+		
+	FirstLanguageManagerPid ! delete,
+	
+	?traces_stop.
+
+
+
+	
+	
+	
+				
