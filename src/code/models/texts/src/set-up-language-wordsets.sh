@@ -1,13 +1,11 @@
 #!/bin/sh
 
-
-echo "  Setting up language wordsets"
+target_dir="language-wordsets"
 
 
 # Prefix section.
 
 chris_pound_base_url="http://www.ruf.rice.edu/~pound"
-
 
 
 retrieve()
@@ -22,8 +20,7 @@ retrieve()
 	fi
 
 	echo "    Retrieving $result_file (from $remote_file)"
-	wget $remote_file --output-document $result_file 1>/dev/null 2>&1
-	
+	wget $remote_file --output-document $result_file --quiet --wait=1 --random-wait 1>/dev/null 2>&1
 	res=$?
 	
 	if [ ! $res -eq 0 ] ; then
@@ -47,6 +44,18 @@ retrieve_from_pound()
 	
 }
 
+
+
+
+# Actual beginning of program.
+
+
+echo "  Setting up language wordsets in $target_dir"
+
+
+mkdir $target_dir
+
+cd $target_dir
 
 
 # Fantasy section.
@@ -301,7 +310,7 @@ retrieve_from_pound ulwa
 
 
 # Ancient Egyptian:
-retrieve_from_pound egyptian ancient-egyptian
+retrieve_from_pound egyptian ancient-egyptian-words
 
 
 
@@ -351,6 +360,9 @@ retrieve_from_pound jorune
 
 # Annoying with the numerous '?':
 retrieve_from_pound tsolyani
+
+
+
 
 
 
