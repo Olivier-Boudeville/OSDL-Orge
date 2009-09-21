@@ -39,9 +39,9 @@
 % Static methods:
 -export([ get_possible_language_variations/0 ]).
 
-% fixme
--export([ get_sequences_for/2, find_sequence/3 ]).
 
+%Debug:
+-export([ build_tree/2, normalize/1 ]).
 
 
 % Declaring all variations of WOOPER standard life-cycle operations:
@@ -79,17 +79,48 @@
 
 
 
-% Each field corresponds to one of the 28 possible letters, except total_count
-% whose role is to precompute the total number of occurences of all letters:
--record( variation_node, { a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p,
-	q, r, s, t, u, v, w, x, y, z, dash, eow, total_count } ).
-
-
-% Each field will contain a pair {PatternCount,VariationNode,Total}.
-
-
 % Implementation notes:
 %
+% Not using the record below, using a basic list instead, as it should use
+% less memory (avoids creating subtrees for letters that have no successor
+% at all).
+
+% Each field corresponds to one of the 28 possible letters, except total_count
+% whose role is to precompute the total number of occurences of all letters:
+%-record( variation_node, { a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p,
+%	q, r, s, t, u, v, w, x, y, z, dash, eow, total_count } ).
+% Each field will contain a pair {PatternCount,VariationNode,Total}.
+
+% Instead we use a series of tuples nested in lists, to represent a tree.
+% Each tuple, which is a tree node, respects this form:
+% {Letter,OccurrenceCount,{Subtree,SubTreeSum}} where:
+%  - Letter designates the letter in the currently explored sequence
+%  - OccurrenceCount is the number of times this letter ended a learnt sequence
+%  - Subtree is a list of tuples of the current type being described, each 
+% tuple corresponding to a possible letter that can be found after Letter
+%  - SubTreeSum is the sum of all occurrences of all letters in the direct
+% subtree
+
+
+% Once a tree has been normalized, OccurrenceCount is the maximum number that
+% will make the corresponding letter be drawn.
+% For example, 'class_LanguageManager:build_tree( [ "a", "a", "b", "c" ], 2 )'
+% shall return:
+% {[ {99,1,{[{eow,1,{[],0}}],1}},
+%    {98,2,{[{eow,1,{[],0}}],1}},
+%    {97,4,{[{eow,2,{[],0}}],2}} ],
+% 4} = { [ FirstTuple, SecondTuple, ThirdTuple ], Sum }
+% Sum=4 is the number of all learnt occurrences of letters at this
+% (first) level (i.e. two "a", one "b" and one "c").
+% The first tuple references "c" (with 99), whose maximum random value is 1
+% (the second element of its tuple), whereas the maximum random value for "b",
+% is 2, as specified in the second tuple, and the maximum random value for "a"
+% is 4.
+% That means that if we draw a random value R in [1,Sum] = [1,4], then
+% if R <= 1 (i.e. R=1), then we selected "c", otherwise if R<=2 (i.e. R=2),
+% then we selected "b", otherwise (R<=4, i.e. R=3 or R=4), then we selected
+% "a".
+	
 	
 	
 % Constructs a new language manager:
@@ -137,13 +168,16 @@ construct( State, ?wooper_construct_parameters ) ->
 			throw( {wordset_directory_not_found,WordSetDir,Origin} )
 	
 	end,		
+	
+	basic_utils:start_random_source( time_based_seed ),
 				
 	?setAttributes( TraceState, [
 		{language_name,LanguageName},
 		{variations,LanguageVariations},
 		{generate_original_only,OriginalOnly},
 		{word_set_dir,WordSetDir},
-		{variation_tree,hashtable:new( length(LanguageVariations) )}
+		{markov_order,MarkovOrder},
+		{variation_trees,hashtable:new( length(LanguageVariations) )}
 	] ).
 		
 	
@@ -178,7 +212,7 @@ learn( State ) ->
 % Returns either learning_success or {learning_failure,Reason}.
 % (request)
 learn( State, VariationName ) -> 
-	
+		 
 	case get_variation_filename( VariationName, State ) of
 	
 		{ok,Filename} ->
@@ -194,11 +228,11 @@ learn( State, VariationName ) ->
 				"This language variation is made of ~B words.", 
 				[ length(Words) ] ) ]),
 
-			VariationTree = build_tree( Words ),
+			{VariationTree,Sum} = build_tree( Words, ?getAttr(markov_order) ),
 			
 			TreeState = ?addKeyValueToAttribute( State, 
-				_Attribute = variation_tree, _Key = VariationName, 
-				_Value = VariationTree ),
+				_Attribute = variation_trees, _Key = VariationName, 
+				_Value = {VariationTree,Sum} ),
 				
 			?wooper_return_state_result( TreeState, learning_success );	
 			
@@ -214,9 +248,21 @@ learn( State, VariationName ) ->
 % Returns a generated word from specified variation, according to language
 % options.
 % (const request)
-generate( State, _Variation ) ->
-	?wooper_return_state_result( State, "test" ).
+generate( State, Variation ) ->
+	VariationTable = ?getAttr(variation_trees),
+	case hashtable:lookupEntry( Variation, VariationTable ) of
+	
+		undefined ->
+			?wooper_return_state_result( State, 
+				{ generation_failed, {variation_not_found,Variation} } );
+		
+		{value, {VariationTree,Sum} } ->
+			GeneratedWord = draw_letters( VariationTree, Sum, 
+				?getAttr(markov_order), _CurrentPattern = [], _Acc = [] ),
+			?wooper_return_state_result( State, 
+				{ generation_success, lists:reverse(GeneratedWord) }  )
 
+	end.
 
 
 % Returns the probability (as a floting-point number) that the specified 
@@ -309,9 +355,110 @@ get_variation_filename( VariationName, State ) ->
 	end.
 	
 
+
+
+
+% Learning section.
+
+
 % Constructs a variation tree from the specified list of words.
-build_tree( _Words ) ->
-	fixme.
+build_tree( Words, Order ) ->
+	%InitialTree = #variation_node{},
+	InitialTree = [],
+	IntegratedTree = process_words( Words, Order, InitialTree ),
+	Res = normalize( IntegratedTree ),
+	%io:format( "Once having learnt words ~p, tree is ~w.~n.", 
+	%	[Words,Res] ),
+	Res.
+	
+
+
+% Integrates the specified word list into the specified variation tree.
+% Returns an updated variation tree.	
+process_words( [], _Order, CurrentVariationTree ) ->
+	CurrentVariationTree;
+	
+process_words( [Word|OtherWords], Order, CurrentVariationTree ) ->
+	NewVariationTree = integrate_word( Word, Order, CurrentVariationTree ),
+	process_words( OtherWords, Order, NewVariationTree ).
+
+
+
+% Integrates the specified word into the specified variation tree.
+% Returns an updated variation tree.	
+integrate_word( Word, Order, CurrentVariationTree ) ->
+	Sequences = get_sequences_for( Word, Order ),
+	%io:format( "Sequences for word '~s' are: ~w.~n", [Word,Sequences] ),
+	integrate_sequences_in_tree( Sequences, Order, CurrentVariationTree ).
+	
+
+
+% Integrates the specified sequences in the variation tree.
+% Returns an updated variation tree.	
+integrate_sequences_in_tree( [], _Order, CurrentVariationTree ) ->
+	CurrentVariationTree ;
+	
+integrate_sequences_in_tree( [Seq|OtherSeq], Order, CurrentVariationTree ) ->
+	UpdatedVariationTree = integrate_sequence_in( Seq, CurrentVariationTree ),
+	integrate_sequences_in_tree( OtherSeq, Order, UpdatedVariationTree ).
+
+
+
+% Integrates the specified sequence in the variation tree.
+% Returns an updated variation tree.	
+integrate_sequence_in( [H|[]], VariationTree ) ->
+		
+	% We arrived to the last letter of the sequence.
+	% Here we reached the subtree is which the initial sequence must be
+	% recorded, we return an updated tree node:
+	% (relies on the fact that sequences have already a correct length)
+	Res = register_sequence( H, VariationTree ),
+	%io:format( "integrate_sequence_in: inserting final letter ~w in ~p, "
+	%	"returning ~w.~n", [[H],VariationTree,Res] ),
+	Res;
+	
+integrate_sequence_in( [H|T], VariationTree ) ->
+	% Here we are in the sequence, thus recursing down the relevant subtree:
+	%io:format( "1 integrate_sequence_in: handling intermediate letter ~s "
+	%	"in ~p.~n",[[H],VariationTree] ),
+	
+	NewTreeForH = case lists:keyfind( H, _IndexInTuple = 1, VariationTree ) of
+		
+		false ->
+			% This letter was never registered, adding a subtree for it:
+			[ { H, 0, {integrate_sequence_in( T, [] ), sum_not_available } }
+				| VariationTree ];
+						
+		{H,Count,{Subtree,sum_not_available}} ->
+			% Just iterates and returns an updated subtree:
+			lists:keyreplace( _Key = H, _IndexInTuple = 1, VariationTree,
+				{H,Count,
+					{integrate_sequence_in( T, Subtree ),sum_not_available} } )
+		
+	end,
+	%io:format( "2 integrate_sequence_in: new tree for ~s is ~p.~n",
+	%	[[H],NewTreeForH] ),
+	
+	NewTreeForH.
+
+
+
+% Registers the sequence, which is caracterized by the subtree we arrived to
+% and its last letter, in that subtree, and returns it.
+register_sequence( H, VariationTree ) ->
+	case lists:keyfind( _Key = H, _IndexInTuple = 1, VariationTree ) of
+		
+		false ->
+			% This letter was never registered, adding an entry for it:
+			[ { H, _Count=1, { _EmptySubtree=[], sum_not_available } } 
+				| VariationTree ];
+			
+		{H,Count,{Subtree,sum_not_available}} ->
+			% This letter was already registered, just increments its count:
+			lists:keyreplace( _Key = H, _IndexInTuple = 1,
+				VariationTree, { H, Count+1, {Subtree,sum_not_available} } )
+				
+	end.
 	
 
 
@@ -342,3 +489,131 @@ find_sequence( Word, CurrentIndex, Order ) when CurrentIndex > Order ->
 find_sequence( Word, CurrentIndex, _Order ) ->	
 	string:substr( Word, 1, CurrentIndex ).
 	
+
+
+
+% Normalization section.
+	
+	
+% Normalizes the specified variation tree, to precompute everything to 
+% make the drawing of letters easier.
+% When at a given depth we have for example [ {a,1,L1}, {b,5,L2, {c,4,L3} ]
+% then we know that the subtree sum is 1+5+4=10, and we can rewrite the tuples
+% that way: [ {a,1,L1}, {b,6,L2, {c,10,L3} ].
+% This allows to generate a random value R in [1,10].
+% If R=1, the we draw a, otherwise if R <7, we draw b, otherwise we draw c.
+% 
+normalize( VariationTree ) ->
+	%io:format( "Normalizing tree ~w.~n", [VariationTree] ),
+	% We enclose the first-level letters as if words began with a virtual
+	% 'bow' letter (for 'beginning of word'), so that we retrieve the 
+	% sum for the first-level letters as well:
+	[{bow,0,{NormalizedTree,Sum}}] = normalize_tree(
+		[ {bow,0,{VariationTree,sum_not_available}} ] ),
+	{NormalizedTree,Sum}.
+
+
+normalize_tree( VariationTree ) ->
+	normalize_tuples( VariationTree, _Acc = [] ).
+	
+	
+normalize_tuples( [], Acc ) ->
+	Acc;
+	
+normalize_tuples( [ {Letter,Count,{Subtree,sum_not_available}} | T ], Acc ) ->
+	Sum = compute_sum_for( Subtree, 0 ),
+	% We reverse the list so that their 'max sum' are ordered from smallest
+	% to biggest:
+	RewritedTuples = lists:reverse( rewrite_tuple( Subtree, 0, [] ) ),
+	normalize_tuples( T, [ {Letter,Count,{RewritedTuples,Sum}} | Acc ] ).
+	 
+
+
+% Computes the sum of all occurrence in the first level of specified node.	
+compute_sum_for( [], Acc ) ->
+	Acc; 	
+
+compute_sum_for( [ {_Letter,Count,{_Subtree,_SubtreeSum} } |T ], Acc ) ->
+	compute_sum_for( T, Acc + Count ).
+	
+	
+
+% Rewrites tuples so that their count stretch in the full range of their sum,
+% and triggers the recursive normalization on their subtrees.
+rewrite_tuple( [], _Current, Acc ) ->
+	Acc;
+	
+rewrite_tuple( [ {Letter,Count,{Subtree,sum_not_available}} | T ], 
+		Current, Acc ) ->
+	NewCount = Current + Count,
+	rewrite_tuple( T, NewCount, 
+		[ {Letter,NewCount, { normalize_tree(Subtree),
+			compute_sum_for(Subtree,0)} }| Acc ] ).
+
+	
+	
+
+% Random generation section.
+
+
+% Draws letters as long as 'eow' is not drawn:
+draw_letters( FullVariationTree, FullSum, Order, CurrentPattern, WordAcc ) ->
+	{PatternTree,PatternSum} = get_subtree_for( FullVariationTree, FullSum, 
+		CurrentPattern ),
+	Value = basic_utils:get_random_value( PatternSum ),
+	case get_entry_for( PatternTree, Value ) of
+	
+		{ eow, _SubtreeEntry } ->
+			% _SubtreeEntry must be: {[],0}
+			% End of word reached, returning it:
+			WordAcc;
+			
+		{ NormalLetter, _SubtreeEntry } ->
+			% Adds one more letter:
+			draw_letters( FullVariationTree, FullSum, Order, 
+				get_new_pattern( CurrentPattern, NormalLetter, Order ), 
+				[NormalLetter|WordAcc] )
+			
+	end.
+
+	
+	
+% Returns the subtree corresponding to specified pattern.	
+get_subtree_for( CurrentVariationTree, SubSum, _Pattern = [] ) ->
+	{CurrentVariationTree, SubSum};
+	
+get_subtree_for( CurrentVariationTree, _Sum, [H|T] ) ->
+	{H,_Count,{Subtree,SubSum}} = lists:keyfind( _Key = H, _IndexInTuple = 1, 
+		CurrentVariationTree ),
+	get_subtree_for( Subtree, SubSum, T ).
+	
+	
+
+% Returns the new pattern to be used.
+get_new_pattern( Pattern, NewLetter, Order ) ->
+	case length(Pattern) of
+	
+		Order ->
+			% We must add the new letter and remove the most ancient one:
+			[_Removed|T] = Pattern,
+			T ++ [NewLetter];
+		
+		_LessThanOrder ->
+			% Just add:
+			Pattern	++ [NewLetter]
+	
+	end.
+	
+
+
+% Returns the letter entry that is selected based on the specified value.		
+get_entry_for( [ {Letter,Count,{Subtree,Sum}} | _T ], Value ) 
+		when Value =< Count ->	
+	% We have got a winner!
+	{ Letter, {Subtree,Sum} };
+	
+get_entry_for( [ _H | T ], Value ) ->
+	% Here Value > Count, going on:
+	get_entry_for( T, Value ).
+	
+	 
