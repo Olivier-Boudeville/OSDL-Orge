@@ -42,7 +42,7 @@ get_words( LanguageManagerPid, Variation, WordCount, Acc ) ->
 	LanguageManagerPid ! {generate,Variation,self()},
 	receive
 	
-		{wooper_result,Word} ->
+		{wooper_result,{generation_success,Word} } ->
 			get_words( LanguageManagerPid, Variation, WordCount-1, [Word|Acc] )
 	
 	end.
@@ -80,7 +80,7 @@ exec() ->
 		[ Language, Variations, Options ] ) ]),
 	
 	FirstLanguageManagerPid = class_LanguageManager:synchronous_new_link(
-		Language, Variations, Options ),
+		Language, Variations, _MarkovOrder = 2, Options ),
 	
 	FirstLanguageManagerPid ! {learn,[],self()},
 	receive
