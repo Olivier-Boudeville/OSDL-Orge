@@ -41,19 +41,20 @@ run() ->
 
 	Language = 	"modern-greek",
 	Variation = 'female-names',
+	Options = [ generate_original_only ],
 		
 	?test_info([ io_lib:format( "Creating a new language manager, "
 		"for variation '~s' of language '~s'.", [ Language, Variation ] ) ]),
 	
 	MyManager = class_LanguageManager:synchronous_new_link( Language,
-		[Variation], [] ),		
+		Variation, _MarkovOrder = 2, Options ),		
 	
 	MyManager ! learn,
 	
 	MyManager ! {generate,[Variation],self()},
 	GeneratedWord = receive
 	
-		{wooper_result,Word} ->
+		{wooper_result, {generation_success,Word} } ->
 			?test_info([ io_lib:format( 
 				"Generated word for variation '~s' is '~s'.", [Variation,Word] )
 			])
