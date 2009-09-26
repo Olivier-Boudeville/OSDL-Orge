@@ -40,34 +40,36 @@ run() ->
 	?test_start,
 
 	Language = 	"modern-greek",
-	Variation = 'female-names',
+	Variations = [ 'female-names' ],
 	Options = [ generate_original_only ],
 		
 	?test_info([ io_lib:format( "Creating a new language manager, "
-		"for variation '~s' of language '~s'.", [ Language, Variation ] ) ]),
+		"for variations ~p of language '~s'.", [ Variations, Language ] ) ]),
 	
 	MyManager = class_LanguageManager:synchronous_new_link( Language,
-		Variation, _MarkovOrder = 2, Options ),		
+		Variations, _MarkovOrder = 2, Options ),		
 	
 	MyManager ! learn,
 	
-	MyManager ! {generate,[Variation],self()},
+	TargetVariation = hd(Variations),
+	
+	MyManager ! {generate,[TargetVariation],self()},
 	GeneratedWord = receive
 	
 		{wooper_result, {generation_success,Word} } ->
 			?test_info([ io_lib:format( 
-				"Generated word for variation '~s' is '~s'.", [Variation,Word] )
-			])
+				"Generated word for variation '~s' is '~s'.",
+					[TargetVariation,Word] ) ])
 	
 	end,
 	
-	MyManager ! {evaluate,[GeneratedWord,Variation],self()},
+	MyManager ! {evaluate,[GeneratedWord,TargetVariation],self()},
 	receive
 	
 		{wooper_result,GeneratedWordProbability} ->
 			?test_info([ io_lib:format( "The evaluated probability that "
 				"the generated word '~s' belongs to variation '~s' is ~f%.",
-				[Word,Variation,GeneratedWordProbability*100] )
+				[Word,TargetVariation,GeneratedWordProbability*100] )
 			])
 	
 	end,

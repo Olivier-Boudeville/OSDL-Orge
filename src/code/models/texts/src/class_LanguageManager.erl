@@ -41,7 +41,7 @@
 
 
 %Debug:
--export([ build_tree/2, normalize/1 ]).
+-export([ build_tree/2, normalize/1, draw_letters/5 ]).
 
 
 % Declaring all variations of WOOPER standard life-cycle operations:
@@ -257,12 +257,15 @@ generate( State, Variation ) ->
 				{ generation_failed, {variation_not_found,Variation} } );
 		
 		{value, {VariationTree,Sum} } ->
+			%io:format( "Generation in tree ~p with sum ~B~n",
+			%	[VariationTree,Sum] ),
 			GeneratedWord = draw_letters( VariationTree, Sum, 
 				?getAttr(markov_order), _CurrentPattern = [], _Acc = [] ),
 			?wooper_return_state_result( State, 
-				{ generation_success, lists:reverse(GeneratedWord) }  )
+				{ generation_success, GeneratedWord }  )
 
 	end.
+
 
 
 % Returns the probability (as a floting-point number) that the specified 
@@ -363,13 +366,12 @@ get_variation_filename( VariationName, State ) ->
 
 % Constructs a variation tree from the specified list of words.
 build_tree( Words, Order ) ->
-	%InitialTree = #variation_node{},
-	InitialTree = [],
-	IntegratedTree = process_words( Words, Order, InitialTree ),
-	Res = normalize( IntegratedTree ),
-	%io:format( "Once having learnt words ~p, tree is ~w.~n.", 
-	%	[Words,Res] ),
-	Res.
+	IntegratedTree = process_words( Words, Order, _EmptyTree = [] ),
+	NormalizedTree = normalize( IntegratedTree ),
+	io:format( "Once having learnt words ~p, "
+		"initial tree is:~n~w, normalized tree is:~n~w.~n.", 
+		[Words,IntegratedTree,NormalizedTree] ),
+	NormalizedTree.
 	
 
 
@@ -508,49 +510,35 @@ normalize( VariationTree ) ->
 	% We enclose the first-level letters as if words began with a virtual
 	% 'bow' letter (for 'beginning of word'), so that we retrieve the 
 	% sum for the first-level letters as well:
-	[{bow,0,{NormalizedTree,Sum}}] = normalize_tree(
-		[ {bow,0,{VariationTree,sum_not_available}} ] ),
+	{ [ {bow,0,{NormalizedTree,Sum}} ], 0 } = compute_sums(
+		[ {bow,0,{VariationTree,sum_not_available}} ], 
+		{ _Acc = [], _Sum = 0 } ),
 	{NormalizedTree,Sum}.
-
-
-normalize_tree( VariationTree ) ->
-	normalize_tuples( VariationTree, _Acc = [] ).
-	
-	
-normalize_tuples( [], Acc ) ->
-	Acc;
-	
-normalize_tuples( [ {Letter,Count,{Subtree,sum_not_available}} | T ], Acc ) ->
-	Sum = compute_sum_for( Subtree, 0 ),
-	% We reverse the list so that their 'max sum' are ordered from smallest
-	% to biggest:
-	RewritedTuples = lists:reverse( rewrite_tuple( Subtree, 0, [] ) ),
-	normalize_tuples( T, [ {Letter,Count,{RewritedTuples,Sum}} | Acc ] ).
-	 
-
-
-% Computes the sum of all occurrence in the first level of specified node.	
-compute_sum_for( [], Acc ) ->
-	Acc; 	
-
-compute_sum_for( [ {_Letter,Count,{_Subtree,_SubtreeSum} } |T ], Acc ) ->
-	compute_sum_for( T, Acc + Count ).
 	
 	
 
-% Rewrites tuples so that their count stretch in the full range of their sum,
-% and triggers the recursive normalization on their subtrees.
-rewrite_tuple( [], _Current, Acc ) ->
-	Acc;
+% For each node, computes the sums of all occurrences of next letters and
+% dispatches letter offsets so that they range in [1,Sum], covering a range
+% proportional to their number of occurrences, so that drawing a number N in
+% [1,Sum] allows to pick letters according to their recorded frequency.
+%
+% Ex: if, during the learning, the current letter was followed X times by 'a'
+% and Y times by 'b', returns an updated tree whose sum is X+Y, and all sums
+% in the tree are recursively determined.
+% If N <= X then 'a' is drawn, otherwise if N <= 3 (always the case), 
+% 'b' is drawn, etc.
+% Returns a pair {SummedTree,Sum}.
+compute_sums( [], {SummedTree,Sum} ) ->
+	% We reverse the list so that their offset is ordered from lowest 
+	% to highest:
+	{lists:reverse(SummedTree),Sum};
 	
-rewrite_tuple( [ {Letter,Count,{Subtree,sum_not_available}} | T ], 
-		Current, Acc ) ->
-	NewCount = Current + Count,
-	rewrite_tuple( T, NewCount, 
-		[ {Letter,NewCount, { normalize_tree(Subtree),
-			compute_sum_for(Subtree,0)} }| Acc ] ).
+compute_sums( [ {Letter,Count,{Subtree,sum_not_available}}|T], {Acc,Sum} ) ->
+	compute_sums( T, { [ {Letter,Sum+Count,compute_sums(Subtree,{[],0})}|Acc],
+		Sum+Count} ) .
+		
+		
 
-	
 	
 
 % Random generation section.
@@ -561,19 +549,26 @@ draw_letters( FullVariationTree, FullSum, Order, CurrentPattern, WordAcc ) ->
 	{PatternTree,PatternSum} = get_subtree_for( FullVariationTree, FullSum, 
 		CurrentPattern ),
 	Value = basic_utils:get_random_value( PatternSum ),
+	%io:format( "draw_letters: pattern = ~p, acc = ~p, drawn = ~B~n", 
+	%	[CurrentPattern,WordAcc, Value] ), 
+	%io:format( "Getting letter for drawn value of ~B/~B in ~p.~n",
+	%	[Value,PatternSum,PatternTree] ),
 	case get_entry_for( PatternTree, Value ) of
 	
 		{ eow, _SubtreeEntry } ->
 			% _SubtreeEntry must be: {[],0}
 			% End of word reached, returning it:
-			WordAcc;
+			Res = lists:reverse(WordAcc),
+			io:format( "End of word reached, generated word is: '~s'.~n", 
+				[Res] ),
+			Res;
 			
 		{ NormalLetter, _SubtreeEntry } ->
+			%io:format( "Drawn letter '~s'.~n", [ [NormalLetter] ] ),
 			% Adds one more letter:
 			draw_letters( FullVariationTree, FullSum, Order, 
 				get_new_pattern( CurrentPattern, NormalLetter, Order ), 
-				[NormalLetter|WordAcc] )
-			
+				[NormalLetter|WordAcc] )	
 	end.
 
 	
