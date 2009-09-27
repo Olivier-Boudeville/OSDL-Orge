@@ -120,6 +120,20 @@
 % if R <= 1 (i.e. R=1), then we selected "c", otherwise if R<=2 (i.e. R=2),
 % then we selected "b", otherwise (R<=4, i.e. R=3 or R=4), then we selected
 % "a".
+
+
+% Learnt words have to be normalized, as otherwise a word like 'Dorice' will
+% insert patterns starting with 'D', which would have no relationship with 
+% the in-word patterns starting by 'd', which would the be far poorer. 
+
+
+% In the special_words hashtable, the keys are all the source words used to
+% learn all variations and all the prohibited ones, and the value is either
+% 'original' or 'prohibited'.
+% All variations are stored there as a whole, since this must be more efficient
+% that way, and returning an original word of another variation is still less
+% desirable than returning an original word of the current variation.
+	
 	
 	
 	
@@ -132,7 +146,18 @@
 % the best accuracy vs memory space trade-off)
 %  - LanguageOptions is the list of supported options, in:
 %    - generate_original_only: the manager will ensure that no generated 
-% word will happen to be the same as a word in the variation
+% word will happen to be the same as a word in the variation (default: not done)
+%    - generate_capitalized_words: the initial letter of generated words will
+% be uppercased, ex: useful for names (default: not done)
+%    - {generated_min_length,Min}: all generated words must be long of at least
+% Min characters (default: 3)
+%    - {generated_max_length,Max}: all generated words must be long of at most
+% Max characters (default: 12)
+%    - {prohibited_index,Content}: specifies an index of all prohibited words,
+% i.e. words that should never be returned; Content is a filename relative to
+% the word set directory
+%    - prohibited_index: implies the use our built-in index of prohibited words
+%
 construct( State, ?wooper_construct_parameters ) ->
 
 	TraceState = class_TraceEmitter:construct( State,
@@ -143,8 +168,9 @@ construct( State, ?wooper_construct_parameters ) ->
 		"with Markov chains of order ~B, and options ~w.", 
 		[ LanguageName, LanguageVariations, MarkovOrder, LanguageOptions ] ) ]),
 	
-	OriginalOnly = lists:member( generate_original_only, LanguageOptions ),
-			
+	{OriginalOnly,Capitalize,MinLen,MaxLen,Prohibited} = parse_options(
+		LanguageOptions, _Defaults = {false,false,3,12,no_prohibited_word} ),
+		
 	{WordSetDir,Origin} = case os:getenv("ORGE_WORD_SET_DIR") of
 	
 		false ->
@@ -169,12 +195,23 @@ construct( State, ?wooper_construct_parameters ) ->
 	
 	end,		
 	
+	% We consider that on average there are 200 original words per variation,
+	% not counting the prohibited index:	
+	InitialSpecialWordTable = hashtable:new( 200*length(LanguageVariations) ),
+	
+	UpdatedSpecialWordTable = manage_prohibited_words( Prohibited, TraceState,
+		WordSetDir, InitialSpecialWordTable ),
+	
 	basic_utils:start_random_source( time_based_seed ),
 				
 	?setAttributes( TraceState, [
 		{language_name,LanguageName},
 		{variations,LanguageVariations},
+		{special_words,UpdatedSpecialWordTable},
 		{generate_original_only,OriginalOnly},
+		{capitalize_generated_words,Capitalize},
+		{min_generated_length,MinLen},
+		{max_generated_length,MaxLen},
 		{word_set_dir,WordSetDir},
 		{markov_order,MarkovOrder},
 		{variation_trees,hashtable:new( length(LanguageVariations) )}
@@ -216,21 +253,31 @@ learn( State, VariationName ) ->
 	case get_variation_filename( VariationName, State ) of
 	
 		{ok,Filename} ->
+		
 			?info([ io_lib:format( "Learning variation ~s, using filename ~s.",
 				[ VariationName, Filename] ) ]),
-			{ok,BinLines} = file:read_file( Filename ),
-			% No closing needed, apparently.
-			Line = binary_to_list( BinLines ),
-			% io:format( "Line = ~s.~n", [ Line ] ),
-			Words = string:tokens( Line, basic_utils:get_whitespaces_list() ),
+				
+			NormalizedWords = get_word_list_from( Filename ),
+
+			OriginalState = case ?getAttr(generate_original_only) of 
+			
+				true ->
+					add_original_words( NormalizedWords, State );
+				
+				false ->
+					State
+				
+			end,
+			
 			%?emit_info([ io_lib:format( "Language words are: ~p.",[Words] ) ]);
 			?info([ io_lib:format( 
 				"This language variation is made of ~B words.", 
-				[ length(Words) ] ) ]),
+				[ length(NormalizedWords) ] ) ]),
 
-			{VariationTree,Sum} = build_tree( Words, ?getAttr(markov_order) ),
+			{VariationTree,Sum} = build_tree( NormalizedWords,
+				?getAttr(markov_order) ),
 			
-			TreeState = ?addKeyValueToAttribute( State, 
+			TreeState = ?addKeyValueToAttribute( OriginalState, 
 				_Attribute = variation_trees, _Key = VariationName, 
 				_Value = {VariationTree,Sum} ),
 				
@@ -259,10 +306,12 @@ generate( State, Variation ) ->
 		{value, {VariationTree,Sum} } ->
 			%io:format( "Generation in tree ~p with sum ~B~n",
 			%	[VariationTree,Sum] ),
-			GeneratedWord = draw_letters( VariationTree, Sum, 
-				?getAttr(markov_order), _CurrentPattern = [], _Acc = [] ),
-			?wooper_return_state_result( State, 
-				{ generation_success, GeneratedWord }  )
+			% Result can be either {generation_success,Word} or 
+			% {generation_failed,Reason}:
+			Result = determine_word( VariationTree, Sum, State,
+				_MaxAttemptCount = 500 ),
+			io:format( "Returning: '~p'.~n", [Result]),
+			?wooper_return_state_result( State, Result )
 
 	end.
 
@@ -291,6 +340,93 @@ get_possible_language_variations() ->
 
 
 % Helper functions.
+
+
+% Parses the language options.
+% Returns a {Original,Capitalize,MinLen,MaxLen,Prohibited} tuple.
+parse_options( [], ParsedTuple ) ->
+	ParsedTuple;
+	
+parse_options( [generate_original_only|T], 
+		{_Original,Capitalize,MinLen,MaxLen,Prohibited} ) ->
+	parse_options( T, {true,Capitalize,MinLen,MaxLen,Prohibited} );
+
+parse_options( [generate_capitalized_words|T],
+		{Original,_Capitalize,MinLen,MaxLen,Prohibited} ) ->
+	parse_options( T, {Original,true,MinLen,MaxLen,Prohibited} );
+
+parse_options( [{generated_min_length,Min}|T],
+		{Original,Capitalize,_MinLen,MaxLen,Prohibited} ) ->
+	parse_options( T, {Original,Capitalize,Min,MaxLen,Prohibited} );
+		
+parse_options( [{generated_max_length,Max}|T],
+		{Original,Capitalize,MinLen,_MaxLen,Prohibited} ) ->
+	parse_options( T, {Original,Capitalize,MinLen,Max,Prohibited} );
+
+parse_options( [prohibited_index|T],
+		{Original,Capitalize,MinLen,MaxLen,_Prohibited} ) ->
+	parse_options( T, {Original,Capitalize,MinLen,MaxLen,prohibited_index} );
+		
+parse_options( [{prohibited_index,ProhibitedContent}|T],
+		{Original,Capitalize,MinLen,MaxLen,_Prohibited} ) ->
+	parse_options( T, {Original,Capitalize,MinLen,MaxLen,ProhibitedContent} );
+
+parse_options( [H|_T], _ParsedOptions ) ->
+	throw( {unexpected_language_option,H} ).
+
+
+
+% Returns a list of normalized words read from specified filename, which
+% must exist.
+get_word_list_from( Filename ) ->
+
+	{ok,BinLines} = file:read_file( Filename ),
+	% No closing needed, apparently.
+	Line = binary_to_list( BinLines ),
+	% io:format( "Line = ~s.~n", [ Line ] ),
+	Words = string:tokens( Line, basic_utils:get_whitespaces_list() ),
+	[ normalize_word(Word) || Word <- Words ].
+
+
+
+% Manages any prohibited words.
+% Returns an updated state.
+manage_prohibited_words( no_prohibited_word, State, _WordSetDir,
+		SpecialWordTable ) ->
+	?info([ "No word will be specifically prohibited." ]),
+	SpecialWordTable;
+	
+manage_prohibited_words( prohibited_index, State, WordSetDir, 
+		SpecialWordTable ) ->
+	% Using built-in prohibited word file:
+	manage_prohibited_words( {prohibited_index,"prohibited-index.txt"}, 
+		State, WordSetDir, SpecialWordTable );
+	
+manage_prohibited_words( {prohibited_index,IndexFilename}, State, 
+		WordSetDir, SpecialWordTable ) ->
+	Filename = file_utils:join(WordSetDir,IndexFilename),
+	case file_utils:is_existing_file( Filename ) of
+	
+		true ->
+			ProhibitedWords = get_word_list_from( Filename ),
+			integrate_prohibited_words(	ProhibitedWords, SpecialWordTable );
+			
+		false ->
+			?error([ io_lib:format( "Index for prohibited words '~s' "
+				"not found, hence not used.", [Filename] ) ]),
+			SpecialWordTable	
+		
+	end.
+	
+	
+
+integrate_prohibited_words( [], SpecialWordTable ) ->
+	SpecialWordTable;
+		
+integrate_prohibited_words( [H|T], SpecialWordTable ) ->
+	integrate_prohibited_words( T, 
+		hashtable:addEntry( _Key = H, _Value = prohibited, SpecialWordTable ) ).
+
 
 
 % Converts an atom designating a language variation into a file element suffix.
@@ -364,13 +500,28 @@ get_variation_filename( VariationName, State ) ->
 % Learning section.
 
 
+add_original_words( Words, State ) ->
+	SpecialWordTable = ?getAttr(special_words),
+	?setAttribute( State, special_words, 
+		integrate_original_words( Words, SpecialWordTable ) ).
+
+
+integrate_original_words( [], SpecialWordTable ) ->
+	SpecialWordTable;
+		
+integrate_original_words( [H|T], SpecialWordTable ) ->
+	integrate_original_words( T, 
+		hashtable:addEntry( _Key = H, _Value = original, SpecialWordTable ) ).
+	
+
+
 % Constructs a variation tree from the specified list of words.
 build_tree( Words, Order ) ->
 	IntegratedTree = process_words( Words, Order, _EmptyTree = [] ),
 	NormalizedTree = normalize( IntegratedTree ),
-	io:format( "Once having learnt words ~p, "
-		"initial tree is:~n~w, normalized tree is:~n~w.~n.", 
-		[Words,IntegratedTree,NormalizedTree] ),
+	%io:format( "Once having learnt words ~p, "
+	%	"initial tree is:~n~w, normalized tree is:~n~w.~n.", 
+	%	[Words,IntegratedTree,NormalizedTree] ),
 	NormalizedTree.
 	
 
@@ -389,6 +540,7 @@ process_words( [Word|OtherWords], Order, CurrentVariationTree ) ->
 % Integrates the specified word into the specified variation tree.
 % Returns an updated variation tree.	
 integrate_word( Word, Order, CurrentVariationTree ) ->
+	% Words are already normalized.
 	Sequences = get_sequences_for( Word, Order ),
 	%io:format( "Sequences for word '~s' are: ~w.~n", [Word,Sequences] ),
 	integrate_sequences_in_tree( Sequences, Order, CurrentVariationTree ).
@@ -494,8 +646,10 @@ find_sequence( Word, CurrentIndex, _Order ) ->
 
 
 
+
 % Normalization section.
 	
+
 	
 % Normalizes the specified variation tree, to precompute everything to 
 % make the drawing of letters easier.
@@ -544,6 +698,99 @@ compute_sums( [ {Letter,Count,{Subtree,sum_not_available}}|T], {Acc,Sum} ) ->
 % Random generation section.
 
 
+% Returns a word meeting all recorded constraints.
+determine_word( _VariationTree, _Sum, _State, 0 ) ->
+	{generation_failed,max_attempt_count_reached};
+	
+determine_word( VariationTree, Sum, State, AttemptCount ) ->
+
+	NewWord = draw_letters( VariationTree, Sum, ?getAttr(markov_order),
+		_CurrentPattern = [], _Acc = [] ),
+	
+	%io:format( "Drawn word: ~s.~n", [NewWord] ),
+
+	case validate_word( NewWord, State ) of
+	
+		{true,CheckedWord} ->
+			{generation_success,CheckedWord};
+			
+		false ->
+			determine_word( VariationTree, Sum, State, AttemptCount-1 )
+			
+	end.
+	
+				
+
+% Transforms and checks specified word so that it can returned.			
+validate_word( Word, State ) ->
+	
+	MinLen = ?getAttr(min_generated_length),
+	MaxLen = ?getAttr(max_generated_length),
+	
+	case length(Word) of
+	
+		Len when Len >= MinLen andalso Len =< MaxLen ->
+		
+			case is_allowed( Word, State ) of
+			
+				true ->
+					{true,manage_capitalization(Word,State)};
+					
+				false ->
+					false
+					
+			end;
+			
+		_BadLen ->
+			false
+			
+	end.			
+			
+
+
+% Checks that the word is not prohibited and, if no original word is wanted,
+% that it is indeed original.
+is_allowed( Word, State ) ->
+
+	case hashtable:lookupEntry( Word, ?getAttr(special_words) ) of
+	
+		{value,prohibited} ->
+			io:format( "### Rejecting prohibited word '~s'.~n", [Word] ),
+			false;
+			
+		{value,original} ->
+			% Clearer than a 'not' operator:
+			case ?getAttr(generate_original_only) of
+			
+				true ->
+					io:format( "### Rejecting original word '~s'.~n", [Word] ),
+					false;
+					
+				false ->
+					true
+					
+			end;
+			
+		{hashtable_key_not_found,_Word} ->
+			true				
+	
+	end.
+	
+								
+			
+manage_capitalization( Word, State ) ->
+	case ?getAttr(capitalize_generated_words) of
+	
+		true ->
+			capitalize_word( Word );
+			
+		false ->
+			Word
+			
+	end.
+
+	
+
 % Draws letters as long as 'eow' is not drawn:
 draw_letters( FullVariationTree, FullSum, Order, CurrentPattern, WordAcc ) ->
 	{PatternTree,PatternSum} = get_subtree_for( FullVariationTree, FullSum, 
@@ -559,8 +806,8 @@ draw_letters( FullVariationTree, FullSum, Order, CurrentPattern, WordAcc ) ->
 			% _SubtreeEntry must be: {[],0}
 			% End of word reached, returning it:
 			Res = lists:reverse(WordAcc),
-			io:format( "End of word reached, generated word is: '~s'.~n", 
-				[Res] ),
+			%io:format( "End of word reached, generated word is: '~s'.~n", 
+			%	[Res] ),
 			Res;
 			
 		{ NormalLetter, _SubtreeEntry } ->
@@ -611,4 +858,19 @@ get_entry_for( [ _H | T ], Value ) ->
 	% Here Value > Count, going on:
 	get_entry_for( T, Value ).
 	
-	 
+	
+	
+% Converts the initial letter of specified word into an uppercase.	 
+capitalize_word( [] ) ->
+	[] ;
+	
+capitalize_word( [H|T] ) ->
+	[string:to_upper(H)|T].
+	
+
+
+% Sets specified word in a canonical form (ex:: avoid uppercases).
+normalize_word( Word ) ->
+	string:to_lower( Word ).
+	
+	

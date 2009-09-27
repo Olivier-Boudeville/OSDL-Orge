@@ -73,7 +73,8 @@ exec() ->
 
 	Language = "modern-greek",
 	Variations = [ 'female-names', 'male-names', surnames ],
-	Options = [ generate_original_only ],
+	Options = [ generate_original_only, generate_capitalized_words,
+		prohibited_index ],
 	
 	?emit_info([ io_lib:format( "Testing a language manager for language '~s',"
 		" with variations ~w and options ~w.", 
