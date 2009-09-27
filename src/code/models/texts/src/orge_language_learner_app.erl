@@ -58,7 +58,8 @@ evaluate_probabilities( LanguageManagerPid, Variation, [Word|T] ) ->
 	
 		{wooper_result,Probability} ->
 			?emit_info([ io_lib:format( "The probability that the word '~s' "
-				"belongs to the variation '~w' is ~.1f %.", 
+				%"belongs to the variation '~w' is ~.5f %.", 
+				"belongs to the variation '~w' is ~f %.", 
 				[Word,Variation,Probability*100] ) ]),
 			evaluate_probabilities( LanguageManagerPid, Variation, T )
 	
@@ -108,8 +109,14 @@ exec() ->
 	?emit_info([ io_lib:format(	"Generated following words: ~s.",
 		[ basic_utils:string_list_to_string(FirstWords)] ) ]),
 	
+	OriginalWords = [ "Artemisia", "Aspasia", "Aspa", "Aster", "Atalante",
+		"Athena", "Basilea", "Vasiliki", "Berenice" ], 
+
+	OtherWords = [ "Tourmente", "Apocalypse", "Ladder", "Boat",
+		"Doppel", "Augen", "Pasta", "Arte" ],
+		
 	evaluate_probabilities( FirstLanguageManagerPid, FirstTestVariation, 
-		FirstWords ),
+		 FirstWords ++ OtherWords ++ OriginalWords ),
 		
 	FirstLanguageManagerPid ! delete,
 	

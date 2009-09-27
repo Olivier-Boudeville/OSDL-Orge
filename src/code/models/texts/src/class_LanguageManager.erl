@@ -41,7 +41,8 @@
 
 
 %Debug:
--export([ build_tree/2, normalize/1, draw_letters/5 ]).
+-export([ build_tree/2, normalize/1, draw_letters/5, get_word_list_from/1 ]).
+-export([ determine_probability_of/4, test/0 ]).
 
 
 % Declaring all variations of WOOPER standard life-cycle operations:
@@ -135,6 +136,11 @@
 % desirable than returning an original word of the current variation.
 	
 	
+test() ->
+	L=get_word_list_from("language-wordsets/modern-greek-female-names.txt"),
+	{T,S} = class_LanguageManager:build_tree( L, 2 ),
+	class_LanguageManager:determine_probability_of( "cea", T, S, 2 ).
+
 	
 	
 % Constructs a new language manager:
@@ -310,21 +316,39 @@ generate( State, Variation ) ->
 			% {generation_failed,Reason}:
 			Result = determine_word( VariationTree, Sum, State,
 				_MaxAttemptCount = 500 ),
-			io:format( "Returning: '~p'.~n", [Result]),
+			%io:format( "Generated word is: '~p'.~n", [Result]),
 			?wooper_return_state_result( State, Result )
 
 	end.
 
 
 
-% Returns the probability (as a floting-point number) that the specified 
+% Returns the probability (as a floating-point number) that the specified 
 % word belongs to the specified variation.
 % (const request)
-evaluate( State, _Word, _Variation ) ->
-	?wooper_return_state_result( State, 0.0 ).
+evaluate( State, Word, Variation ) ->
+	VariationTable = ?getAttr(variation_trees),
+	case hashtable:lookupEntry( Variation, VariationTable ) of
 	
-	
-	
+		undefined ->
+			?wooper_return_state_result( State, 
+				{ evaluation_failed, {variation_not_found,Variation} } );
+		
+		{value, {VariationTree,Sum} } ->
+			NormalizedWord = normalize_word( Word ),
+			%io:format( "Evaluation of normalized word '~s' in tree ~p "
+			%	"with sum ~B~n", [NormalizedWord,VariationTree,Sum] ),
+			
+			Proba = determine_probability_of( NormalizedWord, VariationTree,
+				Sum, ?getAttr(markov_order) ),
+				
+			%io:format( "The probability that the word '~s' belongs to the "
+			%	"variation '~s' is ~f%.~n", [Word,Variation,Proba] ),
+				
+			?wooper_return_state_result( State, Proba )
+
+	end.
+		
 
 
 % Static section.
@@ -409,6 +433,11 @@ manage_prohibited_words( {prohibited_index,IndexFilename}, State,
 	
 		true ->
 			ProhibitedWords = get_word_list_from( Filename ),
+			
+			?info([ io_lib:format( "The index of ~B prohibited words "
+				"from file '~s' has been taken into account.",
+				[length(ProhibitedWords),Filename] ) ]),
+				 
 			integrate_prohibited_words(	ProhibitedWords, SpecialWordTable );
 			
 		false ->
@@ -520,8 +549,15 @@ build_tree( Words, Order ) ->
 	IntegratedTree = process_words( Words, Order, _EmptyTree = [] ),
 	NormalizedTree = normalize( IntegratedTree ),
 	%io:format( "Once having learnt words ~p, "
-	%	"initial tree is:~n~w, normalized tree is:~n~w.~n.", 
+	%	"initial tree is:~n~p, normalized tree is:~n~p.~n.", 
 	%	[Words,IntegratedTree,NormalizedTree] ),
+	%{ok,FirstFile} = file:open( "first.txt", [write] ),
+	%io:format( FirstFile, "~p", [IntegratedTree]),
+	%file:close(FirstFile),
+	%{ok,SecondFile} = file:open( "second.txt", [write] ),
+	%io:format( SecondFile, "~p", [NormalizedTree]),
+	%file:close(SecondFile),
+		
 	NormalizedTree.
 	
 
@@ -580,14 +616,14 @@ integrate_sequence_in( [H|T], VariationTree ) ->
 		
 		false ->
 			% This letter was never registered, adding a subtree for it:
-			[ { H, 0, {integrate_sequence_in( T, [] ), sum_not_available } }
+			[ { H, 0, {integrate_sequence_in( T, [] ), z } }
 				| VariationTree ];
 						
-		{H,Count,{Subtree,sum_not_available}} ->
+		{H,Count,{Subtree,z}} ->
 			% Just iterates and returns an updated subtree:
 			lists:keyreplace( _Key = H, _IndexInTuple = 1, VariationTree,
 				{H,Count,
-					{integrate_sequence_in( T, Subtree ),sum_not_available} } )
+					{integrate_sequence_in( T, Subtree ),z} } )
 		
 	end,
 	%io:format( "2 integrate_sequence_in: new tree for ~s is ~p.~n",
@@ -604,13 +640,13 @@ register_sequence( H, VariationTree ) ->
 		
 		false ->
 			% This letter was never registered, adding an entry for it:
-			[ { H, _Count=1, { _EmptySubtree=[], sum_not_available } } 
+			[ { H, _Count=1, { _EmptySubtree=[], z } } 
 				| VariationTree ];
 			
-		{H,Count,{Subtree,sum_not_available}} ->
+		{H,Count,{Subtree,z}} ->
 			% This letter was already registered, just increments its count:
 			lists:keyreplace( _Key = H, _IndexInTuple = 1,
-				VariationTree, { H, Count+1, {Subtree,sum_not_available} } )
+				VariationTree, { H, Count+1, {Subtree,z} } )
 				
 	end.
 	
@@ -665,8 +701,9 @@ normalize( VariationTree ) ->
 	% 'bow' letter (for 'beginning of word'), so that we retrieve the 
 	% sum for the first-level letters as well:
 	{ [ {bow,0,{NormalizedTree,Sum}} ], 0 } = compute_sums(
-		[ {bow,0,{VariationTree,sum_not_available}} ], 
+		[ {bow,0,{VariationTree,z}} ], 
 		{ _Acc = [], _Sum = 0 } ),
+	%io:format( "---->~n~p <----~n", [NormalizedTree] ),	
 	{NormalizedTree,Sum}.
 	
 	
@@ -687,7 +724,7 @@ compute_sums( [], {SummedTree,Sum} ) ->
 	% to highest:
 	{lists:reverse(SummedTree),Sum};
 	
-compute_sums( [ {Letter,Count,{Subtree,sum_not_available}}|T], {Acc,Sum} ) ->
+compute_sums( [ {Letter,Count,{Subtree,z}}|T], {Acc,Sum} ) ->
 	compute_sums( T, { [ {Letter,Sum+Count,compute_sums(Subtree,{[],0})}|Acc],
 		Sum+Count} ) .
 		
@@ -755,7 +792,7 @@ is_allowed( Word, State ) ->
 	case hashtable:lookupEntry( Word, ?getAttr(special_words) ) of
 	
 		{value,prohibited} ->
-			io:format( "### Rejecting prohibited word '~s'.~n", [Word] ),
+			%io:format( "### Rejecting prohibited word '~s'.~n", [Word] ),
 			false;
 			
 		{value,original} ->
@@ -763,7 +800,7 @@ is_allowed( Word, State ) ->
 			case ?getAttr(generate_original_only) of
 			
 				true ->
-					io:format( "### Rejecting original word '~s'.~n", [Word] ),
+					%io:format( "### Rejecting original word '~s'.~n", [Word] ),
 					false;
 					
 				false ->
@@ -820,16 +857,27 @@ draw_letters( FullVariationTree, FullSum, Order, CurrentPattern, WordAcc ) ->
 
 	
 	
-% Returns the subtree corresponding to specified pattern.	
+% Returns the subtree and sum corresponding to specified pattern.	
 get_subtree_for( CurrentVariationTree, SubSum, _Pattern = [] ) ->
+	%io:format( "get_subtree_for: pattern found, returning: ~p.~n", 
+	%	[{CurrentVariationTree, SubSum}] ),
 	{CurrentVariationTree, SubSum};
 	
 get_subtree_for( CurrentVariationTree, _Sum, [H|T] ) ->
-	{H,_Count,{Subtree,SubSum}} = lists:keyfind( _Key = H, _IndexInTuple = 1, 
-		CurrentVariationTree ),
-	get_subtree_for( Subtree, SubSum, T ).
-	
-	
+	%io:format( "get_subtree_for: looking for '~s' in ~p.~n", 
+	%	[ [H], CurrentVariationTree ] ),
+	case lists:keyfind( _Key = H, _IndexInTuple = 1, 
+			CurrentVariationTree ) of
+		
+		{H,_Count,{Subtree,SubSum}}->
+			get_subtree_for( Subtree, SubSum, T );
+			
+		false ->
+			{ [], 0 }
+			
+	end.		
+		
+
 
 % Returns the new pattern to be used.
 get_new_pattern( Pattern, NewLetter, Order ) ->
@@ -874,3 +922,84 @@ normalize_word( Word ) ->
 	string:to_lower( Word ).
 	
 	
+
+
+% Evaluation section.
+
+
+% Determines the probability that specified normalized word belongs to the
+% language variation whose tree is specified.
+determine_probability_of( Word, VariationTree, Sum, Order ) ->
+
+	%io:format( "Determining probability of word '~s' within tree ~p "
+	%	"whose sum is ~B.~n", [Word, VariationTree, Sum] ),
+		
+	%io:format( "Determining probability of word '~s' within tree "
+	%	"whose sum is ~B.~n", [Word, Sum] ),
+	
+	% Initial value used to be 1.0:	
+	compute_probability( Word, VariationTree, Sum, _CurrentPattern = [],
+		_CurrentProba = math:pow( 8, length(Word) ), Order ).
+	
+	
+	
+compute_probability( [], _VariationTree, _Sum, _CurrentPattern,
+		CurrentProba, _Order ) ->
+	% A Sigmoid	function, to ensure the probability remains in [0,1], and that
+	% it takes advantage of the full range:
+	1 - math:exp( - CurrentProba / 2 );
+				
+compute_probability( [H|T], VariationTree, Sum, CurrentPattern,
+		CurrentProba, Order ) ->
+
+	NewProba = get_probability( H, CurrentPattern, VariationTree, Sum ),
+
+	%io:format( "Current letter = '~s', current proba = ~f, pattern = '~s', "
+	%	"pattern proba = ~f.~n", [ [H],CurrentProba,CurrentPattern,NewProba] ),
+		
+	NewPattern = get_new_pattern( CurrentPattern, H, Order ),	
+
+	compute_probability( T, VariationTree, Sum, NewPattern, 
+		NewProba * CurrentProba, Order ).
+	
+	
+		
+get_probability( Letter, Pattern, FullVariationTree, FullSum ) ->
+
+	{PatternTree,PatternSum} = get_subtree_for( FullVariationTree, FullSum, 
+		Pattern ),
+
+	%io:format( "For pattern '~s' (letter will be '~s'), "
+	%	"returned tree is:~n~p~n", [Pattern,[Letter],PatternTree] ),
+		
+	% Having coded differential occurrence counts forces us to keep track of
+	% previous entry count to recompute the one of the letter we are interested
+	% in:
+	get_pattern_probability( Letter, PatternTree, _LastOffset = 0, PatternSum ).
+	
+	
+
+get_pattern_probability( _Letter, _PatternTree=[], _LastOffset, _PatternSum ) ->
+	% We exhausted the list of known letters for this pattern, this letter
+	% never appeared with the current pattern, thus returning 0:
+	%io:format( "Letter '~s' not found, returning null probability.~n", 
+	%	[ [Letter] ] ),
+	0.0;
+	
+get_pattern_probability( Letter, [ {Letter,LetterOffset,_SubtreeEntry} | _T ],
+		LastOffset, PatternSum ) ->
+	% Letter found, evaluating the corresponding probability:
+	Proba = (LetterOffset - LastOffset ) / PatternSum,
+	
+	%io:format( "Letter '~s' found, previous offset was ~B, "
+	%	"letter offset is ~B, pattern sum is ~B, its probability is ~f.~n", 
+	%	[ [Letter],LastOffset,LetterOffset,PatternSum,Proba] ),
+	
+	Proba;
+	
+get_pattern_probability( Letter, 
+		[ {_OtherLetter,OtherLetterOffset,_SubtreeEntry} | T ], _LastOffset,
+		PatternSum ) ->
+	% Letter not found, continuing:
+	get_pattern_probability( Letter, T, OtherLetterOffset, PatternSum ).
+
