@@ -29,20 +29,27 @@ LOANI_REPOSITORY_ROOT = $(ORGE_TOP)/../../..
 LOANI_INSTALLATIONS_ROOT = $(LOANI_REPOSITORY_ROOT)/../LOANI-installations
 
 
+OSDL_TARGET_VERSION := 0.5
+
+ORGE_WEB_INSTALL_DIR = $(LOANI_INSTALLATIONS_ROOT)/OSDL-$(OSDL_TARGET_VERSION)/share/OSDL/doc/web/main/documentation/OSDL/Orge
+
+
 # egeoip root (for IP geolocation):
 EGEOIP_ROOT = $(LOANI_INSTALLATIONS_ROOT)/egeoip
 
 
-# Previous setting was to use a full Ceylan install:
+# Previous setting was to use a full Ceylan install, now preferring using a
+# dedicated Ceylan-Erlang install, except for documentation:
+
 # Ceylan sources supposed to be available at the same directory level as OSDL:
-#CEYLAN_ROOT := $(LOANI_REPOSITORY_ROOT)/ceylan
-#CEYLAN_TRUNK := $(CEYLAN_ROOT)/Ceylan/trunk
+CEYLAN_ROOT := $(LOANI_REPOSITORY_ROOT)/ceylan
+CEYLAN_TRUNK := $(CEYLAN_ROOT)/Ceylan/trunk
 #CEYLAN_ERLANG_TOP := $(CEYLAN_TRUNK)/src/code/scripts/erlang
-#CEYLAN_DOC_TOP    := $(CEYLAN_TRUNK)/src/doc
+CEYLAN_DOC_TOP    := $(CEYLAN_TRUNK)/src/doc
 
 # Now preferring using a dedicated Ceylan-Erlang install:
 CEYLAN_ERLANG_TOP := $(LOANI_REPOSITORY_ROOT)/Ceylan-Erlang
-CEYLAN_DOC_TOP    := $(CEYLAN_ERLANG_TOP)/common/doc
+#CEYLAN_DOC_TOP    := $(CEYLAN_ERLANG_TOP)/common/doc
 
 
 # Will define COMMON_TOP and WOOPER_TOP:
@@ -50,10 +57,15 @@ TRACES_TOP = $(CEYLAN_ERLANG_TOP)/traces
 
 	
 # Non-Orge OSDL:
-OSDL_ROOT := $(ORGE_TOP)/../..
+OSDL_ROOT := $(ORGE_TOP)/../../OSDL/trunk/src/doc/web/main/documentation/OSDL/Orge
 
 
 ORGE_DEV_TOP := $(ORGE_TOP)/src/code
+
+
+# Must always be found from the current directory (thanks to symlink for ex):
+PROJECT_CSS = Orge.css 
+
 
 
 # Directory section.
@@ -68,6 +80,7 @@ UDP_CLIENTS_BASE_DIR := $(CLIENTS_BASE_DIR)/raw-udp
 
 CREATURES_BASE_DIR := $(MODELS_BASE_DIR)/creatures
 OBJECTS_BASE_DIR   := $(MODELS_BASE_DIR)/objects
+TEXTS_BASE_DIR     := $(MODELS_BASE_DIR)/texts
 
 SOCIETY_BASE_DIR := $(RULESET_BASE_DIR)/society
 
