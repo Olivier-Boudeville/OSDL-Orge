@@ -11,9 +11,17 @@ Appendices
     :local:
 
 
+
+:raw-latex:`\pagebreak`
+
+.. include:: Orge-languages-management.rst
+
+
+
 :raw-latex:`\pagebreak`
 
 .. include:: Orge-orders-of-magnitude.rst
+
 
 
 :raw-latex:`\pagebreak`
@@ -21,6 +29,8 @@ Appendices
 .. include:: Orge-glossary.rst
 
 
+
 :raw-latex:`\pagebreak`
 
 .. include:: Orge-technical-manual.rst
+
