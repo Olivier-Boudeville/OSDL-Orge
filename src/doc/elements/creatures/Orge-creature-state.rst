@@ -73,6 +73,26 @@ Gender
 Most creatures are either male or female, permanently. This has an impact on attributes.
 
 
+Name
+----
+
+The name of a character is mostly determined by:
+
+ - its species
+ - its gender
+ 
+ 
+For that the Orge implementation provides a tool using a Markov-based algorithm in order to "learn" any language and then be able:
+
+ - to generate words which could likely be part of that language
+ - to determine the probability that any specified word belongs to that language
+ 
+Therefore, once the program is trained against dictionaries containing, for example, names for Elven Ladies, a player can either ask the Orge implementation to invent any number of names that would correspond to that language, or specify a name that the player imagined for validation by the Orge implementation. In that context, if supplying the name of a male Dwarf, Orge would probably determine that the probability that this name belongs the Elven Ladies word set is too low, and would reject it.
+
+All details are available in the `Orge Languages Management`_ section.
+
+ 
+
 History
 -------
 
