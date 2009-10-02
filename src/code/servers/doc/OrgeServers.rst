@@ -990,4 +990,22 @@ Three main pieces of software can be updated server-side:
 	- the client manager, which is probably the most changing part of the server-side architecture; two options: either update all current managers on-the-fly, or simply run the updated code only on new connections
 	- the database manager, whose frequency is not known yet
 	
-	 
+	
+
+How To Check Which Orge Ports And Services Are Open
+...................................................
+
+From outside the server, ``nmap`` can be used to check the default Orge port::
+
+  > nmap -p 9512 orge-testing.esperide.com
+
+  Starting Nmap 4.62 ( http://nmap.org ) at 2009-08-30 18:40 CEST
+  Interesting ports on orge-testing.esperide.com (XX.XX.XX.XX):
+  PORT     STATE SERVICE
+  9512/tcp open  unknown
+
+
+From a shell on the Orge server, one can use::
+
+  > orge-testing:/home/orge# netstat -an
+
