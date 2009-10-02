@@ -7,6 +7,7 @@ If the player is given the ability of customize the characteristics of a creatur
 More precisely, all settings listed in `Creature Characterization`_ will have to be defined:
 
  - `Gender`_
+ - `Name`_
  - `History`_
  - `Persona`_ (personality traits), ex: hot tempered, arrogant, coward, roguish, etc.
  - `Primary Attributes`_: it is recommended that on creation, most if not all attributes of an adult creature are in the 4-20 range 
@@ -37,13 +38,11 @@ This should include at least:
 Species Initial Skills
 ......................
 
-
 Unless mentioned otherwise (i.e. unless the creature had an atypic history), a creature of a given species and age will master at least a minimal list of skills, resulting from its cultural integration and training.
 
 
 Human
 _____
-
 
 When reaching the ``Boy/Girl`` age, a basic Human is expected to gain following skills:
  
