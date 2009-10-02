@@ -1,18 +1,27 @@
 ORGE_TOP = ../../../../..
 
+DOCUTILS_TOP = .
 
-DOC_CONTENT = Orge-languages-management.html
+DOC_HTML_CONTENT := Orge-languages-management.html
+DOC_PDF_CONTENT  := Orge-languages-management.pdf
+
+DOC_CONTENT      := $(DOC_HTML_CONTENT) $(DOC_PDF_CONTENT) Orge.css
+
+TEXT_WEB_INSTALL_DIR = $(ORGE_WEB_INSTALL_DIR)/texts
 
 
+
+# Includes the PDF, as it is stored and referenced in the website:
 generate-html-doc: $(DOC_CONTENT)
 
 
-install-html-doc: $(DOC_CONTENT)
-	@#echo "  Installing $< in $(ORGE_WEB_INSTALL_DIR)"
-	@echo "  Installing $<"
-	@mkdir -p $(ORGE_WEB_INSTALL_DIR)
-	@/bin/cp -f $< $(ORGE_WEB_INSTALL_DIR)
+
+install-html-doc: generate-html-doc
+	@echo "  Installing $(DOC_CONTENT) in $(TEXT_WEB_INSTALL_DIR)"
+	@mkdir -p $(TEXT_WEB_INSTALL_DIR)
+	@/bin/cp -f $(DOC_CONTENT) $(TEXT_WEB_INSTALL_DIR)
 	
+
 	
 include $(ORGE_TOP)/GNUmakerules.inc
 
