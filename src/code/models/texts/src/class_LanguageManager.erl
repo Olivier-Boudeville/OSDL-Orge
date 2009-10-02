@@ -40,10 +40,6 @@
 -export([ get_possible_language_variations/0 ]).
 
 
-%Debug:
--export([ build_tree/2, normalize/1, draw_letters/5, get_word_list_from/1 ]).
--export([ determine_probability_of/4, test/0 ]).
-
 
 % Declaring all variations of WOOPER standard life-cycle operations:
 % (template pasted, two replacements performed to update arities)
@@ -135,13 +131,7 @@
 % that way, and returning an original word of another variation is still less
 % desirable than returning an original word of the current variation.
 	
-	
-test() ->
-	L=get_word_list_from("language-wordsets/modern-greek-female-names.txt"),
-	{T,S} = class_LanguageManager:build_tree( L, 2 ),
-	class_LanguageManager:determine_probability_of( "cea", T, S, 2 ).
-
-	
+		
 	
 % Constructs a new language manager:
 %  - LanguageName is a string corresponding to the name of this language,
@@ -548,6 +538,9 @@ integrate_original_words( [H|T], SpecialWordTable ) ->
 build_tree( Words, Order ) ->
 	IntegratedTree = process_words( Words, Order, _EmptyTree = [] ),
 	NormalizedTree = normalize( IntegratedTree ),
+	
+	% Uncomment if you need to debug variation trees being built:
+	
 	%io:format( "Once having learnt words ~p, "
 	%	"initial tree is:~n~p, normalized tree is:~n~p.~n.", 
 	%	[Words,IntegratedTree,NormalizedTree] ),
