@@ -38,13 +38,17 @@
 	
 run() ->
 
-	ServerLocation = localhost,
+	% Using TCP/IP, hence we do not have to rely on node and cookie information:
+	{ TargetHost, _TargetNode, _TargetCookie } =
+		orge_tcp_server:get_server_defaults(),
+		
 	?test_start,
 	
 	?test_info([ "A test Orge TCP server is expected to run already, "
 		"with default settings (see orge_tcp_server_test.erl)." ]),
 
-	?test_info([ "Creating a first new Orge test TCP client." ]),
+	?test_info([ io_lib:format( "Creating a first new Orge test TCP client, "
+		"trying to connect to host ~p.", [TargetHost] ) ]),
 	
 	% Would fail as in orge_tcp_server_test this account is unregistered:
 	%{FirstLogin,FirstPassword} = { "anakin", "Iamy0urfather" },
@@ -53,7 +57,7 @@ run() ->
 	{FirstLogin,FirstPassword} = { "alf", "hell0Brian" },
 	
 	FirstClient = orge_tcp_client:start_link( FirstLogin, FirstPassword,
-		ServerLocation ),
+		TargetHost ),
 	
 	?test_info([ "Checking this first client succeeded in connecting." ]),
 	FirstClient ! {get_login_status,self()},
@@ -79,7 +83,7 @@ run() ->
 	% as no accept will be done.  
 	?test_info([ "Creating a second new Orge test TCP client." ]),
 	SecondClient = orge_tcp_client:start_link( SecondLogin, SecondPassword, 
-		ServerLocation ),
+		TargetHost ),
 	
 	?test_info([ "Checking this second client succeeded in connecting." ]),
 	SecondClient ! {get_login_status,self()},
@@ -95,7 +99,7 @@ run() ->
 	?test_info([ "Trying to log twice with the account of first client "
 	   "(should fail)." ]),
 	SameAsFirstClient = orge_tcp_client:start_link( FirstLogin, FirstPassword, 
-	   ServerLocation ),
+	   TargetHost ),
 	
 	?test_info([ 
 		"Checking whether the first client failed in connecting twice." ]),
