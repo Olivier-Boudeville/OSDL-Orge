@@ -1,7 +1,18 @@
 #!/bin/sh
 
 
-previous_server_pid=`ps -edf|grep beam|grep orge_tcp_server_exec_background|awk '{print $2}'`
+epmd_port=4269
+
+
+USAGE="  Usage: "`basename $0`" [ -d | --debug ]
+  Launches an Orge server.
+  Options are:
+     -d or --debug: run in debug mode (not in the background), instead of in the default production mode
+"
+
+
+
+previous_server_pid=`ps -edf|grep beam|grep orge_tcp_server_exec|awk '{print $2}'`
 
 if [ -n "$previous_server_pid" ] ; then
 
@@ -13,12 +24,41 @@ if [ -n "$previous_server_pid" ] ; then
 fi
 
 
-echo "Starting Orge server..."
+
 
 # Needed to launch an EPMD daemon on a non-standard port:
-epmd -daemon -port 4269
+epmd -daemon -port ${epmd_port} 
 
-make orge_tcp_server_exec_background 
+if [ ! $? -eq 0 ] ; then
 
-echo "...done"
+	echo "Error, unable to launch EPMD daemon on port #${epmd_port}." 1>&2
+	exit 10
+	
+fi
+
+
+do_debug=1
+
+if [ "$1" = "-d" ] || [ "$1" = "--debug" ] ; then
+	do_debug=0
+fi
+
+
+if [ $do_debug -eq 0 ] ; then
+
+	echo "Starting Orge server in debug mode with EPMD port #${epmd_port}..."
+
+	make orge_tcp_server_exec
+
+	echo "...done"
+
+else
+
+	echo "Starting Orge server in production mode with EPMD port #${epmd_port}..."
+
+	make orge_tcp_server_exec_background
+
+	echo "...done"
+
+fi
 
