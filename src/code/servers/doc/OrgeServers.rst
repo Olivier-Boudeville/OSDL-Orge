@@ -146,10 +146,14 @@ The recommended scheme to run an Orge server is to host it on a gateway (ex: a d
 
 
 
+
+
 :raw-latex:`\pagebreak`
+
 
 Server Hardware
 ...............
+
 
 
 Most basic Configuration
@@ -685,7 +689,9 @@ ________
 
 At the lowest level, security is obtained thanks to the kernel, the corresponding distribution, and the aforementioned firewall settings.
 
-At the highest level, the Orge database allows to authenticate each Orge user thanks to identifiers, and to report through supervision traces every abnormal connection attempt.
+At the highest level, the Orge database allows to authenticate each Orge user thanks to identifiers, and to report through supervision traces every abnormal connection attempt. A user-specified account password is never stored in clear text in the database, only its hash code [#]_ is kept, the password itself being itself immediately discarded.
+
+.. [#] Password hashes are currently based on the *MD5 Message Digest Algorithm* (RFC 1321).
 
 In-between lies the Erlang environment, with strict laws regarding the interconnection of virtual machines and processes.
 
@@ -724,6 +730,7 @@ An host file (see ``net_adm:host_file``) can be used as well, to specify candida
   
 Then ``net_adm:world(verbose)`` can be used to detect all accessible nodes.
   
+
 
 Remote Connection to the Orge Server Erlang Shell
 *************************************************
