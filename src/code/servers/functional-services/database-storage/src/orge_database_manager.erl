@@ -60,6 +60,12 @@
 % RAM and the disc copy of the table, whereas read operations will just 
 % involve the RAM, for increased performances.
 
+% Passwords could be stored in the database not as plain text, but as an
+% encrypted hashes (ex: md5, sha, hmac, des, aes, rsa, dss, etc.). 
+% It would require a working crypto module, hence the generation of
+% an Erlang VM linking to OpenSSL, which is perfectly possible.
+
+
 
 % Necessary to call QLC query language functions:
 -include_lib("stdlib/include/qlc.hrl").
@@ -129,6 +135,7 @@
 		character_id_list,
 
 		% Comes from orge_user_settings: 
+		% (can be actually the hash of the real password)
 		account_password,
 		
 		% orge_user_settings expanded fields:
@@ -195,7 +202,7 @@
 		% Login is the specified user login (if any):
 		login,
 		
-		% Password is the specified user password (if any):
+		% Password is the specified user password (if any), or its hash:
 		password,
 
 		% The version triplet of the client used:
@@ -285,6 +292,9 @@ start_link( InitMode, MaximumSlotCount, ListenerPid ) ->
 init( from_scratch, MaximumSlotCount, ListenerPid ) ->
 
 	send_info( "Starting Orge database, created from scratch." ),
+	
+	% To be enabled if passwords are hashed:
+	crypto:start(),
 	
 	start_geolocation_service(),
 	
@@ -406,7 +416,7 @@ loop( DatabaseState ) ->
 			loop( DatabaseState );
 								
 		{try_login,Login,Password,ConnectionId,ManagerPid} ->
-			Answer = try_login(Login,Password,ConnectionId),
+			Answer = try_login( Login, get_hash(Password), ConnectionId ),
 			ManagerPid ! {ConnectionId,Answer},
 			loop( DatabaseState );
 	
@@ -502,9 +512,15 @@ register_user( DatabaseState, NewUserSettings, CallerPid)  ->
 					account_status = active,
 					character_id_list = []
 				}, NewUserSettings ),
-				
+			
+			% We prefer to store hashes of passwords rather than the passwords
+			% themselves:
+			HashedPassword = get_hash( NewUser#orge_user.account_password ),
+			
+			HashedUser = NewUser#orge_user{ account_password = HashedPassword },
+			
 			% Reduces the size in database:	
-			BinarizedUser = binarize_user( NewUser ),
+			BinarizedUser = binarize_user( HashedUser ),
 			
 			F = fun() -> mnesia:write( BinarizedUser ) end,
 			case mnesia:transaction(F) of
@@ -934,7 +950,7 @@ user_settings_to_string(OrgeUserSettings) ->
 		"first address line is '~s', second one is '~s', city is '~s', "
 		"state is '~s', country is '~s', postal code is '~s', "
 		"home telephone is '~s', mobile one is '~s', e-mail address is '~s', "
-		" account login is '~s', account password is '~s', "
+		" account login is '~s', hash of account password is '~s', "
 		"security question is '~s', security answer is '~s'",
 		[ 
 			?user_settings.first_name,
@@ -990,7 +1006,7 @@ user_to_string(OrgeUser) ->
 		"first address line is '~s', second one is '~s', city is '~s', "
 		"state is '~s', country is '~s', postal code is '~s', "
 		"home telephone is '~s', mobile one is '~s', e-mail address is '~s', "
-		" account login is '~s', account password is '~s', "
+		" account login is '~s', hash of account password is '~s', "
 		"security question is '~s', security answer is '~s'",
 		[ 
 			basic_utils:integer_to_string( ?user.identifier ),
@@ -1113,7 +1129,7 @@ connection_slot_obtained_to_string(OrgeConnection) ->
 
 connection_bad_login_to_string(OrgeConnection) ->
 	io_lib:format( "Failed connection #~s due to bad login '~s' "
-		"(with specified password '~s') from host ~s whose ~s at ~s.",
+		"(with specified password hash '~s') from host ~s whose ~s at ~s.",
 		[ 
 			basic_utils:integer_to_string( 
 				OrgeConnection#orge_connection.identifier ),
@@ -1131,7 +1147,7 @@ connection_bad_login_to_string(OrgeConnection) ->
 
 
 connection_bad_password_to_string(OrgeConnection) ->
-	io_lib:format( "Failed connection #~s due to bad password '~s' "
+	io_lib:format( "Failed connection #~s due to bad password hash '~s' "
 		"for known login '~s' (user #~B) from host ~s whose ~s at ~s.",
 		[ 
 			basic_utils:integer_to_string( 
@@ -1152,7 +1168,7 @@ connection_bad_password_to_string(OrgeConnection) ->
 
 connection_account_not_active_to_string(OrgeConnection) ->
 	io_lib:format( "Failed connection #~s due to a non-active account "
-		"for Orge user #~s (login: '~s', password: '~s'), "
+		"for Orge user #~s (login: '~s', password hash: '~s'), "
 		"from host ~s whose ~s, at ~s.",
 		[ 
 			basic_utils:integer_to_string( 
@@ -1174,7 +1190,7 @@ connection_account_not_active_to_string(OrgeConnection) ->
 		
 connection_already_connected_to_string(OrgeConnection) ->
 	io_lib:format( "Failed connection #~s due to an already existing connection"
-		" for Orge user #~s (login: '~s', password: '~s'), "
+		" for Orge user #~s (login: '~s', password hash: '~s'), "
 		"from host ~s whose ~s, at ~s.",
 		[ 
 			basic_utils:integer_to_string( 
@@ -1227,7 +1243,7 @@ connection_timed_out_to_string(OrgeConnection) ->
 
 connection_access_granted_to_string(OrgeConnection) ->
 	io_lib:format( "Active connection #~s of Orge user #~s "
-		"(login: '~s', password: '~s') from host ~s whose ~s, "
+		"(login: '~s', password hash: '~s') from host ~s whose ~s, "
 		"started at ~s.",
 		[ 
 			basic_utils:integer_to_string( 
@@ -1250,7 +1266,7 @@ connection_access_granted_to_string(OrgeConnection) ->
 connection_incompatible_version_to_string(OrgeConnection) ->
 	io_lib:format( "Connection #~s terminated due to "
 		"an incompatible client version (~s) "
-		"for Orge user #~s (login: '~s', password: '~s'), "
+		"for Orge user #~s (login: '~s', password hash: '~s'), "
 		"from host ~s whose ~s, at ~s.",
 		[ 
 			basic_utils:integer_to_string( 
@@ -1602,6 +1618,7 @@ request_slot( ConnectionId, ClientNetId, DatabaseState ) ->
 
 % Checks specified login request, logs it appropriately in database and 
 % performs the login if successful.
+% Note: SentPassword is actually an hash of the password.
 try_login( StringLogin, SentPassword, ConnectionId ) ->
 
 	Login = binarize_field(StringLogin),
@@ -1760,7 +1777,7 @@ record_bad_login( Login, Password, ConnectionId ) ->
 	
 		{atomic,_} ->
 			send_warning( io_lib:format( "Bad login ('~s') specified, "
-				"with password '~s' (connection #~B).", 
+				"with password hash '~s' (connection #~B).", 
 				[ Login, Password, ConnectionId ] ) ),
 			bad_login;
 							
@@ -1795,8 +1812,9 @@ record_bad_password( UserId, Login, WrongPassword, CorrectPassword,
 	case mnesia:transaction(F) of
 	
 		{atomic,_} ->
-			send_warning( io_lib:format( "Bad password ('~s') specified "
-				"for login '~s' instead of password '~s' (connection #~B).", 
+			send_warning( io_lib:format( "Bad password hash ('~s') specified "
+				"for login '~s' instead of password hash '~s' "
+				"(connection #~B).", 
 				[ WrongPassword, CorrectPassword, Login, ConnectionId ] ) ),
 			bad_password;
 							
@@ -1968,7 +1986,8 @@ record_access_granted( Login, Password, ConnectionId, UserId, Role ) ->
 	
 		{atomic,_} ->
 			send_info( io_lib:format( "Access granted for user #~B "
-				"(login: '~s', password: '~s', role: ~w) for connection #~B.",
+				"(login: '~s', password hash: '~s', role: ~w) "
+				"for connection #~B.",
 				[ UserId, Login, Password, Role, ConnectionId ] ) ),
 			access_granted;
 							
@@ -2141,11 +2160,18 @@ add_geolocation_infos(Connection) ->
 	end.
 	
 	
+	
+% Returns the hash code, as a binary, corresponding to the specified password.
+get_hash(Password) ->
+	crypto:md5(Password).
+						
+			
 					
 		
 % Trace section.
 
-% Note: can be factorized in a header or in a module due to the
+
+% Note: cannot be easily factorized out in a header or in a module, due to the
 % use of the defines.
 
 -define( trace_emitter_name, "Database" ).
