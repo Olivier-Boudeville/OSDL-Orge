@@ -1,0 +1,375 @@
+/*
+:Author: Olivier Boudeville
+:Contact: olivier.boudeville at esperide.com
+:Copyright: This stylesheet has been placed in the public domain.
+
+Stylesheet for use with Docutils.  
+See: http://docutils.sourceforge.net/docs/howto/html-stylesheets.html
+
+Note: This is an exact copy of the OSDL-docutils.css version.
+
+*/
+
+@import url(html4css1.css);
+
+
+
+/* Copied verbatim from OSDL.css, with the correct tags. */
+
+
+
+/* Main titles */
+
+
+
+h1.title {
+  color: #ec8b23;
+  background: transparent;
+  font-size: 50px;
+  font-weight: bold;
+  font-family: Verdana, serif;
+  margin-top: 5%;
+  margin-bottom: 0;
+  margin-left: 2%;
+  margin-right: 2%;
+  text-align: center;
+}
+
+
+
+h2.subtitle {
+  color: #8aa0d2 ;
+  font-size: 40px;
+  margin-top: 2%;
+  margin-bottom: 6%;
+  text-align: center;
+}
+
+
+
+
+
+
+/* In-text titles */
+
+
+div.section h1 {
+  color: #ec8b23;
+  font-size: 30px;
+  background: transparent;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 7%;
+  margin-bottom: 5%;
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+
+div.section h2 {
+  color: #4da04b ;
+  font-size: 27px;
+  background: transparent;
+  text-align: left;
+  margin-top: 5%;
+  margin-bottom: 2%;
+}
+
+
+div.section h3 {
+  color: #af38c9;
+  font-size: 22px;
+  background: transparent;
+  margin-top: 5%;
+  margin-bottom: 3%;
+  margin-left: 7%;
+  margin-right: 4%;
+}
+
+
+div.section h4 {
+  color: #8aa0d2;
+  font-size: 21px;
+  margin-left: 10%;
+  margin-right: 7%;
+  font-weight: normal;
+}
+
+
+div.section h5 {
+  color: #ec8b23;
+  font-size: 16px;
+  margin-left: 15%;
+  margin-right: 15%;
+  font-weight: bold;
+  margin-top: 3%;
+  margin-bottom: 2%;
+}
+
+
+div.section h6 {
+  color: #3da03b;
+  font-size: 15px;
+  margin-left: 30%;
+  margin-right: 5%;
+  font-weight: bold;
+  margin-top: 3%;
+  margin-bottom: 2%;
+}
+
+
+div.section h7 {
+  color: #888888;
+  font-size: 15px;
+  margin-left: 10%;
+  margin-right: 5%;
+  font-weight: bold;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+
+
+
+/* Violet */
+div.dedication p.topic-title {
+  color: #bf48d9
+}
+
+
+/* Violet */
+div.abstract p.topic-title {
+  font-weight: bold;
+  color: #bf48d9
+}
+
+
+/* Lightgrey on Black */
+body {
+  color: #DFDFDF;
+  margin-left: 2%;
+  background: #000000;
+}
+
+
+
+/* Sidebar */
+
+
+/* Dark gray */
+div.sidebar {
+  background-color: #333333 ;
+  color: #74716e
+}
+
+
+div.sidebar p {
+  color: #bbbbbb
+}
+
+
+/* Softer Orange */
+div.sidebar p.sidebar-title {
+  color: #ec8b23
+}
+
+
+/* Blue */
+div.sidebar p.sidebar-subtitle {
+  color: #8aa0d2
+}
+
+
+
+
+
+/* Red Bordeaux */
+div.system-messages h1 {
+  color: #cc470c 
+}
+
+
+/* Red Bordeaux */
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: cc470c
+}
+
+  
+  
+/* Black */ 
+p.rubric {
+  color: #000000 
+}
+  
+  
+/* Dark grey */ 
+pre.literal-block, pre.doctest-block {
+  background-color: #444444 
+}
+
+
+
+/* Red Bordeaux */
+span.problematic {
+  color: red 
+}
+
+  
+/* Dark grey */ 
+tt.docutils {
+  background-color: #666666
+}
+  
+
+/* Blue */  
+a:link {
+  text-decoration:none;
+  color: #8aa0d2
+}
+
+
+a:visited {
+  color: #7a8ebc
+}
+
+
+a:active {
+  color: #8aa0d2
+}
+
+
+a:hover { 
+  color:#8aa0d2 
+}
+
+
+div.contents {
+	margin-left: 30%
+}
+
+
+div.contents a.reference {
+  text-decoration: none;
+  list-style-type: none
+}
+
+
+div.contents a:hover.reference { 
+  text-decoration: underline;
+  color:#FFFFFF 
+}
+
+
+a.section-title { 
+  text-decoration: none
+}
+
+
+/* Softer orange */  
+a.toc-backref { 
+  color: #ec8b23; 
+  text-decoration: none
+}
+
+
+h1 a.toc-backref { 
+  color: #ec8b23
+}
+
+
+h2 a.toc-backref { 
+  color: #06b1dc
+}
+
+h3 a.toc-backref { 
+  color: #4da04b
+}
+
+
+div.warning p.admonition-title {
+  color: #ec9523
+}
+
+
+/* Orange */  
+div.attention p.admonition-title {
+  color: #e6841b }
+
+/* Orange */  
+div.caution p.admonition-title {
+  color: #e6841b }
+
+/* Red Bordeaux */  
+div.danger p.admonition-title {
+  color: #cc470c }
+
+/* Red Bordeaux */  
+div.error p.admonition-title {
+  color: #cc470c }
+
+/* Green */  
+div.hint p.admonition-title {
+  color: #4da04b }
+
+/* Blue */  
+div.important p.admonition-title {
+  color: #06b1dc }
+
+/* Violet */  
+div.note p.admonition-title {
+  color: #bf48d9 }
+
+/* Green */  
+div.tip p.admonition-title {
+  color: #4da04b }
+
+
+div.contents p.topic-title {
+  text-decoration: none;
+  color: #bf48d9;
+  font-weight: bold
+}
+
+
+/* Violet */
+a.footnote-reference {
+  text-decoration: none;
+  color: #bf48d9
+}
+
+
+td.label {
+	color: green
+}
+
+
+/* Green */
+a.citation-reference {
+  text-decoration: none;
+  color: #4da04b
+}
+
+
+dl {
+  margin-left: 3%
+}
+
+
+dt {
+  color: #EFEFEF;
+  background: #5E5E5E;
+  margin-top: 1%;
+  font-weight: bold
+}
+
+
+strong {
+ color: #8aa0d2 ;
+ font-weight: bold
+}
+
+em {
+ color: #4da04b ;
+ font-weight: bold
+}
