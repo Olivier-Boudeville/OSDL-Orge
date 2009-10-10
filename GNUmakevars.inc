@@ -60,6 +60,10 @@ TRACES_TOP = $(CEYLAN_ERLANG_TOP)/traces
 OSDL_ROOT := $(ORGE_TOP)/../../OSDL/trunk/src/doc/web/main/documentation/OSDL/Orge
 
 
+OSDL_TARGET_VERSION := 0.5
+
+
+
 ORGE_DEV_TOP := $(ORGE_TOP)/src/code
 
 
@@ -168,11 +172,19 @@ BEAM_DIRS := \
 TCP_FIREWALL_OPT = "--tcp-range 51000 51999"
 
 
+# Orge-specific port:
+EPMD_PORT_OPT = "--epmd_port 4269"
+
+
 # Defined intentionally to avoid command-line cookies:
 # (Orge is expected to rely on file-based cookies instead)
 NO_DEFAULT_COOKIE_WANTED="true"
 
-THIRD_PARTY_OPT = "$(TCP_FIREWALL_OPT)"
+
+OVERRIDDEN_OPT = "$(OVERRIDDEN_OPT) $(TCP_FIREWALL_OPT) $(EPMD_PORT_OPT)"
+
+
+ORGE_WEB_INSTALL_DIR = $(LOANI_INSTALLATIONS_ROOT)/OSDL-$(OSDL_TARGET_VERSION)/share/OSDL/doc/web/main/documentation/OSDL/Orge
 
 	
 include $(TRACES_TOP)/GNUmakesettings.inc
