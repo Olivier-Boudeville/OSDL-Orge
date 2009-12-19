@@ -41,7 +41,7 @@ EGEOIP_ROOT = $(LOANI_INSTALLATIONS_ROOT)/egeoip
 # Previous setting was to use a full Ceylan install, now preferring using a
 # dedicated Ceylan-Erlang install, except for documentation:
 
-# Ceylan sources supposed to be available at the same directory level as OSDL:
+# Ceylan sources supposed to be available at the same directory level as OSDL:
 CEYLAN_ROOT := $(LOANI_REPOSITORY_ROOT)/ceylan
 CEYLAN_TRUNK := $(CEYLAN_ROOT)/Ceylan/trunk
 #CEYLAN_ERLANG_TOP := $(CEYLAN_TRUNK)/src/code/scripts/erlang
@@ -56,7 +56,7 @@ CEYLAN_ERLANG_TOP := $(LOANI_REPOSITORY_ROOT)/Ceylan-Erlang
 TRACES_TOP = $(CEYLAN_ERLANG_TOP)/traces
 
 	
-# Non-Orge OSDL:
+# Non-Orge OSDL:
 OSDL_ROOT := $(ORGE_TOP)/../../OSDL/trunk/src/doc/web/main/documentation/OSDL/Orge
 
 
@@ -168,12 +168,12 @@ BEAM_DIRS := \
 	$(EGEOIP_ROOT)/ebin
 
 
-# See corresponding firewall rules in 'iptables.rules-Gateway.sh':
-TCP_FIREWALL_OPT = "--tcp-range 51000 51999"
+# See corresponding firewall rules in 'iptables.rules-Gateway.sh':
+TCP_FIREWALL_OPT = --tcp-range 51000 51999
 
 
 # Orge-specific port:
-EPMD_PORT_OPT = "--epmd_port 4269"
+EPMD_PORT_OPT = --epmd_port 4269
 
 
 # Defined intentionally to avoid command-line cookies:
@@ -181,7 +181,7 @@ EPMD_PORT_OPT = "--epmd_port 4269"
 NO_DEFAULT_COOKIE_WANTED="true"
 
 
-OVERRIDDEN_OPT := "$(OVERRIDDEN_OPT) $(TCP_FIREWALL_OPT) $(EPMD_PORT_OPT)"
+OVERRIDDEN_OPT := $(OVERRIDDEN_OPT) $(TCP_FIREWALL_OPT) $(EPMD_PORT_OPT)
 
 
 ORGE_WEB_INSTALL_DIR = $(LOANI_INSTALLATIONS_ROOT)/OSDL-$(OSDL_TARGET_VERSION)/share/OSDL/doc/web/main/documentation/OSDL/Orge
