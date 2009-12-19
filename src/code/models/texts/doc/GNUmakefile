@@ -10,6 +10,10 @@ DOC_CONTENT      := $(DOC_HTML_CONTENT) $(DOC_PDF_CONTENT) Orge.css
 TEXT_WEB_INSTALL_DIR = $(ORGE_WEB_INSTALL_DIR)/texts
 
 
+# First (default) target, to avoid that building Orge results in a PDF
+# being generated and even displayed:
+doc:
+
 
 # Includes the PDF, as it is stored and referenced in the website:
 generate-html-doc: $(DOC_CONTENT)
