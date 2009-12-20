@@ -2163,9 +2163,8 @@ add_geolocation_infos(Connection) ->
 	
 % Returns the hash code, as a binary, corresponding to the specified password.
 get_hash(Password) ->
-	crypto:md5(Password).
-						
-			
+	%crypto:md5(Password).
+	crypto:sha(Password).		
 					
 		
 % Trace section.
