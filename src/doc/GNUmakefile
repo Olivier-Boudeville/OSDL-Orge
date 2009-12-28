@@ -5,8 +5,9 @@ MODULES_DIRS = appendices elements general implementation narrative
 
 
 info-local:
-	@echo "  Go to osdl/Orge/trunk/src/code/servers/doc to generate OrgeServers.pdf"
-	@echo "  Go to osdl/Orge/trunk/doc to generate Orge-game-system.pdf (use: 'make full-doc')"
+	@echo "  To generate following documents, go to the specified directory and run 'make full-doc':"
+	@echo "    - for OrgeServers.pdf, go to ../code/servers/doc"
+	@echo "    - for Orge-game-system.pdf, go to ../../doc"
 	
 
 include $(ORGE_TOP)/GNUmakerules.inc
