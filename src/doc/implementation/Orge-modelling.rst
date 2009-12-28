@@ -16,7 +16,7 @@ This section describes more precisely how the main concepts used by Orge are mod
 	 
 	   - belongs to a Species
 	   - Has an age and a life expectancy at births
-	   - Has a gender
+	   - Has a gender
 	   - has an Inventory
        - Experience Gain if killed by the player
        - Links to possible completion of quest element

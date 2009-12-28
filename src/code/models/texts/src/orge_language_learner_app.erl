@@ -109,10 +109,10 @@ exec() ->
 	?emit_info([ io_lib:format(	"Generated following words: ~s.",
 		[ basic_utils:string_list_to_string(FirstWords)] ) ]),
 	
-	OriginalWords = [ "Artemisia", "Aspasia", "Aspa", "Aster", "Atalante",
+	OriginalWords = [ "Artemisia", "Aspasia", "Aspa", "Aster", "Atalante",
 		"Athena", "Basilea", "Vasiliki", "Berenice" ], 
 
-	OtherWords = [ "Tourmente", "Apocalypse", "Ladder", "Boat",
+	OtherWords = [ "Tourmente", "Apocalypse", "Ladder", "Boat",
 		"Doppel", "Augen", "Pasta", "Arte" ],
 		
 	evaluate_probabilities( FirstLanguageManagerPid, FirstTestVariation, 

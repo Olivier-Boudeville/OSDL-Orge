@@ -329,7 +329,7 @@ init( from_scratch, MaximumSlotCount, ListenerPid ) ->
 	send_trace( "Orge database ready." ),
 	
 	% Current user ID is 1 here:
-	loop( #database_state{ 
+	loop( #database_state{ 
 		current_user_id = 1,
 		maximum_slot_count = MaximumSlotCount
 	 } );
@@ -355,7 +355,7 @@ init( from_previous_state, MaximumSlotCount, ListenerPid ) ->
 	
 	send_trace( "Orge database ready." ),
 	
-	loop( #database_state{ 
+	loop( #database_state{ 
 		current_user_id = get_highest_user_number() + 1,
 		maximum_slot_count = MaximumSlotCount
 	} ).

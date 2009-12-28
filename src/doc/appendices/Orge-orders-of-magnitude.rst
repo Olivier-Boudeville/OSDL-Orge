@@ -66,7 +66,7 @@ Length
 | Length of the Great Wall of China                          | 6,400 km           |
 +------------------------------------------------------------+--------------------+
 | Approximate length of the two longest rivers,              | 6,600 km           |
-| the Nile and the Amazon                                    |                    |
+| the Nile and the Amazon                                    |                    |
 +------------------------------------------------------------+--------------------+
 | Equatorial diameter of the Earth                           | 12,756 km          |
 +------------------------------------------------------------+--------------------+
@@ -317,7 +317,7 @@ Energy
 +---------------------------------------------------------------------+--------------------+
 | Real-life example for **Energy** [#]_, [#]_                         | Energies (J, J/kg) |
 +=====================================================================+====================+
-| Energy required to lift a small apple one meter straight up         | 1 J                |
+| Energy required to lift a small apple one meter straight up         | 1 J                |
 | (same energy is released when that same apple falls one meter to    |                    |
 | the ground), or energy that a quiet person generates every          |                    |
 | hundredth of a second (as heat), or energy required to heat one     |                    |
@@ -379,7 +379,7 @@ Pressure
 | Pressure increase per millimeter of a water column                  | 10 Pa              |
 +---------------------------------------------------------------------+--------------------+
 | Threshold of pain. Sounds above this amplitude are unbearable and   | 100 Pa             |
-| can cause ear pain.                                                 |                    |
+| can cause ear pain.                                                 |                    |
 +---------------------------------------------------------------------+--------------------+
 | Standard atmospheric pressure (1 bar) for earth sea level           | 101.3 Pa           |
 +---------------------------------------------------------------------+--------------------+

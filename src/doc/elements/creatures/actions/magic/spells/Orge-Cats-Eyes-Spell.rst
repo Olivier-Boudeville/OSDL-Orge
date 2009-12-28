@@ -11,7 +11,7 @@ _______________________
 
 This spell could be named:
 
- - fantasy setting: ``Cat's Eyes``, ``Night Vision`` or ``Infravision`` (english) / ``Oeil de Chat``, ``Vision nocturne``, ``Nyctalopie`` or ``Infravision`` (french)
+ - fantasy setting: ``Cat's Eyes``, ``Night Vision`` or ``Infravision`` (english) / ``Oeil de Chat``, ``Vision nocturne``, ``Nyctalopie`` or ``Infravision`` (french)
 
 
 

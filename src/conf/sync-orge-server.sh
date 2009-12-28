@@ -5,13 +5,13 @@ USAGE="Synchronizes all Ceylan and OSDL code for an Orge server from a remote re
 
 
 
-# General section.
+# General section.
 
 RSYNC=rsync
 RSYNC_OPT="--bwlimit=50 -pg -e ssh -vcrlz --exclude=*.beam --exclude=*.pdf --exclude=*.dia --exclude=.svn"
 
 
-# Source section.
+# Source section.
 
 ORGE_SERVER_SOURCE_HOST=rainbow
 
@@ -20,7 +20,7 @@ SOURCE_USER=sye
 SOURCE_BASE_PATH=/home/${SOURCE_USER}/Projects/LOANI-0.4/LOANI-repository
 
 
-# Ceylan section.
+# Ceylan section.
 
 SOURCE_CEYLAN_BASE_PATH=${SOURCE_BASE_PATH}/ceylan
 
@@ -36,7 +36,7 @@ SOURCE_ORGE_BASE_PATH=${SOURCE_OSDL_BASE_PATH}/Orge/trunk/src/code
 ORGE_SERVER_SOURCE_PATH=${SOURCE_ORGE_BASE_PATH}
 
 
-# Target section.
+# Target section.
 
 TARGET_USER=$USER
 
@@ -48,7 +48,7 @@ TARGET_CEYLAN_PATH=${TARGET_BASE_PATH}/ceylan/Ceylan/trunk/src/code/scripts
 TARGET_ORGE_PATH=${TARGET_BASE_PATH}/osdl/Orge/trunk/src
 
 
-# Actions.
+# Actions.
 
 mkdir -p ${TARGET_CEYLAN_PATH}
 mkdir -p ${TARGET_ORGE_PATH}

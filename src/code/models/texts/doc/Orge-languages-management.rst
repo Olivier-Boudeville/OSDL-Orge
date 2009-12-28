@@ -359,7 +359,7 @@ Below, ``^`` will mean *and* and ``|`` will refer to the conditional probabiliti
 Mode of Operation
 -----------------  
 
-According to the vocabulary defined in [MC1]_, The *Orge Word Generator* is based on a stationary Markov chain whose order k is arbitrary (it can be freely specified by the user), which means that the generator evaluates the probability of all possible future states (next letter) from the memory of the past k states (letters). See also [MC2]_.
+According to the vocabulary defined in [MC1]_, The *Orge Word Generator* is based on a stationary Markov chain whose order k is arbitrary (it can be freely specified by the user), which means that the generator evaluates the probability of all possible future states (next letter) from the memory of the past k states (letters). See also [MC2]_.
  
 
 

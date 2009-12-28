@@ -780,7 +780,7 @@ accepted_connections_to_string( [], Acc, MaxConnectionCount ) ->
 	
 accepted_connections_to_string( [H|T], Acc, MaxConnectionCount ) ->
 	accepted_connections_to_string( T, 
-		[ io_lib:format( "~n      * ~w", [H] ) | Acc ], MaxConnectionCount ).
+		[ io_lib:format( "~n      * ~w", [H] ) | Acc ], MaxConnectionCount ).
 	
 
 

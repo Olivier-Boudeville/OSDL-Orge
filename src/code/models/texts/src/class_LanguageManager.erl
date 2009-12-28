@@ -785,7 +785,7 @@ is_allowed( Word, State ) ->
 	case hashtable:lookupEntry( Word, ?getAttr(special_words) ) of
 	
 		{value,prohibited} ->
-			%io:format( "### Rejecting prohibited word '~s'.~n", [Word] ),
+			%io:format( "### Rejecting prohibited word '~s'.~n", [Word] ),
 			false;
 			
 		{value,original} ->
@@ -793,7 +793,7 @@ is_allowed( Word, State ) ->
 			case ?getAttr(generate_original_only) of
 			
 				true ->
-					%io:format( "### Rejecting original word '~s'.~n", [Word] ),
+					%io:format( "### Rejecting original word '~s'.~n", [Word] ),
 					false;
 					
 				false ->

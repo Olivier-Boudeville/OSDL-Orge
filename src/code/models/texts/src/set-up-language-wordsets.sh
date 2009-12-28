@@ -25,7 +25,7 @@ retrieve()
 	
 	if [ ! $res -eq 0 ] ; then
 	
-		echo "### Error, download of $remote_file failed." 1>&2
+		echo "### Error, download of $remote_file failed." 1>&2
 		exit $res
 		
 	fi
