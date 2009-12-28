@@ -1,9 +1,9 @@
 ORGE_TOP = ../../../..
 
 
-doc: 
+all:
 
-full-doc: OrgeServers.pdf
+doc: OrgeServers.pdf
 
 
 include $(ORGE_TOP)/GNUmakerules.inc
