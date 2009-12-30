@@ -3,6 +3,7 @@
 .. role:: raw-html(raw)
    :format: html
    
+   
 .. role:: raw-latex(raw)
    :format: latex
 
@@ -123,8 +124,8 @@ Furthermore each server can be based on:
 Sources 	
 -------
 	
-Currently, only raw TCP Orge servers are used. These are full-TCP OTP-less servers. They are implemented in orge_tcp_server.hrl_ and orge_tcp_server.erl_, and tested in orge_tcp_server_test.erl_.
-
+	Currently, only raw TCP Orge servers are used. These are full-TCP OTP-less servers. They are implemented in orge_tcp_server.hrl_ and orge_tcp_server.erl_, and tested in orge_tcp_server_test.erl_.
+	
 To a given Orge server instance, any number of Orge clients can connect. Orge test clients are implemented in orge_tcp_client.hrl_ and orge_tcp_client.erl_, and tested in orge_tcp_client_test.erl_.
 
 Each raw TCP Orge server will spawn one client manager per connected client. The client manager is implemented in orge_client_manager.hrl_ and orge_client_manager.erl_.
@@ -135,8 +136,8 @@ Each raw TCP Orge server uses an Orge database, implemented in orge_database_man
 
 	
 	
-Setting Up An Orge Server Instance
-----------------------------------
+General Information For The Setting Up Of An Orge Server Instance
+-----------------------------------------------------------------
 
 The recommended scheme to run an Orge server is to host it on a gateway (ex: a dedicated powerful server, let's name it ``aranor``) and to monitor the simulation from a remote computer (ex: a laptop, let's name it ``rainbow``), linked to the server by a specific private interface:
 
@@ -301,6 +302,7 @@ For most configurations, a RAID 5 looks like a good compromise between reliabili
 
 Low-budget Orge servers can run on software RAID. Beside purchasing the right disks [#]_, one should consider determining which partitions should be mirrored (data only, or all, including problematic cases as ``/boot``), on which actual connectivity (disks may or, preferably, may not share a bus).
 
+Hardware RAID should been favoured whenever possible, for performances and reliability. A specific RAID card must then be bought, with its dedicated processor and memory.
 
 .. [#] At least three hard disks are needed for RAID 5, preferably from different manufacturers to avoid simultaneous failures, with same size and similar performances. A fourth disk can be useful as a spare disk, to reduce the vulnerability after a failure occurred.
 
@@ -357,7 +359,7 @@ As we will see later, the very first content to be held by such a RAID array wou
 Optional: Backup System
 _______________________
 
-Once in a while, a full backup of the simulation state should be performed, to resist to "disasters" such as fire, flood, crackers, burglary, etc.
+Once in a while (far preferably: on a regular planned basis), a full backup of the simulation state should be performed, to resist to "disasters" such as fire, flood, crackers, burglary, etc.
 
 This can be done either directly by writing the data to a dedicated hard disk that will be then removed and stored in a secure place, or, more usually, by burning a removable media.
  
@@ -443,7 +445,7 @@ which results in these measures::
 
 
 
-An ideal connectivity would be a dedicated optical fiber.
+An ideal connectivity would be of course a dedicated optical fiber.
 
 
 
@@ -520,11 +522,12 @@ The disk itself (speed, interface type, model, etc.) is a significant parameter,
 
 The needed space should be ideally placed on dedicated partitions, using carefully selected filesystem types. Knowing we are to deal mostly with a few large files and that integrity is essential, we would go preferably, instead of the `ReiserFS <http://en.wikipedia.org/wiki/ReiserFS>`_ filesystem and others, for:
 
-	- the `Ext3 <http://en.wikipedia.org/wiki/Ext3>`_ filesystem, with the ``Journal`` level of journaling, as opposed to less reliable ``Ordered`` and ``Writeback`` levels [#]_
+	- the `Ext4 <http://en.wikipedia.org/wiki/Ext4>`_ filesystem, otherwise the `Ext3 <http://en.wikipedia.org/wiki/Ext3>`_with the ``Journal`` level of journaling, as opposed to less reliable ``Ordered`` and ``Writeback`` levels [#]_
 	
 	- the `XFS <http://en.wikipedia.org/wiki/XFS>`_ filesystem
 
-
+    - maybe, in the future, the `ZFS <http://en.wikipedia.org/wiki/ZFS>`_ filesystem
+	
 .. [#] See ``tune2fs`` and the ``journal_data`` option
 
 
@@ -624,8 +627,8 @@ We provide a complete and fully commented iptable configuration script, customiz
 
 The ``Orge section`` is the part we are interested in here [#]_:
 
-  - a TCP port (4369) *could* be left open for the ``epmd`` daemon, although it is seldom necessary and it creates a security risk
-  - a TCP port range (51000 to 51999) is left open for dynamically created Erlang connections to clients (thus here no more than 1000 concurrent connections are allowed), knowing that the interpreter too must be given this range (thanks to the ``inet_dist_listen_min/max`` kernel options)
+  - a TCP port *could* be left open for the ``epmd`` daemon, although it is seldom necessary and it would create a security risk; thus we chose not to let the EPMD port opened, and to have it run on port 4269, instead of its default one (4369)
+  - a TCP port range (51000 to 51999) is left open for dynamically created Erlang connections to clients (thus with this setting no more than 1000 concurrent connections are allowed), knowing that the interpreter too must be given this range (thanks to the ``inet_dist_listen_min/max`` kernel options)
   
 
 .. [#] More informations about Erlang and firewalling issues can be found in this `article <http://www.bluishcoder.co.nz/2005/11/distributed-erlang-and-firewalls.html>`_.
@@ -691,7 +694,7 @@ At the lowest level, security is obtained thanks to the kernel, the correspondin
 
 At the highest level, the Orge database allows to authenticate each Orge user thanks to identifiers, and to report through supervision traces every abnormal connection attempt. A user-specified account password is never stored in clear text in the database, only its hash code [#]_ is kept, the password itself being itself immediately discarded.
 
-.. [#] Password hashes are currently based on the *MD5 Message Digest Algorithm* (RFC 1321).
+.. [#] Password hashes are currently based on the *Secure Hash Standard* (FIPS 180-2) (also known as *SHA*). Previously, the *MD5 Message Digest Algorithm* (RFC 1321) was used.
 
 In-between lies the Erlang environment, with strict laws regarding the interconnection of virtual machines and processes.
 
@@ -702,14 +705,12 @@ Erlang Cookie
 
 It allows to choose which Erlang virtual machines are able to exchange messages.
 
-The recommended way is to set the same Erlang cookie in the Orge server(s) and every computer allowed to connect to the Orge instance (say, on the laptop of an Orge admin).
+The recommended way is to set the same Erlang cookie in the Orge server(s) and every computer allowed to connect to the Orge instance (say, on the laptop of an Orge admin). The cookie itself can preferably be obtained thanks to ``uuidgen`` (available in the ``uuid-runtime`` package in Debian) [#]_::
 
-This can be done that way [#]_::
-
- echo 'This is my Orge cookie.' > ~/.erlang.cookie
+ uuidgen > ~/.erlang.cookie
  chmod 400 ~/.erlang.cookie
 
-.. [#] Of course other cookie sentences should be used instead.
+.. [#] Of course other cookie sentences should be used instead, like: `echo 'This is my Orge cookie.' > ~/.erlang.cookie`.
  
  
 Then that cookie shall be transferred (ex: thanks to ssh) to every computer to be connected with. Check that the owner and permissions are correct (``600``)::
@@ -727,78 +728,129 @@ An host file (see ``net_adm:host_file``) can be used as well, to specify candida
   'aranor.esperide.com'.
   'sonata.esperide.com'.
   'rainbow.esperide.com'.
-  
+      
 Then ``net_adm:world(verbose)`` can be used to detect all accessible nodes.
-  
-
-
+      
+      
+      
 Remote Connection to the Orge Server Erlang Shell
 *************************************************
-
+      
 This is a convenient way of manipulating an Erlang shell remotely. 
-
+      
 See `Interconnecting Erlang Nodes <http://www.ejabberd.im/interconnect-erl-nodes>`_ for further details.
-
+      
 Another maybe more interesting solution is to use SSH to log-in to the server, create a local shell and use it to communicate (locally) with the server one. This removes the need of having the firewall letting the ``epmd`` port opened.
-
-
-
+      
+      
+      
 Tool Versions
 _____________
-
+      
 Both Orge servers and monitoring clients should run the latest stable release of Erlang and Orge.
-
+      
 More precisely, the following set of software and data should be kept up to date:
-
-	- the running operating system (ex: Debian, including the Linux kernel and all packages)
-	- the latest custom stable build of the Erlang/OTP environment
-	- the latest custom stable build of the Orge server
-	- the `egeoip` module and the GeoLite database, for IP geolocation
-
-Erlang and other prerequisites should be configured, compiled and installed specifically for the Orge needs, with relevant settings. See the `Installation Thanks To LOANI`_ section.
-
-
-Installation Thanks To LOANI
-____________________________
-
-LOANI allows to download, build, install, link together a set of Ceylan and OSDL developments, including Orge.
-
-In the context of an Orge server, once some base tools have been installed (ex: ``flex``), one may download the `latest LOANI archive <http://sourceforge.net/project/showfiles.php?group_id=71354&package_id=161367>`_ and for example run from the LOANI-x.y extracted directory, with the ``orge`` user::
-
-  ./loani.sh --onlyOrgeTools --prefix /home/orge/software
+      
+      	- the running operating system (ex: Debian, including the Linux kernel and all packages); see our ``debian-updater.sh`` script
+      	- the latest custom stable build of the Erlang/OTP environment, preferably set in the system tree (ex: in ``/usr/local``), otherwise directly in the Orge user directory
+      	- the latest custom stable build of the Orge server
+      	- the `egeoip` module and the GeoLite database, for IP geolocation
+      	
+All Orge prerequisites, starting from Erlang, should be configured, compiled and installed specifically for the Orge needs, with relevant settings. See the `Actual Setting Up: Installation Guide Of An Orge Server Instance`_ section.
 
 
+
+
+
+
+:raw-latex:`\pagebreak`
+
+Actual Setting Up: Installation Guide Of An Orge Server Instance
+----------------------------------------------------------------
+
+
+Prerequisites
+.............
+
+The issues discussed in the `General Information For The Setting Up Of An Orge Server Instance`_ section are supposed to be already addressed. Thus the following needs have to be covered at this point:
+
+ - a proper *hardware* must be available, with enough disk space, possibly with an UPS and with a RAID array
+ - a proper *network infrastructure* must be available, with an adequate IP and DNS configuration
+ - a proper *operating system* must have been installed and configured, with adequate firewall settings
+
+In the context of an Orge server, some base tools have been installed.
+
+Users of Debian-based distributions should for example install beforehand at least the following packages: ``wget make gcc subversion libncurses5-dev openssl libssl-dev uuid-runtime``.
+
+The installation is to be done thanks to LOANI, which allows to download, build, install, link together a set of Ceylan and OSDL developments, including Orge.
+
+
+
+Running LOANI
+.............
+
+One may then download the `latest LOANI archive <http://sourceforge.net/project/showfiles.php?group_id=71354&package_id=161367>`_ and for example run from the LOANI-x.y extracted directory, with the ``orge`` user::
+
+  # Once the LOANI archive has been copied:
+  $ tar xvzf LOANI-x.y.tar.gz
+  $ cd LOANI-x.y
+  ./loani.sh --onlyOrgeTools --prefix /home/orge/Software
+  
+  
+If you are an OSDL developer, then you may add the ``--sourceforge YOUR_SF_USERNAME`` option.
+
+         	
 LOANI will then take care of Erlang, egeoip, GeoLite and Orge.
-
-Note that the development package for libcurses is needed to build Erlang. On Debian and Ubuntu, the corresponding package is ``libncurses5-dev``, to be installed before running LOANI.
-
-This leads to something like following output::
-
- orge@myserver:~/LOANI-0.5$  ./loani.sh --onlyOrgeTools --prefix /home/orge/software
-
-
-         < Welcome to Loani >
-
- This is the Lazy OSDL Automatic Net Installer, dedicated to the lazy and the fearless.
-
- Its purpose is to have OSDL and all its pre requisites installed with the minimum of time and effort. Some time is nevertheless needed, since some downloads may have to be performed, and the related build is CPU-intensive, so often a bit long. Therefore, even with a powerful computer and broadband access, some patience will be needed.
- Retrieving all pre requisites, pipe-lining when possible.
- Target package list is <Erlang egeoip Geolite >.
- Some tools already available (Erlang Geolite), others will be downloaded (egeoip).
- 	   <---- egeoip retrieved [from SVN]
- All pre requisites available.
- 	   ----> Erlang      : extracting [OK] configuring [OK] building [OK] installing [OK]
- 	   ----> egeoip      : extracting [OK] configuring [OK] building [OK] installing [OK]
-	   ----> Geolite     : extracting [OK] configuring [OK] building [OK] installing [OK]
-	   ----> Orge        : extracting [OK] configuring [OK] building [OK] installing [OK]
- Post-install cleaning of build trees.
- End of LOANI, started at 09:01:00, successfully ended at 09:46:59.
+       			
+This leads to something like the following output::
  
- 
-A simple shell configuration file is generated by LOANI, and can be applied to the Orge user environment, for example::  
+  orge@myserver:~/LOANI-x.y$ ./loani.sh --onlyOrgeTools --prefix /home/orge/Software --sourceforge wondersye
 
- orge@myserver:~/LOANI-0.5$ cat /home/orge/software/Orge-environment.sh >> /home/orge/.bashrc
- orge@myserver:~/LOANI-0.5$ cat ~/.bashrc
+ 
+    	  < Welcome to Loani >
+ 
+  This is the Lazy OSDL Automatic Net Installer, dedicated to the lazy and the fearless.
+ 
+  Its purpose is to have OSDL and all its prerequisites installed with the minimum of time and effort. Some time is nevertheless needed, since some downloads may have to be performed, and the related build is CPU-intensive, so often a bit long. Therefore, even with a powerful computer and broadband access, some patience will be needed.
+  Retrieving all prerequisites, pipe-lining when possible.
+  Erlang found in /usr/local/bin/erl in the correct version (R13B03), thus not installing it.
+  Target package list is < egeoip Geolite Ceylan_Erlang Orge >.
+  No tool already available in repository, will download them all (egeoip Geolite Ceylan_Erlang Orge).
+    	----> enqueuing egeoip (from SVN) in download spool
+    	<---- egeoip retrieved [from SVN]
+    	----> enqueuing GeoLiteCity.dat.gz in download spool
+    	----> enqueuing Ceylan-Erlang (from SVN) in download spool
+    	----> getting Ceylan-Erlang packages from SVN with user name wondersye (check-out)
+    	<---- Ceylan_Erlang retrieved [from SVN]
+    	----> enqueuing Orge (from SVN) in download spool
+    	----> getting Orge from SVN with user name wondersye (check-out)
+    	<---- Orge retrieved [from SVN]
+    	<---- Geolite retrieved [GeoLiteCity.dat.gz]
+  All prerequisites available.
+    	----> egeoip : extracting [OK] configuring [OK] building [OK] installing [OK]
+    	----> Geolite : extracting [OK] configuring [OK] building [OK] installing [OK]
+    	----> Ceylan-Erlang : extracting [OK] configuring [OK] building [OK] installing [OK]
+    	----> Orge : extracting [OK] configuring [OK] building [OK] installing [OK]
+  Post-install cleaning of build trees.
+  End of LOANI, started at 12:23:14, successfully ended at 12:28:00.
+  In order to share a unique Geolite database, we recommend that you run as root:
+  /bin/mkdir -p /usr/local/share/GeoIP && /bin/mv -f /home/orge/Software/egeoip/priv/GeoLiteCity.dat.gz /usr/local/share/GeoIP && cd /home/orge/Software/egeoip/priv/ && /bin/ln -s /usr/local/share/GeoIP/GeoLiteCity.dat.gz
+  Set default ~/.bashrc.minimal file.
+  Linked ~/.bashrc to ~/.bashrc.minimal.
+
+  
+  
+Post-Configuration
+..................
+
+
+Orge User Environment
+_____________________
+
+A simple shell configuration file is generated by LOANI, and can be applied to the Orge user environment, for example::
+	
+ orge@myserver:~/LOANI-x.y$ cat /home/orge/Software/Orge-environment.sh >> /home/orge/.bashrc
+ orge@myserver:~/LOANI-x.y$ cat ~/.bashrc
  # This is the Orge environment file.
  # It has been generated by LOANI on July 2008, 12 (Saturday).
  # Source it to update your environment, so that it takes into
@@ -808,14 +860,29 @@ A simple shell configuration file is generated by LOANI, and can be applied to t
  # Usage example:
  # . /home/orge/software/OSDL-environment.sh
  # This script can be also appended to a shell configuration file. 
- # Ex: 'cat /home/orge/software/OSDL-environment.sh >> ~/.bashrc'. 
+ # Ex: 'cat /home/orge/Software/OSDL-environment.sh >> ~/.bashrc'. 
  echo "--- Orge Settings File sourced ---"
 
  # Erlang section.
- Erlang_PREFIX=/home/orge/software/Erlang-R12B-3
+ Erlang_PREFIX=/home/orge/Software/Erlang-R13B03
  export Erlang_PREFIX
  PATH=$Erlang_PREFIX/bin:${PATH}
  LD_LIBRARY_PATH=$Erlang_PREFIX/lib:${LD_LIBRARY_PATH}
+ 
+ 
+This is not done automatically so that the environmnent of the ``orge`` user is not silently modified.
+
+
+
+Orge Cookie Management
+______________________
+
+Whether created by LOANI or not, an Erlang cookie, in ``~/.erlang.cookie``, must exist.
+
+Once available in the Orge server, one may copy it in the various locations where it could be needed, included on any user host.
+
+In all cases the access to the cookie should be protected (ex: ``chmod 400 ~/.erlang.cookie``).
+
 
 
 
@@ -823,8 +890,8 @@ A simple shell configuration file is generated by LOANI, and can be applied to t
 :raw-latex:`\pagebreak`
 
 
-Managing An Orge Server Instance
---------------------------------
+General Information of the Management Of An Orge Server Instance
+----------------------------------------------------------------
  
 
 Administration
@@ -962,7 +1029,7 @@ An Orge server is preferably monitored based on its traces and its database stat
 
 Both can be consulted remotely if an Erlang connection (not a raw TCP/IP one, as for clients) can be established to the target server.
 
-Generally, for safety reasons, this is prevented by the server firewall (netfilter), which blocks the epmd port: Erlang authorization scheme, which is based on cookies, might be deemed not secure enough.
+Generally, for safety reasons, this is prevented by the server firewall (``netfilter``), which blocks the epmd port: Erlang authorization scheme, which is based on cookies, might be deemed not secure enough.
 
 Therefore the first step is then to log-in to the server (generally by SSH), and then to unblock the epmd port with ``iptables``.
 
@@ -970,16 +1037,17 @@ Then, from the remote computer, both the Orge server traces and Orge database st
 
 Server traces 
 
-The database state can be read (and modified) thanks to the TV application:
+The database state can be read (and modified) thanks to the TV application::
 
-erl -setcookie Orge -name listener -remsh 'orge_tcp_server_run@myhost.mydomain.org'
-tv:start().
+  erl -setcookie Orge -name listener -remsh 'orge_tcp_server_run@myhost.mydomain.org'
+  tv:start().
 
-erl -setcookie Orge -name listener@myhost.mydomain.org
-net_adm:ping('orge_tcp_server_run@myhost.mydomain.org').
-tv:start().
+  erl -setcookie Orge -name listener@myhost.mydomain.org
+  net_adm:ping('orge_tcp_server_run@myhost.mydomain.org').
+  tv:start().
 
-Select File -> Nodes (or hit Ctrl-N) and choose the node corresponding to the remote server. Select View -> Mnesia Tables (or hit Ctrl-M) to have a full access to all the Orge tables.
+  
+Use ``Select File -> Nodes`` (or hit ``Ctrl-N``) and choose the node corresponding to the remote server. Select ``View -> Mnesia Tables`` (or hit ``Ctrl-M``) to have a full access to all the Orge tables.
 
 
 
@@ -993,26 +1061,74 @@ How To Update the Orge Server Without Stopping It
 
 Three main pieces of software can be updated server-side:
 	
-	- the TCP server itself, which is not expected to be updated frequently as its role is limited and its implementation remains simple
-	- the client manager, which is probably the most changing part of the server-side architecture; two options: either update all current managers on-the-fly, or simply run the updated code only on new connections
-	- the database manager, whose frequency is not known yet
+ - the TCP server itself, which is not expected to be updated frequently as its role is limited and its implementation remains simple
+
+ - the client manager, which is probably the most changing part of the server-side architecture; two options: either update all current managers on-the-fly, or simply run the updated code only on new connections
+
+ - the database manager, whose frequency is not known yet
+
 	
 	
 
 How To Check Which Orge Ports And Services Are Open
 ...................................................
 
-From outside the server, ``nmap`` can be used to check the default Orge port::
+From outside the server, ``nmap`` can be used to check the default Orge port. If the Orge server is running you will have something similar to::
 
-  > nmap -p 9512 orge-testing.esperide.com
+  > nmap -p 9512 -PN orge-testing.esperide.com
 
   Starting Nmap 4.62 ( http://nmap.org ) at 2009-08-30 18:40 CEST
   Interesting ports on orge-testing.esperide.com (XX.XX.XX.XX):
   PORT     STATE SERVICE
   9512/tcp open  unknown
+  
+  Nmap done: 1 IP address (1 host up) scanned in 2.09 seconds
+
+
+
+Whereas if it is not running you will have::
+
+  >  nmap -p 9512 -PN orge-testing.esperide.com
+
+  Starting Nmap 4.76 ( http://nmap.org ) at 2009-12-28 14:46 CET
+  Interesting ports on orge-testing.esperide.com (92.243.4.77):
+  PORT     STATE	SERVICE
+  9512/tcp filtered unknown
+
+  Nmap done: 1 IP address (1 host up) scanned in 2.09 seconds
+
 
 
 From a shell on the Orge server, one can use::
 
   > orge-testing:/home/orge# netstat -an
+
+  
+  
+ 
+Running Your Orge Server Instance
+---------------------------------
+
+
+Launch The Orge Server
+......................
+
+
+As the ``orge`` user, execute::
+
+  $ cd /home/orge/LOANI-0.6/LOANI-repository/OSDL-Erlang/Orge/trunk/src/code/servers/raw-tcp/src
+  $ ./start-orge-server.sh
+  Starting Orge server in production mode with EPMD port #4269...
+     Executing application orge_tcp_server_app.beam orge_tcp_server.beam in the background (first form)
+  ...done
+
+
+One may have a look at the server traces, with ``tail -f orge_tcp_server_app.traces``.
+
+
+Inspect The State of The Orge Server
+....................................
+
+
+
 
