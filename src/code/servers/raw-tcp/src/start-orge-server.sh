@@ -18,29 +18,31 @@ if [ -n "$previous_server_pid" ] ; then
 
 	echo "An already running Orge server was detected (PID $previous_server_pid), you must kill it first.
   Example: 'kill -9 $previous_server_pid'" 1>&2
-	
+
 	exit 1
-	
+
 fi
 
 
 
 
 # Needed to launch an EPMD daemon on a non-standard port:
-epmd -daemon -port ${epmd_port} 
+epmd -daemon -port ${epmd_port}
 
 if [ ! $? -eq 0 ] ; then
 
 	echo "Error, unable to launch EPMD daemon on port #${epmd_port}." 1>&2
 	exit 10
-	
+
 fi
 
 
 do_debug=1
 
 if [ "$1" = "-d" ] || [ "$1" = "--debug" ] ; then
+	
 	do_debug=0
+	
 fi
 
 
@@ -61,4 +63,3 @@ else
 	echo "...done"
 
 fi
-
