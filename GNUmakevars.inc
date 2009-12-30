@@ -173,7 +173,7 @@ TCP_FIREWALL_OPT = --tcp-range 51000 51999
 
 
 # Orge-specific port:
-EPMD_PORT_OPT = --epmd_port 4269
+EPMD_PORT_OPT = --epmd-port 4269
 
 
 # Defined intentionally to avoid command-line cookies:
