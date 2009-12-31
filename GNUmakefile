@@ -38,6 +38,20 @@ to-archive: bz2
 	@scp $(ARCHIVE_FILE) $(ARCHIVE_LOCATION)
 
 
+install: install-hook
+
+install-prod: install-prod-hook
+
+
+install-hook:
+	@cd $(ORGE_TOP)/src/code/servers/raw-tcp/src && $(MAKE) install INSTALLATION_PREFIX="$(INSTALLATION_PREFIX)"  
+
+
+install-prod-hook:
+	@cd $(ORGE_TOP)/src/code/servers/raw-tcp/src && $(MAKE) install-prod INSTALLATION_PREFIX="$(INSTALLATION_PREFIX)"  
+
+
+
 clean: clean-local
 
 
