@@ -1,6 +1,6 @@
 ORGE_TOP = ../../../../..
 
-install: generate-start-script
+install-hook install-prod-hook:
 	@if [ -z "$(INSTALLATION_PREFIX)" ] ; then echo "Error, no installation prefix set." 1>&2 ; exit 10 ; else $(MAKE) generate-start-script ; fi
 	@$(MAKE) clean-bin
 
