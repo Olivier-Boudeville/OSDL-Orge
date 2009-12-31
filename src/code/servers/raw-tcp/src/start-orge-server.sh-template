@@ -1,0 +1,76 @@
+#!/bin/sh
+
+epmd_port=ST_EPMD_PORT
+tcp_low=ST_TCP_LOW_RANGE
+tcp_high=ST_TCP_HIGH_RANGE
+
+installations_root=`dirname $0`/../../..
+
+
+ceylan_erlang_root=$installations_root/Ceylan-Erlang
+egeoip_root=$installations_root/egeoip
+orge_root=$installations_root/Orge
+
+
+ceylan_erlang_dir_opt="--beam-dir $ceylan_erlang_root/common/ebin --beam-dir $ceylan_erlang_root/trace/ebin --beam-dir $ceylan_erlang_root/wooper/ebin"
+
+egeoip_dir_opt="--beam-dir $egeoip_root/ebin"
+
+orge_dir_opt="--beam-dir $orge_root/orge/ebin"
+
+
+
+USAGE="  Usage: "`basename $0`" [ -d | --debug ]
+  Launches an Orge server.
+  Options are:
+     -d or --debug: run in debug mode (not in the background), instead of in the default production mode
+"
+
+
+
+previous_server_pid=`ps -edf|grep beam|grep orge_tcp_server_exec|awk '{print $2}'`
+
+if [ -n "$previous_server_pid" ] ; then
+
+	echo "An already running Orge server was detected (PID $previous_server_pid), you must kill it first.
+  Example: 'kill -9 $previous_server_pid'" 1>&2
+
+	exit 1
+
+fi
+
+
+# Needed to launch an EPMD daemon on a non-standard port:
+epmd -daemon -port ${epmd_port}
+
+if [ ! $? -eq 0 ] ; then
+
+	echo "Error, unable to launch EPMD daemon on port #${epmd_port}." 1>&2
+	exit 10
+
+fi
+
+
+do_debug=1
+
+if [ "$1" = "-d" ] || [ "$1" = "--debug" ] ; then
+
+	do_debug=0
+
+	echo "Starting Orge server in debug mode with EPMD port #${epmd_port}..."
+
+else
+
+	echo "Starting Orge server in production mode with EPMD port #${epmd_port}..."
+
+	background_opt="--background"
+
+fi
+
+
+
+# Adaptated from what is run with start-orge-server-from-sources.sh:
+
+$ceylan_erlang_root/common/bin/launch-erl.sh -v --fqdn `hostname -f` $ceylan_erlang_dir_opt $egeoip_dir_opt $orge_dir_opt --tcp-range $tcp_low $tcp_high --epmd-port $epmd_port $background_opt --ln orge_tcp_server_exec --eval 'orge_tcp_server_app:exec()'
+
+echo "...done"
