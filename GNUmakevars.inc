@@ -169,11 +169,14 @@ BEAM_DIRS := \
 
 
 # See corresponding firewall rules in 'iptables.rules-Gateway.sh':
-TCP_FIREWALL_OPT = --tcp-range 51000 51999
+TCP_FIREWALL_LOW  := 51000
+TCP_FIREWALL_HIGH := 51999
+TCP_FIREWALL_OPT = --tcp-range $(TCP_FIREWALL_LOW) $(TCP_FIREWALL_HIGH)
 
 
 # Orge-specific port:
-EPMD_PORT_OPT = --epmd-port 4269
+EPMD_PORT = 4269
+EPMD_PORT_OPT = --epmd-port $(EPMD_PORT)
 
 
 # Defined intentionally to avoid command-line cookies:
