@@ -56,17 +56,25 @@ exec() ->
 			
 		false ->
 			io:format( "  Warning: ping failed for host '~s', "
-				"continuing anyway.~n", [TargetHost] )
+					   "continuing anyway, as this host might filter "
+					   "ICMP packets.~n", [TargetHost] )
 			
 	end,
 	
 	TargetNodeName = list_to_atom( TargetNode ++ "@" ++ TargetHost ),
+	
+												
 	case net_adm:ping( TargetNodeName ) of
 	
 		pong ->
 			io:format( "  Successful ping of node '~s'.~n", [TargetNodeName] );
 			
 		pang ->
+			io:format( "~n  Error, failed to ping Erlang node '~s'."
+					   "~n  Are you sure that the Orge server is running "
+					   "and that no firewall blocks the EPMD port "
+					   "(default Orge one being #4269)?~n~n",
+					   [TargetNodeName] ), 
 			throw( {node_ping_failed,TargetNodeName} )
 			
 	end,
@@ -86,8 +94,8 @@ exec() ->
 	
 	io:format( "  Launching the table viewer.~n" ),
 
-	io:format( "  Hint: type 'CTRL-N', then select '~s', "
-		"then 'CTRL-M' to select the tables to review.~n", [TargetNodeName] ),
+	io:format( "  Hint: type 'CTRL-N' in the [TV] window, then select '~s' "
+			   "in the pop-up, then 'CTRL-M' in the main window to the tables to review (double-click).~n", [TargetNodeName] ),
 		
 	tv:start(),
 
