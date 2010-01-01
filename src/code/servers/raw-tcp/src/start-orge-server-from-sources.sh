@@ -40,9 +40,9 @@ fi
 do_debug=1
 
 if [ "$1" = "-d" ] || [ "$1" = "--debug" ] ; then
-	
+
 	do_debug=0
-	
+
 fi
 
 
