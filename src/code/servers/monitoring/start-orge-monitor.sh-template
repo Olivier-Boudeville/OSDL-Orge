@@ -1,0 +1,44 @@
+#!/bin/sh
+
+epmd_port=ST_EPMD_PORT
+
+
+installations_root=`dirname $0`/../../..
+
+
+ceylan_erlang_root=$installations_root/Ceylan-Erlang
+egeoip_root=$installations_root/egeoip
+orge_root=$installations_root/Orge
+
+
+ceylan_erlang_dir_opt="--beam-dir $ceylan_erlang_root/common/ebin --beam-dir $ceylan_erlang_root/trace/ebin --beam-dir $ceylan_erlang_root/wooper/ebin"
+
+egeoip_dir_opt="--beam-dir $egeoip_root/ebin"
+
+orge_dir_opt="--beam-dir $orge_root/orge/ebin"
+
+
+
+USAGE="  Usage: "`basename $0`" [ -d | --debug ]
+  Launches an Orge monitor.
+"
+
+
+# Needed to launch an EPMD daemon on a non-standard port:
+epmd -daemon -port ${epmd_port}
+
+if [ ! $? -eq 0 ] ; then
+
+	echo "Error, unable to launch EPMD daemon on port #${epmd_port}." 1>&2
+	exit 10
+
+fi
+
+
+
+echo "Starting Orge monitor with EPMD port #${epmd_port}..."
+
+
+$ceylan_erlang_root/common/bin/launch-erl.sh -v --fqdn `hostname -f` $ceylan_erlang_dir_opt $egeoip_dir_opt $orge_dir_opt --epmd-port $epmd_port $background_opt --ln orge_monitor_exec --eval 'orge_monitor_app:exec()'
+
+echo "...done"
