@@ -45,10 +45,11 @@ install-prod: install-prod-hook
 
 install-hook:
 	@cd $(ORGE_TOP)/src/code/servers/raw-tcp/src && $(MAKE) install INSTALLATION_PREFIX="$(INSTALLATION_PREFIX)"  
-
+	@cd $(ORGE_TOP)/src/code/servers/monitoring && $(MAKE) install INSTALLATION_PREFIX="$(INSTALLATION_PREFIX)"
 
 install-prod-hook:
 	@cd $(ORGE_TOP)/src/code/servers/raw-tcp/src && $(MAKE) install-prod INSTALLATION_PREFIX="$(INSTALLATION_PREFIX)"  
+	@cd $(ORGE_TOP)/src/code/servers/monitoring && $(MAKE) install-prod INSTALLATION_PREFIX="$(INSTALLATION_PREFIX)"  
 
 
 
