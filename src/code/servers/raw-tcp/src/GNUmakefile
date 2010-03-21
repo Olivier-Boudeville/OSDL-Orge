@@ -1,5 +1,9 @@
 ORGE_TOP = ../../../../..
 
+
+include $(ORGE_TOP)/GNUmakesettings.inc
+
+
 install install-prod:
 	@if [ -z "$(INSTALLATION_PREFIX)" ] ; then echo "Error, no installation prefix set." 1>&2 ; exit 10 ; else $(MAKE) generate-start-script ; fi
 	@$(MAKE) clean-bin
@@ -20,6 +24,4 @@ clean-bin:
 info-install-script:
 	@echo "INSTALLATION_PREFIX = $(INSTALLATION_PREFIX)"
 
-
-include $(ORGE_TOP)/GNUmakerules.inc
 

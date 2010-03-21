@@ -1,6 +1,9 @@
 ORGE_TOP = ../../../..
 
 
+include $(ORGE_TOP)/GNUmakesettings.inc
+
+
 install install-prod: generate-monitor-script
 
 generate-monitor-script:
@@ -9,5 +12,4 @@ generate-monitor-script:
 	@/bin/cat start-orge-monitor.sh-template|sed 's|ST_EPMD_PORT|$(EPMD_PORT)|g' > "$(INSTALLATION_PREFIX)/orge/bin/start-monitor-server.sh"
 	@chmod +x "$(INSTALLATION_PREFIX)/orge/bin/start-monitor-server.sh"
 
-include $(ORGE_TOP)/GNUmakerules.inc
 

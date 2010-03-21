@@ -1,8 +1,9 @@
 ORGE_TOP = ..
 
+include $(ORGE_TOP)/GNUmakesettings.inc
 
 DOCUTILS_TOP = $(ORGE_TOP)
-	
+
 OVERALL_DOCUMENT_SOURCE = Orge-game-system.rst
 
 
@@ -37,7 +38,7 @@ install-html-doc: generate-html-doc
 	@echo "  Copying Orge documentation from following modules: $(MODULES_DOCUMENT_DIRS), targeting $(ORGE_WEB_INSTALL_DIR)"  
 	@/bin/cp -f -L Orge.css $(ORGE_WEB_INSTALL_DIR)
 	@for m in $(MODULES_DOCUMENT_DIRS) ; do ( cd $$m/doc ; $(MAKE) -s install-html-doc ) ; done
-		
-		
-include $(ORGE_TOP)/GNUmakerules.inc
-	
+
+
+
+

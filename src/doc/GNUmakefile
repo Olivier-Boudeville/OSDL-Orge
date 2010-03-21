@@ -10,4 +10,4 @@ info-local:
 	@echo "    - for Orge-game-system.pdf, go to ../../doc and run 'make full-doc'"
 	
 
-include $(ORGE_TOP)/GNUmakerules.inc
+include $(ORGE_TOP)/GNUmakesettings.inc

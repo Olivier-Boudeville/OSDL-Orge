@@ -9,9 +9,8 @@ MODULES_DIRS = doc src test tools
 # the root (batch mode vs interactive one):	 	
 CMD_LINE_OPT="--batch"
 
-include $(ORGE_TOP)/GNUmakerules.inc
 
-
+include $(ORGE_TOP)/GNUmakesettings.inc
 
 
 # Archive section.
@@ -58,13 +57,13 @@ clean: clean-local
 
 clean-local:
 	@find . \( -name '*.dia~' -o -name 'svn-commit.tmp' \) -exec /bin/rm -f '{}' ';' 
-	
+
 
 info-local:
 	@echo "FQDN = $(FQDN)"
 	@echo "BEAM_PATHS = $(BEAM_PATHS)"
 	@echo "ARCHIVE_LOCATION = $(ARCHIVE_LOCATION)"
-	
+
 
 info-tools:
 	@echo "ERLANG_INTERPRETER = $(ERLANG_INTERPRETER)"
@@ -72,4 +71,5 @@ info-tools:
 	@echo "DOT = $(DOT)"
 	@echo "GNUPLOT = $(GNUPLOT)"
 	@echo "IMG_VIEWER = $(IMG_VIEWER)"
-	
+
+
