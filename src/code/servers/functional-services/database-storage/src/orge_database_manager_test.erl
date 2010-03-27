@@ -58,7 +58,7 @@ run() ->
 
 	?test_start,
 	
-	?test_info([ "Creating a blank database." ]),
+	?test_info( "Creating a blank database." ),
 	BasePid = orge_database_manager:start(from_scratch),
 
 	AlfSettings = #orge_user_settings{
@@ -97,58 +97,60 @@ run() ->
 		
 	},
 	
-	?test_info([ "Requesting the users of the blank Orge database." ]),
+	?test_info( "Requesting the users of the blank Orge database." ),
 	BasePid ! {list_users,self()},
 	receive
 	
 		{orge_users,EmptyList} ->
-			?test_info([ io_lib:format( "Returned users: ~s.", 
-				[compose_user_list(EmptyList)] ) ]) 
+			?test_info_fmt( "Returned users: ~s.", 
+							[compose_user_list(EmptyList)] ) 
 			
 	end,
 	
-	?test_info([ io_lib:format( "Feeding it with first user settings: ~s.", 
-		[orge_database_manager:orge_user_settings_to_string(AlfSettings)] ) ]),
+	?test_info_fmt( "Feeding it with first user settings: ~s.", 
+		[orge_database_manager:orge_user_settings_to_string(AlfSettings)] ),
+
 	BasePid ! {register_user,AlfSettings,self()},
 	receive
 		
 		register_success ->
-			?test_info([ "First user settings successfully registered." ])
+			?test_info( "First user settings successfully registered." )
 		
 	end,
 	
-	?test_info([ io_lib:format( "Feeding it with second user settings: ~s.", 
-		[orge_database_manager:orge_user_settings_to_string(LukeSettings)] ) ]),
+	?test_info_fmt( "Feeding it with second user settings: ~s.", 
+		[orge_database_manager:orge_user_settings_to_string(LukeSettings)] ),
+
 	BasePid ! {register_user,LukeSettings,self()},
 	receive
 		
 		register_success ->
-			?test_info([ "Second user settings successfully registered." ])
+			?test_info( "Second user settings successfully registered." )
 		
 	end,
 
-	?test_info([ "Trying to register twice the first user." ]),
+	?test_info( "Trying to register twice the first user." ),
 	BasePid ! {register_user,AlfSettings,self()},
 	receive
 		
 		{register_failed,login_already_registered} ->
-			?test_info([ "First user successfully rejected "
-				"as already registered." ])
+			?test_info( "First user successfully rejected "
+						"as already registered." )
 		
 	end,
 	
-	?test_info([ "Requesting the users of the updated Orge database." ]),
+	?test_info( "Requesting the users of the updated Orge database." ),
 	BasePid ! {list_users,self()},
 	receive
 	
 		{orge_users,UpdatedList} ->
-			?test_info([ io_lib:format( "Returned users: ~s.", 
-				[compose_user_list(UpdatedList)]) ]) 
+			?test_info_fmt( "Returned users: ~s.", 
+				[compose_user_list(UpdatedList)])
 			
 	end,
 	
 	
-	?test_info([ "Stopping the database." ]),
+	?test_info( "Stopping the database." ),
 	BasePid ! {stop,self()},
 	receive
 	
@@ -157,20 +159,20 @@ run() ->
 			
 	end,
 			
-	?test_info([ "Reloading it with previous state." ]),
+	?test_info( "Reloading it with previous state." ),
 	NewBasePid = orge_database_manager:start(from_previous_state),
 
-	?test_info([ "Requesting the users of the updated Orge database." ]),
+	?test_info( "Requesting the users of the updated Orge database." ),
 	NewBasePid ! {list_users,self()},
 	receive
 	
 		{orge_users,ReloadedList} ->
-			?test_info([ io_lib:format( "Returned users: ~s.",
-				[compose_user_list(ReloadedList)]) ])
+			?test_info_fmt( "Returned users: ~s.",
+				[compose_user_list(ReloadedList)] )
 			
 	end,
 
-	?test_info([ "Stopping the database once again." ]),
+	?test_info( "Stopping the database once again." ),
 	NewBasePid ! {stop,self()},
 	receive
 	
