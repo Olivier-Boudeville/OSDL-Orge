@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2009 Olivier Boudeville
+% Copyright (C) 2009-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -22,8 +21,8 @@
 % Author: Olivier Boudeville (olivier.boudeville@esperide.com)
 
 
-% Unit tests for the Creature class implementation.
-% See the class_Creature module.
+% Unit tests for the Language manager class implementation.
+% See the class_LanguageManager module.
 -module(class_LanguageManager_test).
 
 
@@ -43,8 +42,8 @@ run() ->
 	Variations = [ 'female-names' ],
 	Options = [ generate_original_only ],
 		
-	?test_info([ io_lib:format( "Creating a new language manager, "
-		"for variations ~p of language '~s'.", [ Variations, Language ] ) ]),
+	?test_info_fmt( "Creating a new language manager, "
+		"for variations ~p of language '~s'.", [ Variations, Language ] ),
 	
 	MyManager = class_LanguageManager:synchronous_new_link( Language,
 		Variations, _MarkovOrder = 2, Options ),		
@@ -57,8 +56,7 @@ run() ->
 	GeneratedWord = receive
 	
 		{wooper_result, {generation_success,Word} } ->
-			?test_info([ io_lib:format( 
-				"Generated word for variation '~s' is '~s'.",
+			?test_info_fmt( "Generated word for variation '~s' is '~s'.",
 					[TargetVariation,Word] ) ])
 	
 	end,
@@ -67,10 +65,9 @@ run() ->
 	receive
 	
 		{wooper_result,GeneratedWordProbability} ->
-			?test_info([ io_lib:format( "The evaluated probability that "
+			?test_info_fmt( "The evaluated probability that "
 				"the generated word '~s' belongs to variation '~s' is ~f%.",
 				[Word,TargetVariation,GeneratedWordProbability*100] )
-			])
 	
 	end,
 	
