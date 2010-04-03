@@ -21,8 +21,8 @@
 % Author: Olivier Boudeville (olivier.boudeville@esperide.com)
 
 
-% Unit tests for the Orge database manager.
-% See the orge_database_manager module.
+% Unit tests for the Orge map.
+% See the orge_map module.
 -module(orge_map_test).
 
 
@@ -36,12 +36,11 @@
 
 	
 	
-	
 run() ->
 
 	?test_start,
 	
-	?test_info([ "Creating a blank map." ]),
+	?test_info( "Creating a blank map." ),
 
 	orge_map:start(),
 
