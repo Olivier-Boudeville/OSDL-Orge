@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -36,19 +35,24 @@
 
 
 convertCoinsToCredits( GoldCoinCount, SilverCoinCount, CopperCoinCount ) ->
+
 	Credits = currency:coins_to_credits( GoldCoinCount,
 		SilverCoinCount, CopperCoinCount ), 
-	?test_info([ io_lib:format( "~B gold coin(s), ~B silvers coin(s), "
+
+	?test_info_fmt( "~B gold coin(s), ~B silvers coin(s), "
 		"~B copper coin(s) correspond(s) to ~B credit(s).", 
-		[ GoldCoinCount, SilverCoinCount, CopperCoinCount, Credits ] ) ]),
+		[ GoldCoinCount, SilverCoinCount, CopperCoinCount, Credits ] ),
+
 	Credits.
 			
 			
 convertCreditsToCoins( Credits ) ->
 	{Gold,Silver,Copper} = currency:credits_to_coins( Credits ),
-	?test_info([ io_lib:format( "~B credit(s) correspond(s) to ~B gold coin(s),"
+
+	?test_info_fmt( "~B credit(s) correspond(s) to ~B gold coin(s),"
 		" ~B silvers coin(s), ~B copper coin(s).", 
-		[ Credits, Gold, Silver, Copper ] ) ]),
+		[ Credits, Gold, Silver, Copper ] ),
+
 	{Gold,Silver,Copper}.	 
 	
 
