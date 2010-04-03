@@ -190,5 +190,5 @@ OVERRIDDEN_OPT := $(OVERRIDDEN_OPT) $(TCP_FIREWALL_OPT) $(EPMD_PORT_OPT)
 ORGE_WEB_INSTALL_DIR = $(LOANI_INSTALLATIONS_ROOT)/OSDL-$(OSDL_TARGET_VERSION)/share/OSDL/doc/web/main/documentation/OSDL/Orge
 
 	
-include $(TRACES_TOP)/GNUmakesettings.inc
+#include $(TRACES_TOP)/GNUmakesettings.inc
 
