@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -23,7 +22,7 @@
 
 
 % Custom-made test TCP/IP Orge client.
-% See orge_tcp_server.erl and orge_tcp_server_test.erl.
+% See orge_tcp_client.erl and orge_tcp_server_test.erl.
 -module(orge_tcp_client_test).
 
 
@@ -44,11 +43,11 @@ run() ->
 		
 	?test_start,
 	
-	?test_info([ "A test Orge TCP server is expected to run already, "
-		"with default settings (see orge_tcp_server_test.erl)." ]),
+	?test_info( "A test Orge TCP server is expected to run already, "
+		"with default settings (see orge_tcp_server_test.erl)." ),
 
-	?test_info([ io_lib:format( "Creating a first new Orge test TCP client, "
-		"trying to connect to host ~p.", [TargetHost] ) ]),
+	?test_info_fmt( "Creating a first new Orge test TCP client, "
+		"trying to connect to host ~p.", [TargetHost] ),
 	
 	% Would fail as in orge_tcp_server_test this account is unregistered:
 	%{FirstLogin,FirstPassword} = { "anakin", "Iamy0urfather" },
@@ -59,7 +58,7 @@ run() ->
 	FirstClient = orge_tcp_client:start_link( FirstLogin, FirstPassword,
 		TargetHost ),
 	
-	?test_info([ "Checking this first client succeeded in connecting." ]),
+	?test_info( "Checking this first client succeeded in connecting." ),
 	FirstClient ! {get_login_status,self()},
 	receive
 	
@@ -81,11 +80,11 @@ run() ->
 	% If the maximum number of connections for the server is 1, then
 	% no more client managers will be spawned and the next call will hang,
 	% as no accept will be done.  
-	?test_info([ "Creating a second new Orge test TCP client." ]),
+	?test_info( "Creating a second new Orge test TCP client." ),
 	SecondClient = orge_tcp_client:start_link( SecondLogin, SecondPassword, 
 		TargetHost ),
 	
-	?test_info([ "Checking this second client succeeded in connecting." ]),
+	?test_info( "Checking this second client succeeded in connecting." ),
 	SecondClient ! {get_login_status,self()},
 	receive
 	
@@ -96,19 +95,18 @@ run() ->
 	
 	%timer:sleep(10000),
 	
-	?test_info([ "Trying to log twice with the account of first client "
-	   "(should fail)." ]),
+	?test_info( "Trying to log twice with the account of first client "
+	   "(should fail)." ),
 	SameAsFirstClient = orge_tcp_client:start_link( FirstLogin, FirstPassword, 
 	   TargetHost ),
 	
-	?test_info([ 
-		"Checking whether the first client failed in connecting twice." ]),
+	?test_info("Checking whether the first client failed in connecting twice."),
 		
 	SameAsFirstClient ! {get_login_status,self()},
 	receive
 	
 	   {login_failed,already_connected} ->
-		   ?test_info([ "Double login spotted and rejected as expected." ])
+		   ?test_info( "Double login spotted and rejected as expected." )
 	
 	after 100 ->
 		ok			   
@@ -118,17 +116,16 @@ run() ->
 	
 	%timer:sleep(2000),
 	
-	%?test_info([ "Requesting server informations." ]),
+	%?test_info( "Requesting server informations." ),
 	%ServerPid ! {self(),get_info},	
 	%receive
 	
 	%	{server_info,StateString} ->
-	%		?test_info([ io_lib:format( "Current server state is: ~s.",
-	%			[StateString] ) ]) 
+	%		?test_info_fmt( "Current server state is: ~s.",	[StateString] )
 			
 	%end,
 	
-	%?test_info([ "Requesting the server to shutdown." ]),
+	%?test_info( "Requesting the server to shutdown." ),
 	%ServerPid ! {self(),shutdown},
 	 	
 	?test_stop.
