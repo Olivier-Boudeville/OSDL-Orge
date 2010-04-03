@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -30,12 +29,13 @@
 
 % Implementation notes.
 
-% Inspired from the various clients described in 'Programming Erlang',
-% by Joe Armstrong (chapter 16).
-% WOOPER has been avoided here to presumably speedup the processings, and 
-% as no need for inheritance is expected.
+% Inspired from the various clients described in 'Programming Erlang', by Joe
+% Armstrong (chapter 16).
+%
+% WOOPER has been avoided here to presumably speedup the processings, and as no
+% need for inheritance is expected.
 
-% The role of a client is to contact a server, send commands and receive 
+% The role of a client is to contact a server, send commands and receive
 % updates.
 
 
@@ -95,6 +95,7 @@
 % Returns the PID of the launched client.
 % (static)
 start( ClientLogin, ClientPassword, ServerDNSName ) ->
+
 	start( ClientLogin, ClientPassword, ServerDNSName,
 		?default_listening_orge_tcp_server_port ).
 
@@ -110,11 +111,12 @@ start( ClientLogin, ClientPassword, ServerDNSName ) ->
 % Returns the PID of the launched client.
 % (static)
 start( ClientLogin, ClientPassword, ServerDNSName, ServerTCPListeningPort ) ->
-	?emit_trace([ io_lib:format( "Starting a TCP client "
+
+	?notify_trace_fmt( "Starting a TCP client "
 		"that will connect to server ~s on port #~B with login '~s' "
 		"and password '~s'.",
-		[ ServerDNSName, ServerTCPListeningPort, ClientLogin, ClientPassword ] )
-	]),
+		[ ServerDNSName, ServerTCPListeningPort, ClientLogin, ClientPassword ]),
+
 	spawn( fun() ->	init( ClientLogin, ClientPassword, ServerDNSName,
 		ServerTCPListeningPort ) end ).
 
@@ -131,6 +133,7 @@ start( ClientLogin, ClientPassword, ServerDNSName, ServerTCPListeningPort ) ->
 % Returns the PID of the launched client.
 % (static)
 start_link( ClientLogin, ClientPassword, ServerDNSName ) ->
+
 	start_link( ClientLogin, ClientPassword, ServerDNSName,
 		?default_listening_orge_tcp_server_port ).
 
@@ -143,15 +146,16 @@ start_link( ClientLogin, ClientPassword, ServerDNSName ) ->
 % DNS
 %  - ServerTCPListeningPort the port number of the TCP port the server is
 % expected to listen to incoming connections
+%
 % Returns the PID of the launched client.
 % (static)
 start_link( ClientLogin, ClientPassword, ServerDNSName, 
 		ServerTCPListeningPort ) ->
-	?emit_trace([ io_lib:format( "Starting a linked TCP client "
-		"that will connect to server ~s on port #~B with login '~s' "
-		"and password '~s'.",
-		[ ServerDNSName, ServerTCPListeningPort, ClientLogin, ClientPassword ] )
-	]),
+
+	?notify_trace_fmt( "Starting a linked TCP client that will connect "
+		"to server ~s on port #~B with login '~s' and password '~s'.",
+		[ServerDNSName, ServerTCPListeningPort, ClientLogin, ClientPassword] ),
+
 	spawn_link( fun() -> 
 		init( ClientLogin, ClientPassword, ServerDNSName, 
 			ServerTCPListeningPort ) end ).
@@ -164,7 +168,7 @@ init( ClientLogin, ClientPassword, ServerDNSName, ServerTCPListeningPort ) ->
 
 	io:format( "Client ~w created.~n", [self()] ),
 	
-	?emit_debug([ "Client will try to connect now." ]),
+	?notify_debug( "Client will try to connect now." ),
 	
 	case gen_tcp:connect( ServerDNSName, ServerTCPListeningPort,
 			[ binary, {packet,?default_packet_header_size} ] ) of 
@@ -181,44 +185,45 @@ init( ClientLogin, ClientPassword, ServerDNSName, ServerTCPListeningPort ) ->
 			communication_socket = Socket
 			},
 
-			?emit_debug([ "Client connected, ready for login." ]),
+			?notify_debug( "Client connected, ready for login." ),
 			login(ClientState);
 
 		{error,econnrefused} ->
-			?emit_fatal([ io_lib:format( 
+			?notify_fatal_fmt(
 				"Connection refused (no Orge server running on ~s at port ~s?),"
 				" stopping the client.", 
 				[   ServerDNSName, 
 					basic_utils:integer_to_string(ServerTCPListeningPort)
-				] ) ]);
+				] );
 
 		{error,OtherError} ->
-			?emit_fatal([ io_lib:format( 
+			?notify_fatal_fmt(
 				"Connection failed to server running on ~s at port ~s: ~s,"
 				" stopping the client.", 
 				[   ServerDNSName, 
 					basic_utils:integer_to_string(ServerTCPListeningPort),
 					OtherError
-				] ) ])
+				] )
 		
 	end.		
 			
 		
 login(ClientState) ->
-	?emit_debug([ "Sending a login request." ]),
+
+	?notify_debug( "Sending a login request." ),
 	Socket = ?getState.communication_socket,	
 	MarshalledIdentifiers = list_to_binary( io_lib:format( "~s~s~s", 
-		[?getState.client_login, ?default_identifier_separator,
-			?getState.client_password] ) ),
+		[ ?getState.client_login, ?default_identifier_separator,
+			?getState.client_password ] ) ),
 			 
-	% Uncomment to test the case of too late login (should result on a 
-	% time-out on the server):
+	% Uncomment to test the case of too late login (should result on a time-out
+	% on the server):
 	%timer:sleep(6000),		
 	
 	case gen_tcp:send( Socket, MarshalledIdentifiers ) of 
 	
 		ok ->
-			?emit_debug([ "Login request sent." ]),
+			?notify_debug( "Login request sent." ),
 			receive
 	
 				{tcp,Socket,<<?access_granted>>} ->
@@ -226,37 +231,37 @@ login(ClientState) ->
 					on_successful_login(ClientState);
 		
 				{tcp,Socket,<<?ill_formatted_identifiers>>} ->
-					?emit_fatal( "Server answered: "
+					?notify_fatal( "Server answered: "
 						"ill formatted identifiers, stopping the client." ),
 					on_failed_login(ClientState,ill_formatted_identifiers);
 			
 				{tcp,Socket,<<?access_denied>>} ->
-					?emit_fatal( "Server answered: access denied, "
+					?notify_fatal( "Server answered: access denied, "
 						"incorrect identifiers, stopping the client." ),
 					on_failed_login(ClientState,access_denied);
 			
 				{tcp,Socket,<<?already_connected>>} ->
-					?emit_fatal( "Server answered: access denied, "
+					?notify_fatal( "Server answered: access denied, "
 						"account already in use." ),
 					on_failed_login(ClientState,already_connected);
 						
 				{tcp,Socket,<<?timed_out>>} ->
-					?emit_fatal( "Server answered: "
+					?notify_fatal( "Server answered: "
 						"time-out while waiting for identifiers, "
 						"stopping the client." ),
 					on_failed_login(ClientState,timed_out);
 	
 				{tcp,Socket,<<?no_slot_available>>} ->
 					% Actually the login informations were not even read:
-					?emit_fatal( "Server answered: not available slot, "
+					?notify_fatal( "Server answered: not available slot, "
 						"terminating the client." ),
 					on_failed_login(ClientState,no_slot_available)
 	
 			end;
 		
 		{error,closed} ->
-			?emit_fatal([ "The server closed its socket, "
-				"presumably due to a time-out, stopping the client." ])
+			?notify_fatal( "The server closed its socket, "
+				"presumably due to a time-out, stopping the client." )
 		
 	end.		
 
@@ -264,8 +269,8 @@ login(ClientState) ->
 
 % Called as soon as the login has been validated by the server.
 on_successful_login(ClientState) ->
-	?emit_trace([ 
-		"Client obtained a server slot and its login is successful." ]),
+
+	?notify_trace("Client obtained a server slot and its login is successful."),
 	VersionState = check_client_version( ClientState ),
 	loop( VersionState).
 
@@ -274,9 +279,9 @@ on_successful_login(ClientState) ->
 % Checking whether client version is not deprecated for the server. 
 check_client_version(ClientState) ->
 	ClientVersion = ?getState.client_version,
-	?emit_trace([ io_lib:format( 
-		"Checking whether client version ~p is accepted by server.",
-		[ClientVersion]) ]),
+	?notify_trace_fmt(
+	   "Checking whether client version ~p is accepted by server.",
+		[ClientVersion] ),
 
 	Socket = ?getState.communication_socket,	
 	
@@ -286,15 +291,15 @@ check_client_version(ClientState) ->
 	case gen_tcp:send( Socket, MarshalledVersion ) of 
 	
 		ok ->
-			?emit_debug([ "Client version sent." ]),
+			?notify_debug( "Client version sent." ),
 			receive
 	
 				{tcp,Socket,<<?compatible_version>>} ->
-					?emit_trace([ "Server acknowledged client version." ]),
+					?notify_trace( "Server acknowledged client version." ),
 					loop(ClientState);
 		
 				{tcp,Socket,<<?incompatible_version>>} ->
-					?emit_fatal( "Server answered: "
+					?notify_fatal( "Server answered: "
 						"incompatible client version, stopping the client." ),
 					throw( {incompatible_client_version,ClientVersion} )
 				
@@ -310,8 +315,8 @@ on_failed_login( _ClientState, Reason ) ->
 	
 		{get_login_status,CallerPid} ->
 			CallerPid ! {login_failed,Reason},
-			?emit_info( io_lib:format( 
-				"Client terminates on failed login (~p).", [Reason] ) )
+			?notify_info_fmt(
+				"Client terminates on failed login (~p).", [Reason] )
 			% Client terminates here.
 			
 	end.
@@ -319,7 +324,8 @@ on_failed_login( _ClientState, Reason ) ->
 	
 		
 loop(ClientState) ->
-	?emit_trace( "Client in main loop." ),
+
+	?notify_trace( "Client in main loop." ),
 	receive
 	
 		{get_login_status,CallerPid} ->
@@ -339,14 +345,15 @@ loop(ClientState) ->
 
 % Client-side connection termination (ex: the user exited from the client).
 terminate_normally(ClientState) ->
-	?emit_info( "Client now terminating." ),
+
+	?notify_info( "Client now terminating." ),
 	io:format( "Client ~w terminating.~n", [self()] ),
 	Socket = ?getState.communication_socket,	
 	case gen_tcp:send( Socket, <<?normal_client_side_termination>> ) of 
 	
 		ok ->
 			% No need for the server to acknowledge it:
-			?emit_debug([ "Termination notification sent." ])
+			?notify_debug( "Termination notification sent." )
 			
 	end.
 			
@@ -358,6 +365,7 @@ terminate_normally(ClientState) ->
 
 % Returns a textual description of the specified client state.
 state_to_string(ClientState) ->
+
 	io_lib:format( "State of Orge TCP client version ~s:~n"
 		"  + started on ~s at ~s~n"
 		"  + ~s~n"
