@@ -36,8 +36,8 @@
 
 % TO-DO:
 %
-%  - the client manager could buffer a bit sendings, lest gen_tcp:send
-% eats too much CPU?
+%  - the client manager could buffer a bit sendings, lest gen_tcp:send eats too
+%  much CPU?
 %
 
 
@@ -115,15 +115,15 @@
 % use of the defines. Use of macros implies to define them first. 
 
 
-% For emit_*:
+% For notify_*:
 -include("traces.hrl").
-
+%-include("class_TraceEmitter.hrl").
 
 -define( trace_emitter_categorization, "Orge" ).
 
 
-get_emitter_name( ManagerState ) ->
-	forge_emitter_name( ?getState.connection_identifier ).
+%get_emitter_name( ManagerState ) ->
+%	forge_emitter_name( ?getState.connection_identifier ).
 	
 	
 forge_emitter_name( ConnectionID ) ->
@@ -140,56 +140,48 @@ forge_emitter_name( ConnectionID ) ->
 
 	
 	
-send_error( Message, ManagerState ) ->
-	?notify_error( Message, get_emitter_name( ManagerState ), 
-		?trace_emitter_categorization ).
+%send_error( Message, ManagerState ) ->
+%	?notify_error_cat( Message, get_emitter_name( ManagerState ) ).
 	
--define( error( Message ), send_error( Message, ManagerState ) ).
+%-define( error( Message ), send_error( Message, ManagerState ) ).
 
 
 	
-send_warning( Message, ManagerState ) ->
-	?notify_warning( Message, get_emitter_name( ManagerState ), 
-		?trace_emitter_categorization ).
+%send_warning( Message, ManagerState ) ->
+%	?notify_warning_cat( Message, get_emitter_name( ManagerState ) ).
 	
--define( warning( Message ), send_warning( Message, ManagerState ) ).
+%-define( warning( Message ), send_warning( Message, ManagerState ) ).
 
 send_warning_stateless( Message, ConnectionID ) ->
-	?notify_warning( Message, forge_emitter_name( ConnectionID ), 
-		?trace_emitter_categorization ).
+	?notify_warning_cat( Message, forge_emitter_name( ConnectionID ) ).
 	
 
 	
-send_info( Message, ManagerState ) ->
-	?notify_info( Message, get_emitter_name( ManagerState ), 
-		?trace_emitter_categorization ).
+%send_info( Message, ManagerState ) ->
+%	?notify_info_cat( Message, get_emitter_name( ManagerState ) ).
 	
--define( info( Message ), send_info( Message, ManagerState ) ).
+%-define( info( Message ), send_info( Message, ManagerState ) ).
 	
 
 	
-send_trace( Message, ManagerState ) ->
-	?notify_trace( Message, get_emitter_name( ManagerState ), 
-		?trace_emitter_categorization ).
+%send_trace( Message, ManagerState ) ->
+%	?notify_trace_cat( Message, get_emitter_name( ManagerState ) ).
 
 %send_trace_stateless( Message, ConnectionID ) ->
-%	?notify_trace( Message, forge_emitter_name( ConnectionID ), 
-%		?trace_emitter_categorization ).
+%	?notify_trace_cat( Message, forge_emitter_name( ConnectionID ) ).
 	
--define( trace( Message ), send_trace( Message, ManagerState ) ).
+%-define( trace( Message ), send_trace( Message, ManagerState ) ).
 	
 
 	
-send_debug( Message, ManagerState ) ->
-	?notify_debug( Message, get_emitter_name( ManagerState ), 
-		?trace_emitter_categorization ).
+%send_debug( Message, ManagerState ) ->
+%	?notify_debug_cat( Message, get_emitter_name( ManagerState ) ).
 	
--define( debug( Message ), send_debug( Message, ManagerState ) ).
+%-define( debug( Message ), send_debug( Message, ManagerState ) ).
 
 
 send_debug_stateless( Message, ConnectionID ) ->
-	?notify_debug( Message, forge_emitter_name( ConnectionID ), 
-		?trace_emitter_categorization ).
+	?notify_debug_cat( Message, forge_emitter_name( ConnectionID ) ).
 	
 
 
@@ -258,8 +250,7 @@ init( ServerPid, ListenSocket, ConnectionIdentifier, DatabasePid ) ->
 				database_pid = DatabasePid
 			},
 
-			?debug( io_lib:format( "Connection ~B accepted.",
-				[ConnectionIdentifier] ) ),
+			%?debug_fmt( "Connection ~B accepted.", [ConnectionIdentifier] ),
 			
 			% Useful to introduce random delays:
 			% (seeding necessary otherwise always the same values)
@@ -270,12 +261,12 @@ init( ServerPid, ListenSocket, ConnectionIdentifier, DatabasePid ) ->
 			case check_connection_allowed( ManagerState ) of
 			
 				slot_obtained ->
-					?debug( "A slot could be obtained for this connection." ), 
+					%?debug( "A slot could be obtained for this connection." ), 
 					control_access( ManagerState );
 					
 				slot_refused ->
-					?warning( "No slot could be obtained for this connection, "
-						"notifying the client and terminating." ),
+					%?warning( "No slot could be obtained for this connection, "
+					%	"notifying the client and terminating." ),
 						
 					random_wait(), 
 					gen_tcp:send( ClientSocket,	<<?no_slot_available>> ),
@@ -292,15 +283,14 @@ init( ServerPid, ListenSocket, ConnectionIdentifier, DatabasePid ) ->
 	end.			
 	
 
-	
+
 % Ensures that we do not exceed the maximum count of active connections, by
 % requesting the database.
 check_connection_allowed( ManagerState ) ->
 
 	ConnectionId = ?getState.connection_identifier,
 
-	?debug( io_lib:format( "Connection ~B requesting a server slot.", 
-		[ ConnectionId ] ) ),
+	%?debug_fmt( "Connection ~B requesting a server slot.", [ ConnectionId ] ),
 		
 	?getState.database_pid	! { request_slot, ConnectionId, 
 		?getState.client_host, self() },
@@ -331,9 +321,9 @@ control_access( ManagerState ) ->
 		{tcp,ClientSocket,Data} ->
 			% Thanks to initial header, we received here a full packet.
 			% First message from client must be login informations.
-			%?debug( io_lib:format( 
+			%?debug_fmt(  
 			%	"Client manager received following TCP message: ~w.", 
-			%	[Data] ) ),
+			%	[Data] ),
 			Id = binary_to_list(Data),
 			Identifiers = string:tokens( Id, ?default_identifier_separator ),
 			% Precise reasons of failures not reported to the client to avoid
@@ -345,53 +335,46 @@ control_access( ManagerState ) ->
 					case declare_identifiers( ManagerState, Login, Password ) of
 						
 						access_granted ->
-							?trace( io_lib:format( 
-								"Connection acccepted for login '~s' and "
-								"password '~s'.", [Login,Password] ) ),
+							%?trace_fmt( "Connection acccepted for login '~s' "
+							%	"and password '~s'.", [Login,Password] ),
 							gen_tcp:send( ClientSocket,	<<?access_granted>> ),
 							check_client_version( 
 								?getState{ client_login = access_granted } );
 							
 						bad_login ->
-							?warning( io_lib:format( 
-								"Connection refused for login '~s' and "
-								"password '~s': bad (unregistered) login.",
-								 [Login,Password] ) ),
+							%?warning_fmt( "Connection refused for login '~s' "
+							%	"and password '~s': bad (unregistered) login.",
+							%    [Login,Password] ),
 							gen_tcp:send( ClientSocket,	<<?access_denied>> ),
 							terminate_manager(ManagerState);
 							
 						bad_password ->
-							?warning( io_lib:format( 
-								"Connection refused for login '~s' and "
-								"password '~s': registered login, but "
-								"incorrect password.",
-								 [Login,Password] ) ),
+							%?warning_fmt( "Connection refused for login '~s' "
+							%	"and password '~s': registered login, but "
+							%	"incorrect password.",
+							%	 [Login,Password] ),
 							gen_tcp:send( ClientSocket,	<<?access_denied>> ),
 							terminate_manager(ManagerState);
 							
 						already_connected ->
-							?warning( io_lib:format( 
-								"Connection refused for login '~s' and "
-								"password '~s': correct login and password, "
-								"but account already in use.",
-								 [Login,Password] ) ),
+							%?warning_fmt( "Connection refused for login '~s' "
+							%	"and password '~s': correct login and password,"
+							%	" but account already in use.",
+							%			 [Login,Password] ),
 							gen_tcp:send( ClientSocket,	<<?already_connected>>),
 							terminate_manager(ManagerState);
 														
 						account_not_active ->
-							?warning( io_lib:format( 
-								"Connection refused for login '~s' and "
-								"password '~s': correct login and password, "
-								"but account not active.",
-								 [Login,Password] ) ),
+							%?warning_fmt( "Connection refused for login '~s' "
+							%	"and password '~s': correct login and password,"
+							%	" but account not active.", [Login,Password] ),
 							gen_tcp:send( ClientSocket,	<<?access_denied>>),
 							terminate_manager(ManagerState);
 				
 						internal_error ->
-							?warning( io_lib:format( 
-								"Connection refused for login '~s' and "
-								"password '~s': internal error.",
-								 [Login,Password] ) ),
+							%?warning_fmt( "Connection refused for login '~s' "
+							%	" and password '~s': internal error.",
+							%			  [Login,Password] ),
 							gen_tcp:send( ClientSocket,	<<?access_denied>>),
 							terminate_manager(ManagerState)
 
@@ -399,9 +382,8 @@ control_access( ManagerState ) ->
 					
 				_IdentifierList ->
 					% Parsing did not result in exactly two elements:
-					?error( io_lib:format( 
-						"Error, unable to determine login identifiers "
-						"in '~w', connection refused.", [Identifiers] ) ),
+					%?error_fmt( "Error, unable to determine login identifiers"
+					%	" in '~w', connection refused.", [Identifiers] ),
 						
 					?getState.database_pid ! { declare_marshalling_failed,
 						?getState.connection_identifier },	
@@ -414,21 +396,19 @@ control_access( ManagerState ) ->
 			end;		
 			
 			
-		Any ->
+		_Any ->
 		
-			?debug( io_lib:format( "Client manager received "
-				"unhandled message while not identified: ~w (ignored).",
-				[Any] ) ),								
+			%?debug_fmt( "Client manager received unhandled message "
+			%	"while not identified: ~w (ignored).", [Any] ),
 			control_access( ManagerState )
 	
 	
 	% Milliseconds:
 	after 5000 ->
 	
-		?warning( "Time-out while waiting for the client identification, "
-			"notifying the client and the server, and "
-			"stopping this client manager."
-			),
+		%?warning( "Time-out while waiting for the client identification, "
+		%	"notifying the client and the server, and "
+		%	"stopping this client manager."	),
 			
 		?getState.database_pid	! { declare_timed_out, 
 			?getState.connection_identifier },
@@ -437,6 +417,7 @@ control_access( ManagerState ) ->
 		terminate_manager(ManagerState)
 				
 	end.
+
 
 
 % Checks that the client has a relevant version.
@@ -453,24 +434,23 @@ check_client_version( ManagerState ) ->
 					ClientVersion ) of
 				
 				first_bigger ->
-					?error( io_lib:format( "Client version (~s) too old, "
-						"ending connection ~B.", [
-							basic_utils:version_to_string(ClientVersion),
-							?getState.connection_identifier ] ) ),
+					%?error_fmt( "Client version (~s) too old, "
+					%			"ending connection ~B.", [
+					%		text_utils:version_to_string(ClientVersion),
+					%		?getState.connection_identifier ] ),
 						
 					?getState.database_pid	! { declare_incompatible_version,
 						ClientVersion },
 			
-					gen_tcp:send( ClientSocket,
-						<<?incompatible_version>> ),
+					gen_tcp:send( ClientSocket,	<<?incompatible_version>> ),
 					
 					terminate_manager(ManagerState);
 						
 					
 				_EqualOrSecondBigger ->
 				
-					?trace( io_lib:format( "Client version ~s acccepted.",
-						[basic_utils:version_to_string(ClientVersion)] ) ),
+					%?trace_fmt( "Client version ~s acccepted.",
+					%	[text_utils:version_to_string(ClientVersion)] ),
 						
 					gen_tcp:send( ClientSocket,	<<?compatible_version>> ),
 
@@ -481,8 +461,11 @@ check_client_version( ManagerState ) ->
 	end.
 
 
+	
+
 
 % Main loop of this client manager, once the client has been identified.
+%
 % ManagerState is the current state of this manager (ex: containing the name
 % under which the server is registered and all other informations).
 loop( ManagerState ) ->
@@ -500,8 +483,7 @@ loop( ManagerState ) ->
 			% No loop here.
 		
 		{tcp_closed,ClientSocket} ->
-			?debug( "Client connection closed, "
-				"notifying database and server." ),
+			%?debug("Client connection closed, notifying database and server."),
 				
 			?getState.database_pid	! { declare_unexpected_client_termination, 
 				?getState.connection_identifier },
@@ -509,16 +491,14 @@ loop( ManagerState ) ->
 			?getState.server_pid ! {self(),closed};
 			% No loop here.
 			
-		{tcp_closed,Other} ->
-			?debug( io_lib:format(  
-				"Unexpected closing of client connection received "
-				"(from ~w instead of from ~w), ignored.", 
-				[Other,ClientSocket] ) ),
+		{tcp_closed,_Other} ->
+			%?debug_fmt( "Unexpected closing of client connection received "
+			%	"(from ~w instead of from ~w), ignored.", [Other,ClientSocket]),
 			loop( ManagerState );	
 			
 
 		{tcp,ClientSocket,<<?normal_client_side_termination>>} ->
-			?info( "Received a notification of client-side termination." ),
+			%?info( "Received a notification of client-side termination." ),
 			?getState.database_pid	! { declare_normal_client_side_termination, 
 				?getState.connection_identifier },
 			terminate_manager(ManagerState);
@@ -526,41 +506,42 @@ loop( ManagerState ) ->
 		{tcp,ClientSocket,Data} ->
 			io:format( "Received unhandled data: ~p.", [Data] );
 				
-		Any ->
-			?debug( io_lib:format( "Client manager received "
-				"unhandled message while identified: ~w (ignored).",
-				[Any] ) ),
+		_Any ->
+			%?debug_fmt( "Client manager received "
+			%	"unhandled message while identified: ~w (ignored).", [Any] ),
 			loop( ManagerState )
 	
 	end.
 
 
-
+	
 % To be called whenever this client manager determined it should stop.
 terminate_manager(ManagerState) ->
+
 	gen_tcp:close( ?getState.client_socket ),
-	?getState.server_pid ! {self(),closed},
-	?info( "Client manager terminated." ).
+	?getState.server_pid ! {self(),closed}.
+	%?info( "Client manager terminated." ).
 	% Nothing more here, terminating.	
 
 
 	
 on_server_shutdown(ManagerState) ->
-	?info( "Received a shutdown notification from server, "
-		"notifying client and stopping now." ),
+
+	%?info( "Received a shutdown notification from server, "
+	%	"notifying client and stopping now." ),
+
 	?getState.database_pid	! { declare_shutdown_by_server,
 		?getState.connection_identifier },
 	gen_tcp:send( ?getState.client_socket, <<?shutdown_notification>> ),
 	terminate_manager(ManagerState).
 	
 	
-	
 % Checks that specified login/password are correct,and not already in use.
 % Registers in all cases the connection in database.	
 declare_identifiers( ManagerState, Login, Password ) ->
 	ConnectionId = ?getState.connection_identifier,
-	{ClientIP,ClientPort,ReversedDNS} = ?getState.client_host,
-	DNSString = case ReversedDNS of
+	{_ClientIP,_ClientPort,ReversedDNS} = ?getState.client_host,
+	_DNSString = case ReversedDNS of
 	
 		unknown_dns ->
 			"(DNS could not be resolved)";
@@ -570,11 +551,10 @@ declare_identifiers( ManagerState, Login, Password ) ->
 			
 	end,
 
-	?debug( io_lib:format( 
-		"Received login '~s' and password '~s', checking database "
-		"from connection ~B for ~s ~s.", 
-		[ Login, Password, ConnectionId,
-			basic_utils:ipv4_to_string(ClientIP,ClientPort), DNSString ] ) ),
+	%?debug_fmt(	"Received login '~s' and password '~s', checking database "
+	%	"from connection ~B for ~s ~s.", 
+	%	[ Login, Password, ConnectionId,
+	%		net_utils:ipv4_to_string(ClientIP,ClientPort), DNSString ] ),
 		
 	?getState.database_pid	! { try_login, Login, Password, ConnectionId,
 		self() },
@@ -589,6 +569,7 @@ declare_identifiers( ManagerState, Login, Password ) ->
 	
 	
 % Waits for a random duration between 1 and 2 seconds.
+%
 % May be used to fight denial of service and guessings based on request
 % durations.
 random_wait() ->
