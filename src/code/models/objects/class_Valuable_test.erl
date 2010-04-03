@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -30,8 +29,6 @@
 -define(Tested_modules, [class_Valuable] ).
 
 
-% For all facilities common to all tests:
-%-include("test_constructs.hrl").
 
 % For trace facilities:
 -include("traces_for_tests.hrl").
@@ -43,9 +40,8 @@ run() ->
 
 	?test_start,
 		
-	?test_info([ "Creating a new Valuable." ]),
+	?test_info( "Creating a new Valuable." ),
 	
-		
 	MyValuable = class_Valuable:synchronous_new_link( _BaseValue = 32 ),		
 	
 	MyValuable ! delete,

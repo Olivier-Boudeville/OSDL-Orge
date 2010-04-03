@@ -1,4 +1,4 @@
-% Copyright (C) 2009 Olivier Boudeville
+% Copyright (C) 2009-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -57,10 +57,10 @@ evaluate_probabilities( LanguageManagerPid, Variation, [Word|T] ) ->
 	receive
 	
 		{wooper_result,Probability} ->
-			?emit_info([ io_lib:format( "The probability that the word '~s' "
+			?notify_info_fmt( "The probability that the word '~s' "
 				%"belongs to the variation '~w' is ~.5f %.", 
 				"belongs to the variation '~w' is ~f %.", 
-				[Word,Variation,Probability*100] ) ]),
+				[Word,Variation,Probability*100] ),
 			evaluate_probabilities( LanguageManagerPid, Variation, T )
 	
 	end.
@@ -77,9 +77,9 @@ exec() ->
 	Options = [ generate_original_only, generate_capitalized_words,
 		prohibited_index ],
 	
-	?emit_info([ io_lib:format( "Testing a language manager for language '~s',"
-		" with variations ~w and options ~w.", 
-		[ Language, Variations, Options ] ) ]),
+	?notify_info_fmt( "Testing a language manager for language '~s',"
+					  " with variations ~w and options ~w.", 
+					  [ Language, Variations, Options ] ),
 	
 	FirstLanguageManagerPid = class_LanguageManager:synchronous_new_link(
 		Language, Variations, _MarkovOrder = 2, Options ),
@@ -88,11 +88,10 @@ exec() ->
 	receive
 	
 		{wooper_result,learning_success} ->
-			?emit_info([ "Learning succeeded." ]);
+			?notify_info( "Learning succeeded." );
 			
 		{wooper_result,{learning_failure,Reason}} ->
-			?emit_info([ io_lib:format( "Learning failed, reason: ~p.",
-				[Reason] ) ])
+			?notify_info_fmt( "Learning failed, reason: ~p.", [Reason] )
 			
 	end,
 
@@ -100,14 +99,14 @@ exec() ->
 
 	FirstTestVariation = 'female-names',
 	
-	?emit_info([ io_lib:format(	"Requesting the generation of ~B words "
-		"from the '~s' variation.", [WordCount,FirstTestVariation] ) ]),
+	?notify_info_fmt( "Requesting the generation of ~B words "
+		"from the '~s' variation.", [WordCount,FirstTestVariation] ),
 		 
 	FirstWords = get_words( FirstLanguageManagerPid, FirstTestVariation,
 		WordCount, [] ),
 	
-	?emit_info([ io_lib:format(	"Generated following words: ~s.",
-		[ basic_utils:string_list_to_string(FirstWords)] ) ]),
+	?notify_info_fmt( "Generated following words: ~s.",
+		[ basic_utils:string_list_to_string(FirstWords)] ),
 	
 	OriginalWords = [ "Artemisia", "Aspasia", "Aspa", "Aster", "Atalante",
 		"Athena", "Basilea", "Vasiliki", "Berenice" ], 

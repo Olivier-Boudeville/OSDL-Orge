@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -32,22 +31,22 @@
 
 
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters, CreatureName, Description, Location, Age ).
+-define( wooper_construct_parameters, CreatureName, Description, Location, Age ).
 
 
 % Declaring all variations of WOOPER standard life-cycle operations:
 % (template pasted, two replacements performed to update arities)
 -define( wooper_construct_export, new/4, new_link/4, 
-	synchronous_new/4, synchronous_new_link/4,
-	synchronous_timed_new/4, synchronous_timed_new_link/4,
-	remote_new/5, remote_new_link/5, remote_synchronous_new/5,
-	remote_synchronous_new_link/5, remote_synchronous_timed_new/5,
-	remote_synchronous_timed_new_link/5, construct/5, delete/1 ).
+		 synchronous_new/4, synchronous_new_link/4,
+		 synchronous_timed_new/4, synchronous_timed_new_link/4,
+		 remote_new/5, remote_new_link/5, remote_synchronous_new/5,
+		 remote_synchronous_new_link/5, remote_synchronous_timed_new/5,
+		 remote_synchronous_timed_new_link/5, construct/5, delete/1 ).
 
 
 
-% Method declarations.
--define(wooper_method_export, act/1, getAge/1, setAge/2 ).
+% Member method declarations.
+-define( wooper_method_export, act/1, getAge/1, setAge/2 ).
 
 
 % Helper functions.
@@ -92,19 +91,19 @@
 %  - Location, a 'location' record designating an in-world location 
 %  - Age, the initial age of this creature
 % Creature starts with no physical nor mental fatigue.
-construct(State,?wooper_construct_parameters) ->
+construct( State, ?wooper_construct_parameters ) ->
 
 	% First the direct mother classes, then this class-specific actions:
 	ActorState = class_Actor:construct( State, CreatureName ),
 	DescribableState = class_Describable:construct(ActorState,Description),
 	LocatableState = class_Locatable:construct( DescribableState, Location ),
 
-	?send_info([ LocatableState, io_lib:format( 
+	?send_info_fmt( LocatableState, 
 		"Creating a new creature whose name is ~s, whose description is ~w "
 		"and whose location is ~s.",
-		[ CreatureName, Description, space:location_to_string(Location) ] ) ]),
+		[ CreatureName, Description, space:location_to_string(Location) ] ),
 	
-	?setAttributes( LocatableState, [ 
+	setAttributes( LocatableState, [ 
 		{age,Age},
 		{physical_fatigue,0}, 
 		{max_physical_fatigue,0},
@@ -112,19 +111,19 @@ construct(State,?wooper_construct_parameters) ->
 		{mental_fatigue,0}, 
 		{max_mental_fatigue,0},
 		{mental_recover_rate,0}, 
-		{trace_categorization,?TraceEmitterCategorization} ] ).
+		{trace_categorization,
+		 text_utils:string_to_binary(?TraceEmitterCategorization)}
+				 ] ).
 	
 	
 	
 % Overridden destructor.
-% Unsubscribing for TimeManager supposed already done, thanks to a termination
-% message. 
 delete(State) ->
-	% Class-specific actions:
-	?info([ "Deleting creature." ]),
-	% erlang:unlink() not used, as done manager-side. 
 
-	?debug([ "Creature deleted." ]),
+	% Class-specific actions:
+	?info( "Deleting creature." ),
+
+	?debug( "Creature deleted." ),
 
 	% Then call the direct mother class counterparts and allow chaining:
 	class_Actor:delete(State).
@@ -146,8 +145,8 @@ getAge(State) ->
 	
 % Sets the age of this creature.
 % (oneway)
-setAge(State,NewAge) ->
-	?wooper_return_state_only( ?setAttribute(State,age,NewAge) ).
+setAge( State, NewAge ) ->
+	?wooper_return_state_only( setAttribute( State, age, NewAge ) ).
 	
 	
 	
@@ -157,10 +156,11 @@ setAge(State,NewAge) ->
 
 
 % The core of the test actor behaviour.
+%
 % (oneway)
 act(State) ->
 
-	?info([ "Creature acting" ]),
+	?info( "Creature acting" ),
 	
 	?wooper_return_state_only(State).
 			

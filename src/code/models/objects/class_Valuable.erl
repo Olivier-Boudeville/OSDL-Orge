@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -27,26 +26,26 @@
 
 
 % Determines what are the mother classes of this class (if any):
--define(wooper_superclasses,[]).
+-define( wooper_superclasses,[]).
 
 
 
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters, BaseValue ).
+-define( wooper_construct_parameters, BaseValue ).
 
 
 % Life-cycle related exported operators:
 -define( wooper_construct_export, new/1, new_link/1, 
-	synchronous_new/1, synchronous_new_link/1,
-	synchronous_timed_new/1, synchronous_timed_new_link/1,
-	remote_new/2, remote_new_link/2, remote_synchronous_new/2,
-	remote_synchronous_new_link/2, remote_synchronous_timed_new/2,
-	remote_synchronous_timed_new_link/2, construct/2, delete/1 ).
+		 synchronous_new/1, synchronous_new_link/1,
+		 synchronous_timed_new/1, synchronous_timed_new_link/1,
+		 remote_new/2, remote_new_link/2, remote_synchronous_new/2,
+		 remote_synchronous_new_link/2, remote_synchronous_timed_new/2,
+		 remote_synchronous_timed_new_link/2, construct/2, delete/1 ).
 
 
 
-% Method declarations.
--define(wooper_method_export, getCreditValue/1, setCreditValue/2 ).
+% Member method declarations.
+-define( wooper_method_export, getCreditValue/1, setCreditValue/2 ).
 
 
 
@@ -54,6 +53,8 @@
 -include("wooper.hrl").
 
 
+
+% Not a trace emitter anymore:
 
 % Must be included before class_TraceEmitter header:
 %-define(TraceEmitterCategorization,"Orge.Valuable").
@@ -64,25 +65,22 @@
 
 	
 % Constructs a new valuable instance, with specified base value, in credits.
-construct(State,?wooper_construct_parameters) ->
+construct( State, ?wooper_construct_parameters ) ->
 
 	% First the direct mother classes, then this class-specific actions:	
-	?setAttribute( State, base_value, BaseValue ).
+	setAttribute( State, base_value, BaseValue ).
 	
 	
 	
 % Overridden destructor.
-% Unsubscribing for TimeManager supposed already done, thanks to a termination
-% message. 
 delete(State) ->
-	% Class-specific actions:
-	%?info([ "Deleting creature." ]),
-	% erlang:unlink() not used, as done manager-side. 
 
-	%?debug([ "Valuable deleted." ]),
+	%?info( "Deleting valuable." ),
+
+	%?debug( "Valuable deleted." ),
 
 	% Then call the direct mother class counterparts and allow chaining:
-	class_Actor:delete(State).
+	State.
 	
 	
 	
@@ -101,8 +99,9 @@ getCreditValue(State) ->
 	
 % Sets the base value, in credits, of this instance.
 % (oneway)
-setCreditValue(State,NewBaseValue) ->
-	?wooper_return_state_only( ?setAttribute(State,base_value,NewBaseValue) ).
+setCreditValue( State, NewBaseValue ) ->
+	?wooper_return_state_only( setAttribute( State, base_value, NewBaseValue ) 
+							 ).
 	
 			
 	

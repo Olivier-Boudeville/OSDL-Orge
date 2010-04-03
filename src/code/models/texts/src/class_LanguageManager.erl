@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2009 Olivier Boudeville
+% Copyright (C) 2009-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -27,11 +26,11 @@
 
 
 % Determines what are the mother classes of this class (if any):
--define(wooper_superclasses,[ class_TraceEmitter ]).
+-define( ooper_superclasses,[ class_TraceEmitter ]).
 
 
 % Parameters taken by the constructor ('construct'). 
--define(wooper_construct_parameters, LanguageName, LanguageVariations,
+-define( wooper_construct_parameters, LanguageName, LanguageVariations,
 	MarkovOrder, LanguageOptions ).
 
 
@@ -44,17 +43,17 @@
 % Declaring all variations of WOOPER standard life-cycle operations:
 % (template pasted, two replacements performed to update arities)
 -define( wooper_construct_export, new/4, new_link/4, 
-	synchronous_new/4, synchronous_new_link/4,
-	synchronous_timed_new/4, synchronous_timed_new_link/4,
-	remote_new/5, remote_new_link/5, remote_synchronous_new/5,
-	remote_synchronous_new_link/5, remote_synchronous_timed_new/5,
-	remote_synchronous_timed_new_link/5, construct/5, delete/1 ).
+		 synchronous_new/4, synchronous_new_link/4,
+		 synchronous_timed_new/4, synchronous_timed_new_link/4,
+		 remote_new/5, remote_new_link/5, remote_synchronous_new/5,
+		 remote_synchronous_new_link/5, remote_synchronous_timed_new/5,
+		 remote_synchronous_timed_new_link/5, construct/5, delete/1 ).
 
 
 
 % Method declarations.
--define(wooper_method_export, learn/1, learn/2, 
-	generate/2, evaluate/3 ).
+-define( wooper_method_export, learn/1, learn/2, 
+		 generate/2, evaluate/3 ).
 
 
 
@@ -78,9 +77,8 @@
 
 % Implementation notes:
 %
-% Not using the record below, using a basic list instead, as it should use
-% less memory (avoids creating subtrees for letters that have no successor
-% at all).
+% Not using the record below, using a basic list instead, as it should use less
+% memory (avoids creating subtrees for letters that have no successor at all).
 
 % Each field corresponds to one of the 28 possible letters, except total_count
 % whose role is to precompute the total number of occurences of all letters:
@@ -101,6 +99,7 @@
 
 % Once a tree has been normalized, OccurrenceCount is the maximum number that
 % will make the corresponding letter be drawn.
+%
 % For example, 'class_LanguageManager:build_tree( [ "a", "a", "b", "c" ], 2 )'
 % shall return:
 % {[ {99,1,{[{eow,1,{[],0}}],1}},
@@ -109,14 +108,14 @@
 % 4} = { [ FirstTuple, SecondTuple, ThirdTuple ], Sum }
 % Sum=4 is the number of all learnt occurrences of letters at this
 % (first) level (i.e. two "a", one "b" and one "c").
-% The first tuple references "c" (with 99), whose maximum random value is 1
-% (the second element of its tuple), whereas the maximum random value for "b",
-% is 2, as specified in the second tuple, and the maximum random value for "a"
-% is 4.
-% That means that if we draw a random value R in [1,Sum] = [1,4], then
-% if R <= 1 (i.e. R=1), then we selected "c", otherwise if R<=2 (i.e. R=2),
-% then we selected "b", otherwise (R<=4, i.e. R=3 or R=4), then we selected
-% "a".
+%
+% The first tuple references "c" (with 99), whose maximum random value is 1 (the
+% second element of its tuple), whereas the maximum random value for "b", is 2,
+% as specified in the second tuple, and the maximum random value for "a" is 4.
+%
+% That means that if we draw a random value R in [1,Sum] = [1,4], then if R <= 1
+% (i.e. R=1), then we selected "c", otherwise if R<=2 (i.e. R=2), then we
+% selected "b", otherwise (R<=4, i.e. R=3 or R=4), then we selected "a".
 
 
 % Learnt words have to be normalized, as otherwise a word like 'Dorice' will
@@ -159,13 +158,13 @@ construct( State, ?wooper_construct_parameters ) ->
 	TraceState = class_TraceEmitter:construct( State,
 		"Manager for language " ++ LanguageName ),
 	
-	?send_info([ TraceState, io_lib:format( 
+	?send_info_fmt( TraceState, 
 		"Creating a manager for language '~s' and variation(s) ~w, "
 		"with Markov chains of order ~B, and options ~w.", 
-		[ LanguageName, LanguageVariations, MarkovOrder, LanguageOptions ] ) ]),
+		[ LanguageName, LanguageVariations, MarkovOrder, LanguageOptions ] ),
 	
 	{OriginalOnly,Capitalize,MinLen,MaxLen,Prohibited} = parse_options(
-		LanguageOptions, _Defaults = {false,false,3,12,no_prohibited_word} ),
+		LanguageOptions, _Defaults={false,false,3,12,no_prohibited_word} ),
 		
 	{WordSetDir,Origin} = case os:getenv("ORGE_WORD_SET_DIR") of
 	
@@ -183,8 +182,8 @@ construct( State, ?wooper_construct_parameters ) ->
 	case file_utils:is_existing_directory( WordSetDir ) of
 	
 		true ->
-			?send_info([ TraceState, io_lib:format( 
-				"Using word set directory ~s, ~s.", [ WordSetDir, Origin ] ) ]);
+			?send_info_fmt( TraceState, "Using word set directory ~s, ~s.", 
+							[ WordSetDir, Origin ] );
 				
 		false ->
 			throw( {wordset_directory_not_found,WordSetDir,Origin} )
@@ -192,7 +191,7 @@ construct( State, ?wooper_construct_parameters ) ->
 	end,		
 	
 	% We consider that on average there are 200 original words per variation,
-	% not counting the prohibited index:	
+	% not counting the prohibited index:
 	InitialSpecialWordTable = hashtable:new( 200*length(LanguageVariations) ),
 	
 	UpdatedSpecialWordTable = manage_prohibited_words( Prohibited, TraceState,
@@ -200,7 +199,7 @@ construct( State, ?wooper_construct_parameters ) ->
 	
 	basic_utils:start_random_source( time_based_seed ),
 				
-	?setAttributes( TraceState, [
+	setAttributes( TraceState, [
 		{language_name,LanguageName},
 		{variations,LanguageVariations},
 		{special_words,UpdatedSpecialWordTable},
@@ -210,17 +209,19 @@ construct( State, ?wooper_construct_parameters ) ->
 		{max_generated_length,MaxLen},
 		{word_set_dir,WordSetDir},
 		{markov_order,MarkovOrder},
-		{variation_trees,hashtable:new( length(LanguageVariations) )}
-	] ).
-		
+		{variation_trees,hashtable:new( length(LanguageVariations) )},
+		{trace_categorization,
+		 text_utils:string_to_binary(?TraceEmitterCategorization)}
+							   ] ).
+
 	
 
 % Overridden destructor.
 delete(State) ->
 	% Class-specific actions:
-	?info([ "Deleting language manager." ]),
+	?info( "Deleting language manager." ),
 
-	?debug([ "Language manager deleted." ]),
+	?debug( "Language manager deleted." ),
 
 	% Then call the direct mother class counterparts and allow chaining:
 	class_TraceEmitter:delete(State).
@@ -228,10 +229,12 @@ delete(State) ->
 	
 	
 	
+
 % Method section.
 
 	
 % Learns all known variations of this language.
+%
 % Returns either learning_success or {learning_failure,Reason}.
 % (request)
 learn( State ) ->
@@ -242,6 +245,7 @@ learn( State ) ->
 	
 
 % Learns specified variation of this language.
+%
 % Returns either learning_success or {learning_failure,Reason}.
 % (request)
 learn( State, VariationName ) -> 
@@ -250,8 +254,8 @@ learn( State, VariationName ) ->
 	
 		{ok,Filename} ->
 		
-			?info([ io_lib:format( "Learning variation ~s, using filename ~s.",
-				[ VariationName, Filename] ) ]),
+			?info_fmt( "Learning variation ~s, using filename ~s.",
+				[ VariationName, Filename] ),
 				
 			NormalizedWords = get_word_list_from( Filename ),
 
@@ -265,10 +269,9 @@ learn( State, VariationName ) ->
 				
 			end,
 			
-			%?emit_info([ io_lib:format( "Language words are: ~p.",[Words] ) ]);
-			?info([ io_lib:format( 
-				"This language variation is made of ~B words.", 
-				[ length(NormalizedWords) ] ) ]),
+			%?notify_info_fmt( "Language words are: ~p.",[Words] );
+			?info_fmt( "This language variation is made of ~B words.", 
+				[ length(NormalizedWords) ] ),
 
 			{VariationTree,Sum} = build_tree( NormalizedWords,
 				?getAttr(markov_order) ),
@@ -280,8 +283,8 @@ learn( State, VariationName ) ->
 			?wooper_return_state_result( TreeState, learning_success );	
 			
 		{error,Reason} ->
-			?error([ io_lib:format( "Learning of variation ~s failed: ~p",
-				[ VariationName, Reason ] ) ]),
+			?error_fmt( "Learning of variation ~s failed: ~p",
+				[ VariationName, Reason ] ),
 			?wooper_return_state_result( State, {learning_failure,Reason} )
 						
 	end.
@@ -290,8 +293,10 @@ learn( State, VariationName ) ->
 
 % Returns a generated word from specified variation, according to language
 % options.
+%
 % (const request)
 generate( State, Variation ) ->
+
 	VariationTable = ?getAttr(variation_trees),
 	case hashtable:lookupEntry( Variation, VariationTable ) of
 	
@@ -313,10 +318,12 @@ generate( State, Variation ) ->
 
 
 
-% Returns the probability (as a floating-point number) that the specified 
-% word belongs to the specified variation.
+% Returns the probability (as a floating-point number) that the specified word
+% belongs to the specified variation.
+%
 % (const request)
 evaluate( State, Word, Variation ) ->
+
 	VariationTable = ?getAttr(variation_trees),
 	case hashtable:lookupEntry( Variation, VariationTable ) of
 	
@@ -341,10 +348,12 @@ evaluate( State, Word, Variation ) ->
 		
 
 
+
 % Static section.
 
 
 % Returns all the possible language variations.
+%
 % (static)
 get_possible_language_variations() ->
 	[ 'female-names', 'male-names', surnames, placenames, names, words ].
@@ -390,8 +399,8 @@ parse_options( [H|_T], _ParsedOptions ) ->
 
 
 
-% Returns a list of normalized words read from specified filename, which
-% must exist.
+% Returns a list of normalized words read from specified filename, which must
+% exist.
 get_word_list_from( Filename ) ->
 
 	{ok,BinLines} = file:read_file( Filename ),
@@ -404,10 +413,11 @@ get_word_list_from( Filename ) ->
 
 
 % Manages any prohibited words.
+%
 % Returns an updated state.
 manage_prohibited_words( no_prohibited_word, State, _WordSetDir,
 		SpecialWordTable ) ->
-	?info([ "No word will be specifically prohibited." ]),
+	?info( "No word will be specifically prohibited." ),
 	SpecialWordTable;
 	
 manage_prohibited_words( prohibited_index, State, WordSetDir, 
@@ -424,15 +434,15 @@ manage_prohibited_words( {prohibited_index,IndexFilename}, State,
 		true ->
 			ProhibitedWords = get_word_list_from( Filename ),
 			
-			?info([ io_lib:format( "The index of ~B prohibited words "
+			?info_fmt( "The index of ~B prohibited words "
 				"from file '~s' has been taken into account.",
-				[length(ProhibitedWords),Filename] ) ]),
+				[length(ProhibitedWords),Filename] ),
 				 
 			integrate_prohibited_words(	ProhibitedWords, SpecialWordTable );
 			
 		false ->
-			?error([ io_lib:format( "Index for prohibited words '~s' "
-				"not found, hence not used.", [Filename] ) ]),
+			?error_fmt( "Index for prohibited words '~s' "
+				"not found, hence not used.", [Filename] ),
 			SpecialWordTable	
 		
 	end.
@@ -464,8 +474,8 @@ get_variation_suffix( AtomVariation ) ->
 
 
 
-% Returns the filename which would correspond to the one of the word set 
-% for the specified language and variation.
+% Returns the filename which would correspond to the one of the word set for the
+% specified language and variation.
 get_filename_for( Language, Variation ) ->
 	Language ++ "-" ++ get_variation_suffix( Variation ) ++ ".txt".
 		
@@ -476,6 +486,7 @@ learn_all( State, [] ) ->
 	{State,learning_success};
 	
 learn_all( State, [H|T] ) ->
+
 	% H is an atom, not a string (list):
 	case executeRequest( State, learn, H ) of
 	
@@ -491,6 +502,7 @@ learn_all( State, [H|T] ) ->
 
 % Returns either {ok,Filename} or {error,Reason}.
 get_variation_filename( VariationName, State ) ->
+
 	case lists:member( VariationName, ?getAttr(variations) ) of
 	
 		true ->
@@ -521,7 +533,7 @@ get_variation_filename( VariationName, State ) ->
 
 add_original_words( Words, State ) ->
 	SpecialWordTable = ?getAttr(special_words),
-	?setAttribute( State, special_words, 
+	setAttribute( State, special_words, 
 		integrate_original_words( Words, SpecialWordTable ) ).
 
 
@@ -556,6 +568,7 @@ build_tree( Words, Order ) ->
 
 
 % Integrates the specified word list into the specified variation tree.
+%
 % Returns an updated variation tree.	
 process_words( [], _Order, CurrentVariationTree ) ->
 	CurrentVariationTree;
@@ -567,6 +580,7 @@ process_words( [Word|OtherWords], Order, CurrentVariationTree ) ->
 
 
 % Integrates the specified word into the specified variation tree.
+%
 % Returns an updated variation tree.	
 integrate_word( Word, Order, CurrentVariationTree ) ->
 	% Words are already normalized.
@@ -577,6 +591,7 @@ integrate_word( Word, Order, CurrentVariationTree ) ->
 
 
 % Integrates the specified sequences in the variation tree.
+%
 % Returns an updated variation tree.	
 integrate_sequences_in_tree( [], _Order, CurrentVariationTree ) ->
 	CurrentVariationTree ;
@@ -588,12 +603,15 @@ integrate_sequences_in_tree( [Seq|OtherSeq], Order, CurrentVariationTree ) ->
 
 
 % Integrates the specified sequence in the variation tree.
+%
 % Returns an updated variation tree.	
 integrate_sequence_in( [H|[]], VariationTree ) ->
 		
 	% We arrived to the last letter of the sequence.
+    %
 	% Here we reached the subtree is which the initial sequence must be
 	% recorded, we return an updated tree node:
+	%
 	% (relies on the fact that sequences have already a correct length)
 	Res = register_sequence( H, VariationTree ),
 	%io:format( "integrate_sequence_in: inserting final letter ~w in ~p, "
@@ -619,6 +637,7 @@ integrate_sequence_in( [H|T], VariationTree ) ->
 					{integrate_sequence_in( T, Subtree ),z} } )
 		
 	end,
+
 	%io:format( "2 integrate_sequence_in: new tree for ~s is ~p.~n",
 	%	[[H],NewTreeForH] ),
 	
@@ -626,9 +645,10 @@ integrate_sequence_in( [H|T], VariationTree ) ->
 
 
 
-% Registers the sequence, which is caracterized by the subtree we arrived to
-% and its last letter, in that subtree, and returns it.
+% Registers the sequence, which is caracterized by the subtree we arrived to and
+% its last letter, in that subtree, and returns it.
 register_sequence( H, VariationTree ) ->
+
 	case lists:keyfind( _Key = H, _IndexInTuple = 1, VariationTree ) of
 		
 		false ->
@@ -647,6 +667,7 @@ register_sequence( H, VariationTree ) ->
 
 % Returns the list of all sequences found in Word, with respect to the specified
 % order.
+%
 % Ex: get_sequences_for( "orge", 2 ) should return:
 % [ "o", "or", "org", "rge", [ $g, $e, eow] ].
 get_sequences_for( Word, Order ) ->
@@ -664,6 +685,7 @@ get_sequences_for( Word, CurrentIndex, Order, Acc  ) ->
 		
 		
 % Given specified index, returns all sequences ending at that index.
+%
 % Ex: find_sequences( [ $o, $r, $g, $e, eow ], _Index = 2, _Order = 2 ) =
 % [ $o, $r ]. 
 find_sequence( Word, CurrentIndex, Order ) when CurrentIndex > Order ->	
@@ -680,19 +702,22 @@ find_sequence( Word, CurrentIndex, _Order ) ->
 	
 
 	
-% Normalizes the specified variation tree, to precompute everything to 
-% make the drawing of letters easier.
+% Normalizes the specified variation tree, to precompute everything to make the
+% drawing of letters easier.
+%
 % When at a given depth we have for example [ {a,1,L1}, {b,5,L2, {c,4,L3} ]
 % then we know that the subtree sum is 1+5+4=10, and we can rewrite the tuples
 % that way: [ {a,1,L1}, {b,6,L2, {c,10,L3} ].
+%
 % This allows to generate a random value R in [1,10].
 % If R=1, the we draw a, otherwise if R <7, we draw b, otherwise we draw c.
 % 
 normalize( VariationTree ) ->
 	%io:format( "Normalizing tree ~w.~n", [VariationTree] ),
-	% We enclose the first-level letters as if words began with a virtual
-	% 'bow' letter (for 'beginning of word'), so that we retrieve the 
-	% sum for the first-level letters as well:
+
+	% We enclose the first-level letters as if words began with a virtual 'bow'
+	% letter (for 'beginning of word'), so that we retrieve the sum for the
+	% first-level letters as well:
 	{ [ {bow,0,{NormalizedTree,Sum}} ], 0 } = compute_sums(
 		[ {bow,0,{VariationTree,z}} ], 
 		{ _Acc = [], _Sum = 0 } ),
@@ -707,14 +732,15 @@ normalize( VariationTree ) ->
 % [1,Sum] allows to pick letters according to their recorded frequency.
 %
 % Ex: if, during the learning, the current letter was followed X times by 'a'
-% and Y times by 'b', returns an updated tree whose sum is X+Y, and all sums
-% in the tree are recursively determined.
+% and Y times by 'b', returns an updated tree whose sum is X+Y, and all sums in
+% the tree are recursively determined.
+%
 % If N <= X then 'a' is drawn, otherwise if N <= 3 (always the case), 
 % 'b' is drawn, etc.
 % Returns a pair {SummedTree,Sum}.
 compute_sums( [], {SummedTree,Sum} ) ->
-	% We reverse the list so that their offset is ordered from lowest 
-	% to highest:
+	% We reverse the list so that their offset is ordered from lowest to
+	% highest:
 	{lists:reverse(SummedTree),Sum};
 	
 compute_sums( [ {Letter,Count,{Subtree,z}}|T], {Acc,Sum} ) ->
@@ -823,8 +849,10 @@ manage_capitalization( Word, State ) ->
 
 % Draws letters as long as 'eow' is not drawn:
 draw_letters( FullVariationTree, FullSum, Order, CurrentPattern, WordAcc ) ->
+
 	{PatternTree,PatternSum} = get_subtree_for( FullVariationTree, FullSum, 
 		CurrentPattern ),
+
 	Value = basic_utils:get_random_value( PatternSum ),
 	%io:format( "draw_letters: pattern = ~p, acc = ~p, drawn = ~B~n", 
 	%	[CurrentPattern,WordAcc, Value] ), 
@@ -938,7 +966,7 @@ determine_probability_of( Word, VariationTree, Sum, Order ) ->
 	
 compute_probability( [], _VariationTree, _Sum, _CurrentPattern,
 		CurrentProba, _Order ) ->
-	% A Sigmoid	function, to ensure the probability remains in [0,1], and that
+	% A Sigmoid function, to ensure the probability remains in [0,1], and that
 	% it takes advantage of the full range:
 	1 - math:exp( - CurrentProba / 2 );
 				
@@ -973,8 +1001,9 @@ get_probability( Letter, Pattern, FullVariationTree, FullSum ) ->
 	
 
 get_pattern_probability( _Letter, _PatternTree=[], _LastOffset, _PatternSum ) ->
-	% We exhausted the list of known letters for this pattern, this letter
-	% never appeared with the current pattern, thus returning 0:
+	% We exhausted the list of known letters for this pattern, this letter never
+	% appeared with the current pattern, thus returning 0:
+
 	%io:format( "Letter '~s' not found, returning null probability.~n", 
 	%	[ [Letter] ] ),
 	0.0;

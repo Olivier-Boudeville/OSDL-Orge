@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -30,9 +29,6 @@
 -define(Tested_modules, [class_Creature] ).
 
 
-% For all facilities common to all tests:
-%-include("test_constructs.hrl").
-
 % For trace facilities:
 -include("traces_for_tests.hrl").
 
@@ -46,7 +42,7 @@ run() ->
 
 	?test_start,
 		
-	?test_info([ "Creating a new Creature." ]),
+	?test_info( "Creating a new Creature." ),
 	
 	%MyLocation = #location{ x = 1, y = 2, z = 3 },
 	MyLocation = fixme,

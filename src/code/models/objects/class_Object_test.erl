@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -30,9 +29,6 @@
 -define(Tested_modules, [class_Object] ).
 
 
-% For all facilities common to all tests:
-%-include("test_constructs.hrl").
-
 % For trace facilities:
 -include("traces_for_tests.hrl").
 
@@ -44,7 +40,7 @@ run() ->
 
 	?test_start,
 		
-	?test_info([ "Creating a new test Object." ]),
+	?test_info( "Creating a new test Object." ),
 			
 	Size = 0.8,
 			
@@ -55,7 +51,7 @@ run() ->
 	receive
 	
 		{wooper_result,Size} ->
-				?test_info([ "getSize succeeded." ])
+				?test_info( "getSize succeeded." )
 
 	end,
 	
@@ -67,7 +63,7 @@ run() ->
 	receive
 	
 		{wooper_result,NewSize} ->
-				?test_info([ "setSize succeeded." ])
+				?test_info( "setSize succeeded." )
 
 	end,
 
@@ -75,9 +71,9 @@ run() ->
 	receive
 	
 		{wooper_result,FirstStateString} ->
-				?test_info([ io_lib:format( 
+				?test_info_fmt(
 					"Received following full textual description: ~s",
-					[FirstStateString] ) ])
+					[FirstStateString] )
 
 	end,
 
@@ -85,7 +81,7 @@ run() ->
 	receive
 	
 		{wooper_result,true} ->
-				?test_info([ "Object is usable as expected." ])
+				?test_info( "Object is usable as expected." )
 
 	end,
 	
@@ -93,18 +89,18 @@ run() ->
 	receive
 	
 		{wooper_result,false} ->
-				?test_info([ "Object is not reparable as expected." ])
+				?test_info( "Object is not reparable as expected." )
 
 	end,
 	
-	?test_info([ "Adding almost full wear for this object." ]),
+	?test_info( "Adding almost full wear for this object." ),
 	MyObject ! {increaseWearOf,500},
 	
 	MyObject ! {isUsable,[],self()},
 	receive
 	
 		{wooper_result,false} ->
-				?test_info([ "Object is no more usable, as expected." ])
+				?test_info( "Object is no more usable, as expected." )
 
 	end,
 	
@@ -112,16 +108,16 @@ run() ->
 	receive
 	
 		{wooper_result,true} ->
-				?test_info([ "Object is reparable now, as expected." ])
+				?test_info( "Object is reparable now, as expected." )
 
 	end,
 	MyObject ! {toString,[],self()},
 	receive
 	
 		{wooper_result,SecondStateString} ->
-				?test_info([ io_lib:format( 
+				?test_info_fmt(
 					"Received following full textual description: ~s",
-					[SecondStateString] ) ])
+					[SecondStateString] )
 
 	end,
 	
