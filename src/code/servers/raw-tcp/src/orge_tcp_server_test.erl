@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -47,7 +46,7 @@ run() ->
 
 	?test_start,
 	
-	?test_info([ "Creating a new Orge tcp_server." ]),
+	?test_info( "Creating a new Orge tcp_server." ),
 	
 	DatabaseManagement = from_scratch,
 	%DatabaseManagement = from_previous_state,
@@ -55,13 +54,12 @@ run() ->
 	ServerPid = orge_tcp_server:create_link( ?test_server_name,
 		DatabaseManagement, local_only ),
 		
-	?test_info([ "Requesting server informations." ]),
+	?test_info( "Requesting server informations." ),
 	ServerPid ! {self(),get_info},	
 	receive
 	
 		{server_info,StateString} ->
-			?test_info([ io_lib:format( "Current server state is: ~s.",
-				[StateString] ) ]) 
+			?test_info_fmt( "Current server state is: ~s.",	[StateString] )
 			
 	end,
 	
@@ -85,28 +83,28 @@ run() ->
 		
 	},
 
-	?test_info([ io_lib:format( "Registering a first user: ~s.",
-		[ orge_database_manager:user_settings_to_string(AlfSettings)] ) ]),
+	?test_info_fmt( "Registering a first user: ~s.",
+		[ orge_database_manager:user_settings_to_string(AlfSettings)] ),
 		
 	ServerPid ! {register_user,AlfSettings,self()},
 	receive
 		
 		{registration_result,user_registered} ->
-			?test_info([ "First user settings successfully registered." ])
+			?test_info( "First user settings successfully registered." )
 		
 	end,
 	
 	UnknownLogin = "Mr. Big",
-	?test_info([ io_lib:format( "Unregistering now an unknown user "
-		"whose login is: ~s.", [UnknownLogin] ) ]),
+	?test_info_fmt( "Unregistering now an unknown user whose login is: ~s.", 
+					[UnknownLogin] ),
 	
 	ServerPid ! {unregister_user,UnknownLogin,self()},
 	receive
 		
 		{unregistration_result,{user_unregistration_failed,FailureReason}} ->
-			?test_info([ io_lib:format( 
+			?test_info_fmt(
 				"Unregistering of an unknown user failed as expected: ~w.",
-				[FailureReason] ) ])
+				[FailureReason] )
 		
 	end,
 	
@@ -127,25 +125,25 @@ run() ->
 		security_answer = "Use the Force"
 	},
 	
-	?test_info([ io_lib:format( "Registering a second user: ~s.",
-		[ orge_database_manager:user_settings_to_string(LukeSettings)] ) ]),
+	?test_info_fmt( "Registering a second user: ~s.",
+		[ orge_database_manager:user_settings_to_string(LukeSettings)] ),
 		
 	ServerPid ! {register_user,LukeSettings,self()},
 	receive
 		
 		{registration_result,user_registered} ->
-			?test_info([ "Second user settings successfully registered." ])
+			?test_info( "Second user settings successfully registered." )
 		
 	end,
 	
 	
 	% Corresponds to LukeSettings:
-	?test_info([ "Unregistering now first user." ]),
+	?test_info( "Unregistering now first user." ),
 	ServerPid ! {unregister_user,"anakin",self()},
 	receive
 		
 		{unregistration_result,user_unregistered} ->
-			?test_info([ "Unregistering of a known user succeeded." ])
+			?test_info( "Unregistering of a known user succeeded." )
 		
 	end,
 
@@ -166,14 +164,14 @@ run() ->
 		security_answer = "That belongs in a museum. "
 	},
 	
-	?test_info([ io_lib:format( "Registering a third user: ~s.",
-		[ orge_database_manager:user_settings_to_string(IndianaSettings)] ) ]),
+	?test_info_fmt( "Registering a third user: ~s.",
+		[ orge_database_manager:user_settings_to_string(IndianaSettings)] ),
 		
 	ServerPid ! {register_user,IndianaSettings,self()},
 	receive
 		
 		{registration_result,user_registered} ->
-			?test_info([ "Third user settings successfully registered." ])
+			?test_info( "Third user settings successfully registered." )
 		
 	end,
 	
@@ -188,8 +186,8 @@ run() ->
 			receive
 			
 				Any ->
-					?test_warning([ io_lib:format( "Test ignored following "
-						"unexpected message: ~p.", [Any] ) ])
+					?test_warning_fmt( "Test ignored following "
+						"unexpected message: ~p.", [Any] )
 					
 			end;
 			
@@ -199,12 +197,12 @@ run() ->
 	end,
 	
 	
-	?test_info([ "Requesting the server to shutdown." ]),
+	?test_info( "Requesting the server to shutdown." ),
 	ServerPid ! {self(),shutdown},
 	receive
 		
 		orge_server_shutdown ->
-			?test_info([ "Orge server successfully shutdown." ])
+			?test_info( "Orge server successfully shutdown." )
 			
 	end,	
 	?test_stop.

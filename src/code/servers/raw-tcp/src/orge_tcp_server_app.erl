@@ -1,5 +1,4 @@
-% 
-% Copyright (C) 2003-2009 Olivier Boudeville
+% Copyright (C) 2003-2010 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
@@ -47,7 +46,7 @@ exec() ->
 
 	?traces_start,
 	
-	?emit_info([ "Creating a new Orge tcp_server." ]),
+	?notify_info( "Creating a new Orge tcp_server." ),
 	
 	DatabaseManagement = from_scratch,
 	%DatabaseManagement = from_previous_state,
@@ -55,13 +54,13 @@ exec() ->
 	ServerPid = orge_tcp_server:create_link( ?orge_server_name,
 		DatabaseManagement, global_only ),
 		
-	?emit_info([ "Requesting server informations." ]),
+	?notify_info( "Requesting server informations." ),
 	ServerPid ! {self(),get_info},	
 	receive
 	
 		{server_info,StateString} ->
-			?emit_info([ io_lib:format( "Current server state is: ~s.",
-				[StateString] ) ]) 
+			?notify_info_fmt( "Current server state is: ~s.",
+				[StateString] ) 
 			
 	end,
 	
@@ -84,28 +83,28 @@ exec() ->
 		
 	},
 
-	?emit_info([ io_lib:format( "Registering a first user: ~s.",
-		[ orge_database_manager:user_settings_to_string(AlfSettings)] ) ]),
+	?notify_info_fmt( "Registering a first user: ~s.",
+		[ orge_database_manager:user_settings_to_string(AlfSettings)] ),
 		
 	ServerPid ! {register_user,AlfSettings,self()},
 	receive
 		
 		{registration_result,user_registered} ->
-			?emit_info([ "First user settings successfully registered." ])
+			?notify_info( "First user settings successfully registered." )
 		
 	end,
 	
 	UnknownLogin = "Mr. Big",
-	?emit_info([ io_lib:format( "Unregistering now an unknown user "
-		"whose login is: ~s.", [UnknownLogin] ) ]),
+	?notify_info_fmt( "Unregistering now an unknown user "
+		"whose login is: ~s.", [UnknownLogin] ),
 	
 	ServerPid ! {unregister_user,UnknownLogin,self()},
 	receive
 		
 		{unregistration_result,{user_unregistration_failed,FailureReason}} ->
-			?emit_info([ io_lib:format( 
+			?notify_info_fmt(
 				"Unregistering of an unknown user failed as expected: ~w.",
-				[FailureReason] ) ])
+				[FailureReason] )
 		
 	end,
 	
@@ -126,25 +125,25 @@ exec() ->
 		security_answer = "Use the Force"
 	},
 	
-	?emit_info([ io_lib:format( "Registering a second user: ~s.",
-		[ orge_database_manager:user_settings_to_string(LukeSettings)] ) ]),
+	?notify_info_fmt( "Registering a second user: ~s.",
+		[ orge_database_manager:user_settings_to_string(LukeSettings)] ),
 		
 	ServerPid ! {register_user,LukeSettings,self()},
 	receive
 		
 		{registration_result,user_registered} ->
-			?emit_info([ "Second user settings successfully registered." ])
+			?notify_info( "Second user settings successfully registered." )
 		
 	end,
 	
 	
 	% Corresponds to LukeSettings:
-	?emit_info([ "Unregistering now first user." ]),
+	?notify_info( "Unregistering now first user." ),
 	ServerPid ! {unregister_user,"anakin",self()},
 	receive
 		
 		{unregistration_result,user_unregistered} ->
-			?emit_info([ "Unregistering of a known user succeeded." ])
+			?notify_info( "Unregistering of a known user succeeded." )
 		
 	end,
 
@@ -165,30 +164,30 @@ exec() ->
 		security_answer = "That belongs in a museum. "
 	},
 	
-	?emit_info([ io_lib:format( "Registering a third user: ~s.",
-		[ orge_database_manager:user_settings_to_string(IndianaSettings)] ) ]),
+	?notify_info_fmt( "Registering a third user: ~s.",
+		[ orge_database_manager:user_settings_to_string(IndianaSettings)] ),
 		
 	ServerPid ! {register_user,IndianaSettings,self()},
 	receive
 		
 		{registration_result,user_registered} ->
-			?emit_info([ "Third user settings successfully registered." ])
+			?notify_info( "Third user settings successfully registered." )
 		
 	end,
 	
 	
-	?emit_info([ "Orge server running, waiting until end of time, "
-		"or until a shutdown request is received." ]),
+	?notify_info( "Orge server running, waiting until end of time, "
+		"or until a shutdown request is received." ),
 		
 	receive
 			
 		orge_shutdown_request ->
-			?emit_info([ "Requesting the server to shutdown." ]),
+			?notify_info( "Requesting the server to shutdown." ),
 			ServerPid ! {self(),shutdown},
 			receive
 		
 				orge_server_shutdown ->
-					?emit_info([ "Orge server successfully shutdown." ])
+					?notify_info( "Orge server successfully shutdown." )
 			
 			end,	
 			?traces_stop
