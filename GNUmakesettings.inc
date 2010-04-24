@@ -16,7 +16,7 @@ include $(WOOPER_TOP)/GNUmakevars.inc
 include $(COMMON_TOP)/GNUmakevars.inc
 
 include $(ORGE_TOP)/GNUmakerules.inc
-include $(TRACES_TOP)/GNUmakevars.inc
+include $(TRACES_TOP)/GNUmakerules.inc
 include $(WOOPER_TOP)/GNUmakerules.inc
 include $(COMMON_TOP)/GNUmakerules.inc
 
