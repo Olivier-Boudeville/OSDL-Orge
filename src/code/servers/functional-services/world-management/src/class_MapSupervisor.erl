@@ -46,7 +46,8 @@
 
 
 % Static method declarations.
--define( wooper_static_method_export, create_supervisor_for/1 ).
+-define( wooper_static_method_export, create_supervisor_for/1,
+		add_info_message/1, add_info_message/2 ).
 
 
 % Allows to define WOOPER base variables and methods for that class:
@@ -55,6 +56,7 @@
 
 % Must be included before class_TraceEmitter header:
 -define(TraceEmitterCategorization,"Orge.Map.Supervisor").
+
 
 % Allows to use macros for trace sending:
 -include("class_TraceEmitter.hrl").
@@ -75,7 +77,7 @@
 % actually a signed 32 bit integer, coordinates will range in −2,147,483,648 to
 % +2,147,483,647, which means a maximum length of 4,294,967,295 cm, thus 42 949
 % 673 meters, about 43 kilometers. Therefore, in 32 bit, as long as distances
-% will stay within that limit, computations will be effective.
+% will stay within that limit, computations will still be quite effective.
 % In 64 bit, distance is 18,446,744,073,709,551,615 cm, thus about
 % 184 467 440 737 095 km, which is quite a lot.
 %
@@ -95,7 +97,7 @@
 % coordinates, thus in centimeters. 
 %
 % A zoom factor F is defined. It allows to convert screen distances into
-% virtual-world distances. It is defined in virtual word centimeters per pixel.
+% virtual-world distances. It is defined in virtual world centimeters per pixel.
 % For example if F = 100 cm/px then a line segment of 10 pixels corresponds to 1
 % meter in the virtual world.
 % 
@@ -109,7 +111,8 @@
 % default ignored.
 
 % GS identifiers are actually {Id,GsPid}, even if only Id could be stored for
-% each widget..
+% each widget.
+
 
 
 % Constructs a new map supervisor.
@@ -118,15 +121,23 @@
 %
 % - Name: the name of this instance, specified as a plain string
 %
-% - VirtualWorldPid is the PID of the virtual world to supervise.
+% - VirtualWorldPid is the PID of the virtual world to supervise
+%
+% The supervisor starts with a default main camera.
 %
 construct( State, ?wooper_construct_parameters ) ->
 
 	% The attribute of an instance are:
 	%
-	% - main_camera is the PID of the main camera
+	% - current_camera_pid is the PID of the currently selected camera (there
+	% must always be one)
+	%
+	% - camera_list is the list of the PID of all known cameras
 	%
 	% - virtual_world_pid is the PID of the virtual world to supervise
+	%
+	% - world_boundaries is a pair of two points that delimits the virtual
+	% world: {_TopLeft={X1,Y1},_BottomRight={X2,Y2}}
 	%
 	% - gs_pid is the PID of the GS process, most GS messages are based on 
 	% a pair made of the container ID and this PID
@@ -147,21 +158,32 @@ construct( State, ?wooper_construct_parameters ) ->
 						text_utils:binary_to_string(N)
 
 				end,
-		
-	TraceState = class_TraceEmitter:construct( State, Name 
-											   ++ " Map Supervisor for world '"
-											   ++ WorldName ++ "'" ),
 	
+	TraceState = class_TraceEmitter:construct( State, Name 
+	               ++ " Map Supervisor for world '" ++ WorldName ++ "'" ),
 
-	% Starts from the origin of the virtual world, with 1 meter corresponding to
+	VirtualWorldPid ! {getBoundaries,[],self()},
+	{P1={X1,Y1},P2={X2,Y2}} = receive
+							
+							{wooper_result,R} ->
+								R
+									
+						end,
+	
+	Position = linear_2D:get_integer_center( P1, P2 ), 
+		
+	% Starts from the center of the virtual world, with 1 meter corresponding to
 	% 1 pixel:
-	MainCameraPid = class_Camera:new_link( "Main camera", _Position={0,0},
-										_ZoomFactor=100 ),
+	MainCameraPid = class_Camera:new_link( "Default camera", Position,
+							_ZoomFactor=100.0, VirtualWorldPid, self() ),
+
 
 	% Then the class-specific attributes:
 	InitState = setAttributes( TraceState, [
-		 {main_camera_pid,MainCameraPid},
-		 {virtual_world_pid,VirtualWorldPid},									
+		 {current_camera_pid,MainCameraPid},
+		 {camera_list,[ MainCameraPid]},								
+		 {virtual_world_pid,VirtualWorldPid},
+		 %{world_boundaries,WorldBoundaries},
 		 {gs_pid,undefined}, 
 		 {gs_id,undefined}, 
 		 {main_win_id,undefined}, 
@@ -174,8 +196,16 @@ construct( State, ?wooper_construct_parameters ) ->
 	self() ! enterGUIMainLoop,
 
 	% Returns an updated state:
-	init_gui( InitState ).
+	GuiState = init_gui( InitState ),
 	
+	add_info_message( "Entering the '~s' virtual world...~n", [WorldName] ),
+	
+	add_info_message( "World boundaries: top-left corner at {~B,~B}, "
+					 "bottom-right one at {~B,~B}.", [X1,Y1,X2,Y2] ),
+
+	add_info_message( "Setting the default camera to the center of the world."),
+
+	GuiState.
 	
 	
 delete(State) ->
@@ -187,7 +217,7 @@ delete(State) ->
 % Member method section.
 
 
-% Enters the GUI main loop.
+% Enters the GUI main loop, hijacks the WOOPER one.
 %
 % (oneway)
 enterGUIMainLoop(State) ->
@@ -202,11 +232,32 @@ enterGUIMainLoop(State) ->
 			?wooper_return_state_only(State);
 
 		{gs,_Id,configure,_Data,[W,H|_]} ->
-			% Repack:
-			%io:format( "Configured!" ),
+			% Repacks what needs to (ex: packer_win and other packers)
+			%io:format( "Configuring ~w!", [Id] ),
 			gs:config( packer_win, [{width,W},{height,H}] ), 
 			enterGUIMainLoop(State);
+
+		{gs,cam_x_location,keypress,[], ['Return'|_]} ->
+			_CamPid = ?getAttr(current_camera_pid),
+			XText = gs:read( cam_x_location, text ),
+			
+			case string:to_integer(XText) of
+				
+				{_X,[]} ->
+					% Correct input, update:
+					ok
+						end,
+			enterGUIMainLoop(State);
+			
+
+		{gs,cam_create_button,click,[],_AddString} ->
+			NewState = add_camera(State),
+			enterGUIMainLoop( NewState );
 		
+		{add_info_message,Message} ->
+			add_info_message( Message ),
+			enterGUIMainLoop( State );
+			
 		Other ->
 			io:format( "Message ignored by the map supervisor: '~p'.~n",
 					   [Other] ),
@@ -258,18 +309,14 @@ init_gui( State ) ->
 								{bg,gui:get_color(grey)},
 								{configure,true}
 												  ]),
-
-	% Setting up camera panel dimensions:
-	CameraCellLength = 50,
-
-	CameraPanelWidth  = 3*CameraCellLength,
-	CameraPanelHeight = 4*CameraCellLength,
-
+	
+	CameraPanelDimensions = {CameraPanelWidth,CameraPanelHeight} = 
+		get_camera_panel_dimensions(),
+		
 	% The main window is split into four areas:
 	%   - first row: empty then canvas
-	%   - second row: camera panel then empty
-	gs:frame( packer_win, MainWinId, [ 
-      {bw,1},
+	%   - second row: camera panel then information panel
+	gs:frame( packer_win, MainWinId, [ {bw,1},
 	  {packer_x,[ {fixed,CameraPanelWidth}, {stretch,10} ]},
 	  {packer_y,[ {stretch,10},{fixed,CameraPanelHeight} ]}
 									 ]),
@@ -284,35 +331,13 @@ init_gui( State ) ->
 		%{scrollregion, {100,200,30,200}}
 												] ),
 
-	% In the main frame, the camera frame is at the bottom left:
-
-	CellWidth = CellHeight = {fixed,CameraCellLength},
-
-	gs:frame( packer_cam, packer_win, [ 
-      {bw,1}, 
-	  {pack_xy,{1,2}},
-	  {packer_x,[CellWidth,CellWidth,CellWidth]},
-	  {packer_y,[CellHeight,CellHeight,CellHeight,CellHeight]},
-	  {width,CameraPanelWidth},
-	  {height,CameraPanelHeight} ] ),
-
-	gs:create( label, cam_label, packer_cam, [ {label,{text,"No camera set"}},
-      {justify,center}, {bw,1}, {pack_xy,{{1,3},1}} ]),
-
-	gs:create( button, cam_left_button, packer_cam, 
-      [ {label,{text,"Left"}}, {pack_xy,{1,3}} ]),
-
-	gs:create( button, cam_right_button, packer_cam, 
-	  [ {label,{text,"Right"}}, {pack_xy,{3,3}} ]),
-
-	gs:create( button, cam_center_button, packer_cam, 
-      [ {label,{text,"Center"}}, {pack_xy,{2,3}} ]),
-
-	gs:create( button, cam_up_button, packer_cam, 
-      [ {label,{text,"Up"}}, {pack_xy,{2,2}} ]),
-
-	gs:create( button, cam_down_button, packer_cam, 
-      [ {label,{text,"Down"}}, {pack_xy,{2,4}} ]),
+	% In the main frame, the camera panel is at the bottom left:
+	
+	render_camera_panel( _CamParentId=packer_win, _CamPosition={1,2},
+						CameraPanelDimensions, ?getAttr(current_camera_pid) ),
+	
+	% In the main frame, the information panel is at the bottom right:
+	render_information_panel( _InfoParentId=packer_win, _InfoPosition={2,2} ),
 	
     % Sets the GUI to visible and refreshes to initial size:
 
@@ -329,5 +354,279 @@ init_gui( State ) ->
 						   {canvas_id,CanvasId}
 						   ] ).
 
+
+
+% Returns the length of a unit camera cell, in pixels.
+get_camera_cell_length() ->
+	40.
+
+
+% Returns the number of unit camera cells, along the X axis.
+get_camera_abscissa_cell_count() ->
+	7.
+
+
+% Returns the number of unit camera cells, along the Y axis.
+get_camera_ordinate_cell_count() ->
+	7.
+
+
+% Returns the dimensions in pixels of the camera panel.
+get_camera_panel_dimensions() ->	
+
+	% Setting up camera panel dimensions:
+	CameraCellLength = get_camera_cell_length(),
+
+	CameraPanelWidth  = get_camera_abscissa_cell_count() * CameraCellLength,
+	CameraPanelHeight = get_camera_ordinate_cell_count() * CameraCellLength,
+
+	% Scales are to be taken into account here.
+	
+	{CameraPanelWidth,CameraPanelHeight}.
+
+
+	
+% Renders the camera panel.	
+render_camera_panel( ParentId, Position, 
+					_Dimensions={CameraPanelWidth,CameraPanelHeight},
+					CameraPid ) ->
+
+	CellWidth = CellHeight = {fixed,get_camera_cell_length()},
+
+	% See diagram for panel layout:
+	
+	AbscissaLayout = [ CellWidth  || _X <- lists:seq(1,
+							    get_camera_abscissa_cell_count() ) ],
+	
+	OrdinateLayout = [ CellHeight || _Y <- lists:seq(1,
+								get_camera_ordinate_cell_count() ) ],
+
+	
+	gs:frame( packer_cam, ParentId, [ 
+      {bw,1}, 
+	  {pack_xy,Position},
+	  {packer_x,AbscissaLayout},
+	  {packer_y,OrdinateLayout},
+	  {width,CameraPanelWidth},
+	  {height,CameraPanelHeight} ] ),
 	
 	
+	% Camera status sub-panel (top left one):
+	
+	CameraPid ! {getFullStatus,[],self()},
+	{CameraName,_CameraPosition={X,Y},CameraZoomFactor} = receive 
+					 {wooper_result,{N,P,Z}} ->
+						{text_utils:binary_to_string(N),P,Z}
+				 end,
+
+	gs:create( label, cam_name_label, packer_cam, [ {label,
+	  {text,"Camera name:"}},
+      {justify,center}, {bw,1}, {pack_xy,{{1,3},1}} ] ),
+
+	gs:create( entry, cam_current_name, packer_cam, [
+	  {text,CameraName}, {justify,center}, {bw,1}, {pack_xy,{{1,3},2}} ] ),
+
+	gs:create( button, cam_create_button, packer_cam, [ 
+	  {label,{text,"Add"}}, {pack_xy,{{1,3},3}} ]),
+	
+	
+	% Camera location sub-panel (top right one):
+	
+	gs:create( label, cam_pos_label, packer_cam, [ {label,
+	  {text,"Position:"}},
+      {justify,center}, {bw,1}, {pack_xy,{{5,7},1}} ] ),
+
+	gs:create( label, cam_x_label, packer_cam, [ {label,
+	  {text,"X:"}}, {justify,center}, {bw,1}, {pack_xy,{5,2}} ] ),
+	
+	gs:create( entry, cam_x_location, packer_cam, [
+	  {keypress,true}, {text,io_lib:format("~B",[X])}, {pack_xy,{{6,7},2}} ] ),
+	 
+	gs:create( label, cam_y_label, packer_cam, [ {label,
+	  {text,"Y:"}}, {justify,center}, {bw,1}, {pack_xy,{5,3}} ] ),
+	
+	gs:create( entry, cam_y_location, packer_cam, [
+      {keypress,true}, {text,io_lib:format("~B",[Y])}, {pack_xy,{{6,7},3}} ] ),
+	 
+	
+	
+	% Camera zoom sub-panel (bottom right one):
+	
+	gs:create( label, cam_zoom_label, packer_cam, [ {label,
+	  {text,"Zoom factor:"}},
+      {justify,center}, {bw,1}, {pack_xy,{{5,7},5}} ] ),
+	
+	gs:create( label, cam_zoom_factor_label, packer_cam, [ {label,
+	  {text,"x"}}, {justify,right}, {bw,1}, {pack_xy,{5,6}} ] ),
+	
+	gs:create( entry, cam_factor, packer_cam, [
+	  {keypress,true}, {text,io_lib:format("~.2f",[CameraZoomFactor])}, 
+	  {pack_xy,{{6,7},6}} ] ),
+	
+	gs:create( button, cam_zoom_in, packer_cam, [ 
+	  {label,{text,"In"}}, {pack_xy,{6,7}} ]),
+	
+	gs:create( button, cam_zoom_out, packer_cam, [ 
+	  {label,{text,"Out"}}, {pack_xy,{7,7}} ]),
+	
+	% Camera editor sub-panel (bottom left one):
+
+	gs:create( listbox, cam_editor_list, packer_cam, [ 
+			{items,[ CameraName ]},
+			{bw,1}, {hscroll,false}, {pack_xy,{{1,3},{5,6}}} ] ),
+
+	gs:create( button, cam_load_button, packer_cam, [ 
+	  {label,{text,"Load"}}, {pack_xy,{1,7}} ]),
+
+	gs:create( button, cam_del_button, packer_cam, [ 
+	  {label,{text,"Del"}}, {pack_xy,{2,7}} ]),
+
+	gs:create( button, cam_save_button, packer_cam, [ 
+	  {label,{text,"Save"}}, {pack_xy,{3,7}} ]),
+
+	
+	% Cross of buttons, line by line:
+	
+	CameraResourceDir = "../resources/camera",	
+	
+	
+	% First we go down from the top:
+	
+	gs:create( button, cam_up_stop_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-up-stop.xbm")}},
+	    {pack_xy,{4,1}} ]),
+
+	gs:create( button, cam_up_double_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-up-double.xbm")}},
+	    {pack_xy,{4,2}} ]),
+	
+	
+	gs:create( button, cam_up_single_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-up-single.xbm")}},
+	    {pack_xy,{4,3}} ]),
+	
+	
+	% Main button line, from left to right:
+	
+	gs:create( button, cam_left_stop_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-left-stop.xbm")}},
+	    {pack_xy,{1,4}} ]),
+
+	gs:create( button, cam_left_double_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-left-double.xbm")}},
+	    {pack_xy,{2,4}} ]),
+	
+	
+	gs:create( button, cam_left_single_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-left-single.xbm")}},
+	    {pack_xy,{3,4}} ]),
+	
+	
+	gs:create( button, cam_center_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-center.xbm")}}, 
+		{pack_xy,{4,4}} ]),
+
+	
+	gs:create( button, cam_right_single_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-right-single.xbm")}},
+	    {pack_xy,{5,4}} ]),
+
+	gs:create( button, cam_right_double_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-right-double.xbm")}},
+	    {pack_xy,{6,4}} ]),
+	
+	gs:create( button, cam_right_stop_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-right-stop.xbm")}},
+	    {pack_xy,{7,4}} ]),
+
+	% Then we continue below:
+	
+	gs:create( button, cam_down_single_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-down-single.xbm")}},
+	    {pack_xy,{4,5}} ]),
+	
+	gs:create( button, cam_down_double_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-down-double.xbm")}},
+	    {pack_xy,{4,6}} ]),
+	
+	gs:create( button, cam_down_stop_button, packer_cam, 
+      [ {label,{image,
+				file_utils:join(CameraResourceDir,"button-down-stop.xbm")}},
+	    {pack_xy,{4,7}} ]).
+
+
+
+update_cam_list(State) ->
+	NameFun = fun(CamPid) ->
+				  CamPid ! {getName,[],self()},
+				  receive
+					  {wooper_result,N} -> text_utils:binary_to_string(N) 
+				  end
+		  end,
+				  
+	Names = lists:map( NameFun, ?getAttr(camera_list) ),
+	
+	gs:config( cam_editor_list, {items,Names} ).	
+
+			  
+% records the current camera settings, as a new camera.
+add_camera(State) ->
+	Name = gs:read( cam_current_name, text ),
+	XText = gs:read( cam_x_location, text ),
+	YText = gs:read( cam_y_location, text ),
+	ZoomText = gs:read( cam_factor, text ),
+
+	io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", [Name,XText,YText,ZoomText] ),
+	
+	{X,[]} = string:to_integer(XText),
+	{Y,[]} = string:to_integer(YText),
+	{Zoom,[]} = string:to_float(ZoomText),
+	
+	io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", [Name,X,Y,Zoom] ),
+	NewCameraPid = class_Camera:new_link( Name, {X,Y}, Zoom ),
+	NewState = appendToAttribute( State, camera_list, NewCameraPid ),
+	update_cam_list(NewState),
+	NewState.
+
+
+% Renders the information panel.	
+render_information_panel( ParentId, Position ) ->
+	gs:frame( packer_info, ParentId, [ 
+      {bw,1}, 
+	  {pack_xy,Position},
+	  {packer_x,[{stretch,_Weight=1}]},
+	  {packer_y,[ {fixed,20}, {stretch,1}, {fixed,50} ]} ] ),
+
+	_Width = gs:read( packer_info, width ),
+	
+	gs:scale( scale_x, packer_info, [ {pack_xy,{1,1}}, {width,300}, 
+									 {range,{1,500}} ] ),
+			 
+	gs:editor( info_editor, packer_info, [ {pack_xy,{1,2}}, {width,150},
+		{wrap,word}, {vscroll,right}, {enable,false} ] ).
+		
+			 
+			 
+% Adds specified message to the information panel editor. 
+add_info_message( Message ) ->			 
+	gs:config( info_editor, {enable,true} ),
+	gs:config( info_editor, {insert,{'end',Message ++ "\n"}} ),	
+	gs:config( info_editor, {enable,false} ).
+
+
+% Adds specified message to the information panel editor. 
+add_info_message( MessageFormat, MessageValues ) ->			 
+	add_info_message( io_lib:format( MessageFormat, MessageValues ) ).
+
