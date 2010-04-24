@@ -14,14 +14,18 @@ run() ->
 
 	?test_start,
 
-	TestWorld = class_VirtualWorld:synchronous_new_link( "My Test Virtual World"
-													   ),
+	TestBoundaries = { _TopLeft={-1000,2000}, _BottomRight={1500,-700} },
+	
+	TestWorld = class_VirtualWorld:synchronous_new_link( 
+		"My Test Virtual World", TestBoundaries ),
 
 	MapSupervisorPid = class_MapSupervisor:create_supervisor_for( TestWorld ),
 
 	receive 
 
-		t -> t end,
+		t -> t 
+	
+	end,
 
 	MapSupervisorPid ! delete,
 
