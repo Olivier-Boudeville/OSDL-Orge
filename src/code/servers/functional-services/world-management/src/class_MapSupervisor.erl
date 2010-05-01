@@ -114,6 +114,24 @@
 % each widget.
 
 
+% The coefficient, in [0,1], by which the current zoom factor is multiplied or
+% divided when a zooom-in or zoom-out is requested.
+
+% Ex: a coefficient of 0.5 means that a zoom-in from x400 will lead to x600.
+-define( zoom_coefficient, 0.5 ).
+
+
+% Number of pixels corresponding to a move due to a click on a single arrow.
+% Note: thus depends on the current zoom factor.
+-define( move_offset_single, 5 ).
+
+
+% Number of pixels corresponding to a move due to a click on a double
+% arrow.
+% Note: thus depends on the current zoom factor.
+-define( move_offset_double, 50 ).
+
+
 
 % Constructs a new map supervisor.
 %
@@ -175,19 +193,22 @@ construct( State, ?wooper_construct_parameters ) ->
 	% Starts from the center of the virtual world, with 1 meter corresponding to
 	% 1 pixel:
 	MainCameraPid = class_Camera:new_link( "Default camera", Position,
-							_ZoomFactor=100.0, VirtualWorldPid, self() ),
+%		get_onscreen_camera_position(), 
+{0,0},
+_ZoomFactor=100.0, VirtualWorldPid, 
+		self() ),
 
 
 	% Then the class-specific attributes:
 	InitState = setAttributes( TraceState, [
 		 {current_camera_pid,MainCameraPid},
-		 {camera_list,[ MainCameraPid]},								
+		 {camera_list,[ MainCameraPid ]},								
 		 {virtual_world_pid,VirtualWorldPid},
 		 %{world_boundaries,WorldBoundaries},
 		 {gs_pid,undefined}, 
 		 {gs_id,undefined}, 
 		 {main_win_id,undefined}, 
-		 {canvas_id,undefined}, 
+		 {canvas_id,undefined},
 		 {trace_categorization,
 		  text_utils:string_to_binary(?TraceEmitterCategorization)} 
 							   ] ),
@@ -208,7 +229,10 @@ construct( State, ?wooper_construct_parameters ) ->
 	GuiState.
 	
 	
+% Overridden destructor.
 delete(State) ->
+	[ CamPid ! delete || CamPid <- ?getAttr(camera_list) ],
+	gs:stop(),
 	State.
 
 	
@@ -234,10 +258,13 @@ enterGUIMainLoop(State) ->
 		{gs,_Id,configure,_Data,[W,H|_]} ->
 			% Repacks what needs to (ex: packer_win and other packers)
 			%io:format( "Configuring ~w!", [Id] ),
-			gs:config( packer_win, [{width,W},{height,H}] ), 
-			enterGUIMainLoop(State);
+			gs:config( packer_win, [{width,W},{height,H}] ),
+			% Updates as well the camera center, needed for screen/world
+			% conversions:
+			?getAttr(current_camera_pid) ! {setOnscreenPosition,{W,H}},
+			enterGUIMainLoop( State );
 
-		{gs,cam_x_location,keypress,[], ['Return'|_]} ->
+		{gs,cam_x_location,keypress,[],['Return'|_]} ->
 			_CamPid = ?getAttr(current_camera_pid),
 			XText = gs:read( cam_x_location, text ),
 			
@@ -246,18 +273,38 @@ enterGUIMainLoop(State) ->
 				{_X,[]} ->
 					% Correct input, update:
 					ok
-						end,
+
+			end,
 			enterGUIMainLoop(State);
 			
 
 		{gs,cam_create_button,click,[],_AddString} ->
-			NewState = add_camera(State),
-			enterGUIMainLoop( NewState );
+			enterGUIMainLoop( add_camera(State) );
 		
+		% Camera movement section:
+
+		{gs,cam_up_single_button,click,[],_} ->
+			enterGUIMainLoop( move_up( State, ?move_offset_single ) );
+
+		{gs,cam_up_double_button,click,[],_} ->
+			enterGUIMainLoop( move_up( State, ?move_offset_double ) );
+
+
+		% Camera zoom section:
+
+		{gs,cam_zoom_in,click,[],["In"]} ->
+			enterGUIMainLoop( zoom_in(State) );
+
+
+		{gs,cam_zoom_out,click,[],["Out"]} ->
+			enterGUIMainLoop( zoom_out(State) );
+
+
 		{add_info_message,Message} ->
 			add_info_message( Message ),
 			enterGUIMainLoop( State );
 			
+
 		Other ->
 			io:format( "Message ignored by the map supervisor: '~p'.~n",
 					   [Other] ),
@@ -267,6 +314,61 @@ enterGUIMainLoop(State) ->
 			
 
 
+
+% Camera movement section.
+
+
+% Moves the camera up by specified value, in pixels.
+% Returns a new state.
+move_up( State, Value ) ->
+
+	CamPid = ?getAttr(current_camera_pid),
+
+	CamPid ! {updateOrdinateWith,Value,self()},
+
+	receive 
+
+		{wooper_result,{Y,NewY}} -> 
+			gs:config( cam_y_location, {text,io_lib:format("~B",[NewY])} ),
+			add_info_message( "Moved upward of ~s.", 
+							  [ text_utils:distance_to_string(NewY-Y) ] ),
+			State
+
+	end.
+				
+	
+
+
+
+% Camera zoom section.
+
+
+% Manages a zoom-in request.
+% Returns a new state.
+zoom_in(State) ->
+	CamPid = ?getAttr(current_camera_pid),
+	CamPid ! {getZoomFactor,[],self()},
+	CurrentZoom = receive {wooper_result,Z} -> Z end,
+	NewZoom = CurrentZoom * ( 1 + ?zoom_coefficient ) ,
+	CamPid ! {setZoomFactor,NewZoom},
+	gs:config( cam_factor, {text,io_lib:format("~.2f",[NewZoom])} ),
+	add_info_message( "Zoomed in to factor x~.2f.", [NewZoom] ),
+	State.
+
+
+% Manages a zoom-out request.
+% Returns a new state.
+zoom_out(State) ->
+	CamPid = ?getAttr(current_camera_pid),
+	CamPid ! {getZoomFactor,[],self()},
+	CurrentZoom = receive {wooper_result,Z} -> Z end,
+	NewZoom = CurrentZoom / ( 1 + ?zoom_coefficient ),
+	CamPid ! {setZoomFactor,NewZoom},
+	gs:config( cam_factor, {text,io_lib:format("~.2f",[NewZoom])} ),
+	add_info_message( "Zoomed out to factor x~.2f.", [NewZoom] ),
+	State.
+						  
+	
 % Static method section.
 
 
@@ -462,13 +564,18 @@ render_camera_panel( ParentId, Position,
 	gs:create( entry, cam_factor, packer_cam, [
 	  {keypress,true}, {text,io_lib:format("~.2f",[CameraZoomFactor])}, 
 	  {pack_xy,{{6,7},6}} ] ),
+
+	CameraResourceDir = "../resources/camera",	
 	
 	gs:create( button, cam_zoom_in, packer_cam, [ 
-	  {label,{text,"In"}}, {pack_xy,{6,7}} ]),
+	  {label,{image,file_utils:join(CameraResourceDir,"button-zoom-in.xbm")}}, 
+												  {pack_xy,{6,7}} ] ),
 	
 	gs:create( button, cam_zoom_out, packer_cam, [ 
-	  {label,{text,"Out"}}, {pack_xy,{7,7}} ]),
-	
+	  {label,{image,file_utils:join(CameraResourceDir,"button-zoom-out.xbm")}},
+												  {pack_xy,{7,7}} ] ),
+
+
 	% Camera editor sub-panel (bottom left one):
 
 	gs:create( listbox, cam_editor_list, packer_cam, [ 
@@ -486,9 +593,6 @@ render_camera_panel( ParentId, Position,
 
 	
 	% Cross of buttons, line by line:
-	
-	CameraResourceDir = "../resources/camera",	
-	
 	
 	% First we go down from the top:
 	
@@ -588,14 +692,19 @@ add_camera(State) ->
 	YText = gs:read( cam_y_location, text ),
 	ZoomText = gs:read( cam_factor, text ),
 
-	io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", [Name,XText,YText,ZoomText] ),
+	io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", 
+			   [Name,XText,YText,ZoomText] ),
 	
 	{X,[]} = string:to_integer(XText),
 	{Y,[]} = string:to_integer(YText),
 	{Zoom,[]} = string:to_float(ZoomText),
 	
 	io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", [Name,X,Y,Zoom] ),
-	NewCameraPid = class_Camera:new_link( Name, {X,Y}, Zoom ),
+
+	NewCameraPid = class_Camera:new_link( Name, {X,Y},
+        get_onscreen_camera_position(), Zoom,
+		?getAttr(virtual_world_pid), _MapSupervisor=self() ),
+
 	NewState = appendToAttribute( State, camera_list, NewCameraPid ),
 	update_cam_list(NewState),
 	NewState.
@@ -621,8 +730,28 @@ render_information_panel( ParentId, Position ) ->
 			 
 % Adds specified message to the information panel editor. 
 add_info_message( Message ) ->			 
+
 	gs:config( info_editor, {enable,true} ),
-	gs:config( info_editor, {insert,{'end',Message ++ "\n"}} ),	
+
+	% Most recent messages are to be displayed first:
+	gs:config( info_editor, {insert, {_Top={0,0}, Message ++ "\n" } } ),
+
+	RowCount = gs:read( info_editor, size ),
+
+	% Max number of lines remembered:
+	MaxCount = 1000,
+	case RowCount of 
+
+		Count when Count > MaxCount ->
+			io:format( "Removing oldest lines, from ~B to ~B.~n",
+					   [MaxCount,Count] ),
+			gs:config( info_editor, {del, {{MaxCount,0},{Count,lineend} } } );
+		
+		_ ->
+			ok
+
+	end,
+	%gs:config( info_editor, {insertpos,'end'} ),
 	gs:config( info_editor, {enable,false} ).
 
 
@@ -630,3 +759,11 @@ add_info_message( Message ) ->
 add_info_message( MessageFormat, MessageValues ) ->			 
 	add_info_message( io_lib:format( MessageFormat, MessageValues ) ).
 
+
+% Returns the onscreen position {Xsc,Ysc} of the camera center, i.e. the center
+% of the camera frame.
+get_onscreen_camera_position() ->
+	W = gs:read( packer_cam, width ), 
+	H = gs:read( packer_cam, height ),
+	{ round(W/2), round(H/2) }.
+	
