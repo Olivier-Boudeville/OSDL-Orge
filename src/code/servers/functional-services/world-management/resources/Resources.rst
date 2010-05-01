@@ -20,5 +20,4 @@ Symbols
 
  - arrows : http://www.clker.com/search/arrow/6, converted to black and white, shadows removed, stop arrows created with The Gimp
 
- 
- 
+ - zoom in/out: short of having arrows pointed to/from the corners of a square, using a magnifying glass, from http://www.clker.com/clipart-8071.html
