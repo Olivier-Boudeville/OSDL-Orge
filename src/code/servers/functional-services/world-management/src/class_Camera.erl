@@ -58,8 +58,8 @@
 % - ScreenPosition = {Xsc,Ysc} is the camera initial onscreen position, in
 % pixels
 %
-% - ZoomFactor is the initial zoom of this camera, in cm/px (i.e. expressed in
-% virtual world centimeters per pixel
+% - ZoomFactor is the initial zoom of this camera, in px/cm (i.e. expressed in
+% pixel per virtual world centimeter)
 %
 construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor, 
 		   VirtualWorldPid, MapSupervisorPid ) when 
@@ -75,7 +75,7 @@ construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor,
 	% - screen_position={Xsc,Ysc} is the current onscreen camera position (pair
 	% of pixel coordinates)
 	%
-	% - zoom_factor is the current zoom of this camera, in cm/px (float)
+	% - zoom_factor is the current zoom of this camera, in px/cm (float)
 	% 
 	% - world_pid is the PID of the virtual world this camera represents
 	%
@@ -110,7 +110,7 @@ construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor,
 					 "1 pixel corresponds to ~s of the virtual world.", 
 					 [ Name,Xc,Yc,ZoomFactor,
 					  % Takes millimeters:
-					  text_utils:distance_to_string(10*ZoomFactor)], 
+					  text_utils:distance_to_string(100/ZoomFactor)], 
 					 SetState ),
 	SetState.
 	
@@ -266,7 +266,7 @@ add_info_message( MessageFormat, MessageValue, State ) ->
 %
 screen_offset_to_absolute_world_abscissa( Xsoffset, State ) ->
 	{Xworld,_Yworld} = ?getAttr(position),
-	Xworld + Xsoffset * ?getAttr(zoom_factor).
+	Xworld + Xsoffset / ?getAttr(zoom_factor).
 
 
 % Converts the specified screen ordinate offset (in pixels) between the target
@@ -277,7 +277,7 @@ screen_offset_to_absolute_world_abscissa( Xsoffset, State ) ->
 %
 screen_offset_to_absolute_world_ordinate( Ysoffset, State ) ->
 	{_Xworld,Yworld} = ?getAttr(position),
-	Yworld - Ysoffset * ?getAttr(zoom_factor).
+	Yworld - Ysoffset / ?getAttr(zoom_factor).
 
 
 % Converts the specified screen coordinate offsets (in pixels) between the
@@ -290,6 +290,6 @@ screen_offset_to_absolute_world_ordinate( Ysoffset, State ) ->
 screen_offsets_to_absolute_world_coordinates( {Xsoffset,Ysoffset}, State ) ->
 	{Xworld,Yworld} = ?getAttr(position),
 	Z = ?getAttr(zoom_factor),
-	{ Xworld + Xsoffset*Z, Yworld - Ysoffset*Z }.
+	{ Xworld + Xsoffset/Z, Yworld - Ysoffset/Z }.
 
 
