@@ -96,10 +96,15 @@
 % This map is centered on MapOrigin={Xm,Ym}, expressed in virtual-world
 % coordinates, thus in centimeters. 
 %
-% A zoom factor F is defined. It allows to convert screen distances into
-% virtual-world distances. It is defined in virtual world centimeters per pixel.
-% For example if F = 100 cm/px then a line segment of 10 pixels corresponds to 1
-% meter in the virtual world.
+% A zoom factor F is defined. It allows to convert screen distances (pixel
+% offsets, compared to the center of the screen which is the location of the
+% current camera) into virtual-world distances.
+%
+% It is displayed to the user in pixels per virtual world meter, whereas it is
+% managed internally in pixels per virtual world centimeter.
+%
+% For example, if F is displayed as 100px/m, then each pixel will correspond to
+% one centimeter of the virtual world, and it will be stored as 1px/cm.
 % 
 % The onscreen size of the map and the zoom factor determine how much of the
 % virtual world is shown.
@@ -190,13 +195,11 @@ construct( State, ?wooper_construct_parameters ) ->
 	
 	Position = linear_2D:get_integer_center( P1, P2 ), 
 		
-	% Starts from the center of the virtual world, with 1 meter corresponding to
-	% 1 pixel:
+	% Starts from the center of the virtual world, with 1 pixel corresponding to
+	% 1 meter:
 	MainCameraPid = class_Camera:new_link( "Default camera", Position,
-%		get_onscreen_camera_position(), 
-{0,0},
-_ZoomFactor=100.0, VirtualWorldPid, 
-		self() ),
+		 % get_onscreen_camera_position() not possible, GUI not created yet:
+         {0,0}, _ZoomFactor=100.0, VirtualWorldPid, self() ),
 
 
 	% Then the class-specific attributes:
@@ -292,11 +295,11 @@ enterGUIMainLoop(State) ->
 
 		% Camera zoom section:
 
-		{gs,cam_zoom_in,click,[],["In"]} ->
+		{gs,cam_zoom_in,click,[],_} ->
 			enterGUIMainLoop( zoom_in(State) );
 
 
-		{gs,cam_zoom_out,click,[],["Out"]} ->
+		{gs,cam_zoom_out,click,[],_} ->
 			enterGUIMainLoop( zoom_out(State) );
 
 
@@ -330,7 +333,7 @@ move_up( State, Value ) ->
 
 		{wooper_result,{Y,NewY}} -> 
 			gs:config( cam_y_location, {text,io_lib:format("~B",[NewY])} ),
-			add_info_message( "Moved upward of ~s.", 
+			add_info_message( "Moved upward, of ~s.", 
 							  [ text_utils:distance_to_string(NewY-Y) ] ),
 			State
 
@@ -340,7 +343,7 @@ move_up( State, Value ) ->
 
 
 
-% Camera zoom section.
+% Camera zoomw section.
 
 
 % Manages a zoom-in request.
@@ -352,7 +355,7 @@ zoom_in(State) ->
 	NewZoom = CurrentZoom * ( 1 + ?zoom_coefficient ) ,
 	CamPid ! {setZoomFactor,NewZoom},
 	gs:config( cam_factor, {text,io_lib:format("~.2f",[NewZoom])} ),
-	add_info_message( "Zoomed in to factor x~.2f.", [NewZoom] ),
+	add_info_message( "Zoomed in, to factor x~.2f.", [NewZoom] ),
 	State.
 
 
@@ -365,7 +368,7 @@ zoom_out(State) ->
 	NewZoom = CurrentZoom / ( 1 + ?zoom_coefficient ),
 	CamPid ! {setZoomFactor,NewZoom},
 	gs:config( cam_factor, {text,io_lib:format("~.2f",[NewZoom])} ),
-	add_info_message( "Zoomed out to factor x~.2f.", [NewZoom] ),
+	add_info_message( "Zoomed out, to factor x~.2f.", [NewZoom] ),
 	State.
 						  
 	
