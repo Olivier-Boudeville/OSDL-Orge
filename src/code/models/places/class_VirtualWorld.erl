@@ -42,7 +42,8 @@
 
 
 % Member method declarations.
--define( wooper_method_export, getBoundaries/1 ).
+-define( wooper_method_export, getBoundaries/1, getCenter/1,
+		getElementsInDisc/3 ).
 
 
 % Static method declarations.
@@ -82,6 +83,8 @@ construct( State, Name, _Boundaries={PTopLeft,PBottomRight} ) ->
 	% - bottom_right_point: the point in the virtual world which corresponds to
 	% the bottom-right corner (integer coordinates)
 	%
+	% - top_level_elements: the list of the top-level elements in this world
+	%
 
 	% First the direct mother classes:
 	TraceState = class_TraceEmitter:construct( State, Name ),
@@ -89,7 +92,8 @@ construct( State, Name, _Boundaries={PTopLeft,PBottomRight} ) ->
 	% Then the class-specific attributes:
 	setAttributes( TraceState, [
 		 {top_left_point,PTopLeft},
-		 {bottom_right_point,PBottomRight},						
+		 {bottom_right_point,PBottomRight},
+		 {top_level_elements,[]},					
 		 {trace_categorization,
 		  text_utils:string_to_binary(?TraceEmitterCategorization)} 
 							   ] ).
@@ -114,7 +118,27 @@ getBoundaries( State ) ->
 			  {?getAttr(top_left_point),?getAttr(bottom_right_point)} ).
 
 
+% Returns the coordinates of the center of the world, based on its boundaries.
+%
+% (const request) (integer coordinates)
+getCenter( State ) ->
+	?wooper_return_state_result( State, linear_2D:get_integer_center(
+			?getAttr(top_left_point), ?getAttr(bottom_right_point) ) ).
 
+
+% Returns all elements of this world that may be included, partially or totally,
+% in the specified disc.
+%
+% The real list may actually be a subset of the returned one, as the selection
+% is based on bounding-boxes.
+%
+% (const request)
+getElementsInDisc( State, _Center, _Radius ) ->
+	TopLevelElements = ?getAttr(top_level_elements),
+	?wooper_return_state_result( State,	TopLevelElements ).
+
+
+	
 % Static method section.
 
 
