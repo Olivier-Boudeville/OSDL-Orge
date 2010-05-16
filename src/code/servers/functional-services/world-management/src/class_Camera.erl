@@ -23,10 +23,16 @@
 
 % Member method declarations.
 -define( wooper_method_export, setName/2, 
-		 getPosition/1, setAbscissa/2, getAbscissa/1,
+		 getPosition/1, setPosition/2, setAbscissa/2, getAbscissa/1,
 		 setOrdinate/2, getOrdinate/1, updateOrdinateWith/2,
 		 setOnscreenPosition/2, getZoomFactor/1, setZoomFactor/2,
-		 getFullStatus/1 ).
+		 getFullStatus/1, selectElementsToRender/2 ).
+
+
+% FIXME, for debugging only:
+-export([ screen_offset_to_absolute_world_abscissa/2,
+		 screen_offset_to_absolute_world_ordinate/2,
+		 screen_offsets_to_absolute_world_coordinates/2 ]).
 
 
 % Static method declarations.
@@ -58,8 +64,9 @@
 % - ScreenPosition = {Xsc,Ysc} is the camera initial onscreen position, in
 % pixels
 %
-% - ZoomFactor is the initial zoom of this camera, in px/cm (i.e. expressed in
-% pixel per virtual world centimeter)
+% - ZoomFactor is the initial zoom of this camera, in px/m (i.e. expressed in
+% pixel per virtual world meter), knowing that zoom factor will always be
+% managed here, internally, as px/cm
 %
 construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor, 
 		   VirtualWorldPid, MapSupervisorPid ) when 
@@ -91,12 +98,14 @@ construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor,
 						R
 
 				end,
-												 
+					
+	ActualZoom = ZoomFactor / 100,
+	
 	% Then the class-specific attributes:
 	SetState = setAttributes( TraceState, [
 		 {position,Position},
 		 {screen_position,ScreenPosition},
-		 {zoom_factor,ZoomFactor},
+		 {zoom_factor,ActualZoom},
 		 {top_left_point,TopLeft},
 		 {bottom_right_point,BottomRight},						
 		 {world_pid,VirtualWorldPid},
@@ -106,11 +115,11 @@ construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor,
 							   ] ),
 	
 	add_info_message( "Camera '~s' starting at location {~B,~B} "
-					 "with zoom factor x~.4f, which means that "
-					 "1 pixel corresponds to ~s of the virtual world.", 
+					 "with zoom factor x~.2f pixels per meter, which means "
+					 "that 1 pixel corresponds to ~s of the virtual world.", 
 					 [ Name,Xc,Yc,ZoomFactor,
 					  % Takes millimeters:
-					  text_utils:distance_to_string(100/ZoomFactor)], 
+					  text_utils:distance_to_short_string(1000/ZoomFactor)], 
 					 SetState ),
 	SetState.
 	
@@ -143,6 +152,13 @@ setName( State, NewName ) ->
 % (const request)
 getPosition( State ) ->
 	?wooper_return_state_result( State, ?getAttr(position) ).
+
+
+% Sets the current in-world position of this camera.
+%
+% (oneway)
+setPosition( State, NewPosition ) ->
+	?wooper_return_state_only( setAttribute( State, position, NewPosition ) ).
 
 
 
@@ -180,19 +196,18 @@ getOrdinate( State ) ->
 
 
 
-% Update the current ordinate of this camera by moving it upward by the
-% specified number of pixels: this value is multiplied by the current zoom
-% factor.
+% Updates the current ordinate of this camera by moving it upward by the
+% specified number of pixels, converted thanks to the current zoom factor into
+% world-ordinate.
 %
 % Returns the previous and new ordinates.
 %
 % (request)
 updateOrdinateWith( State, PixelValue ) ->
-	{X,Y} = ?getAttr(position),
-	NewY = Y + round( PixelValue * ?getAttr(zoom_factor) ),
-	?wooper_return_state_result( 
-	   setAttribute(State,position,{X,NewY}), 
-	   {Y,NewY} ).
+	{Xworld,Yworld} = ?getAttr(position),
+	NewY = round(Yworld + PixelValue/?getAttr(zoom_factor)),
+	?wooper_return_state_result( setAttribute(State,position,{Xworld,NewY}),
+								{Yworld,NewY} ).
 
 
 
@@ -214,7 +229,8 @@ setOnscreenPosition( State, NewPosition ) ->
 %
 % (const request)
 getZoomFactor( State ) ->
-	?wooper_return_state_result( State, ?getAttr(zoom_factor) ).
+	% From px/cm to px/m:
+	?wooper_return_state_result( State, ?getAttr(zoom_factor) * 100 ).
 
 
 
@@ -222,8 +238,9 @@ getZoomFactor( State ) ->
 %
 % (oneway)
 setZoomFactor( State, NewZoomFactor ) ->
+	% From px/m to px/cm:
 	?wooper_return_state_only( 
-			setAttribute( State, zoom_factor, NewZoomFactor ) ).
+			setAttribute( State, zoom_factor, NewZoomFactor / 100 ) ).
 
 
 
@@ -234,8 +251,28 @@ setZoomFactor( State, NewZoomFactor ) ->
 % (const request)
 getFullStatus( State ) ->
 	?wooper_return_state_result( State, {?getAttr(name), 
-	   	?getAttr(position), ?getAttr(zoom_factor)} ).
+	   	?getAttr(position), ?getAttr(zoom_factor)* 100} ).
 	
+
+
+% Returns the subset of the elements of the virtual world which are in the field
+% of this camera.
+% ScreenRadius is the radius, in pixels, of the minimum enclosing circle
+% (centered on the camera position).
+selectElementsToRender( State, ScreenRadius ) ->
+	VirtualWorldPid = ?getAttr(world_pid),
+	Center = ?getAttr(position),
+	% In centimeters:
+	WorldRadius = math_utils:ceiling( ScreenRadius/?getAttr(zoom_factor) ),
+	VirtualWorldPid ! {getElementsInDisc,[Center,WorldRadius],self()},
+	SelectedElements = receive
+						   
+						   {wooper_result,Elements} ->
+							   Elements
+								   
+					   end,
+	?wooper_return_state_result( State, SelectedElements ).
+
 
 
 % Static method section.
@@ -262,22 +299,26 @@ add_info_message( MessageFormat, MessageValue, State ) ->
 % point P={X,Y} and the camera C={Xc,Yc}, i.e. Xsoffset=X-Xc, into an absolute
 % in-world abscissa (in centimeters).
 %
-% Returns the corresponding number of centimeters.
-%
+% Returns the corresponding new in-world position, rather than just the
+% abscissa, for the next position update.
+
 screen_offset_to_absolute_world_abscissa( Xsoffset, State ) ->
-	{Xworld,_Yworld} = ?getAttr(position),
-	Xworld + Xsoffset / ?getAttr(zoom_factor).
+	{Xworld,Yworld} = ?getAttr(position),
+	{Xworld + Xsoffset/?getAttr(zoom_factor),Yworld}.
+
 
 
 % Converts the specified screen ordinate offset (in pixels) between the target
 % point P={X,Y} and the camera C={Xc,Yc}, i.e. Ysoffset=Y-Yc, into an absolute
 % in-world ordinate (in centimeters).
 %
-% Returns the corresponding number of centimeters.
+% Returns the corresponding new in-world position, rather than just the
+% ordinate, for the next position update.
 %
 screen_offset_to_absolute_world_ordinate( Ysoffset, State ) ->
-	{_Xworld,Yworld} = ?getAttr(position),
-	Yworld - Ysoffset / ?getAttr(zoom_factor).
+	{Xworld,Yworld} = ?getAttr(position),
+	{Xworld,Yworld - Ysoffset/?getAttr(zoom_factor)}.
+
 
 
 % Converts the specified screen coordinate offsets (in pixels) between the
