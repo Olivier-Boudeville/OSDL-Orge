@@ -73,13 +73,14 @@
 % increasing onscreen from left to right, ordinate from bottom to top.
 %
 % Their unit is the virtual-world centimeter. This is not the meter, in order to
-% stays as much as possible with integer coordinates. Supposing an integer is
+% stay as much as possible with integer coordinates. Supposing an integer is
 % actually a signed 32 bit integer, coordinates will range in −2,147,483,648 to
 % +2,147,483,647, which means a maximum length of 4,294,967,295 cm, thus 42 949
 % 673 meters, about 43 kilometers. Therefore, in 32 bit, as long as distances
-% will stay within that limit, computations will still be quite effective.
-% In 64 bit, distance is 18,446,744,073,709,551,615 cm, thus about
-% 184 467 440 737 095 km, which is quite a lot.
+% will stay within that limit, computations will still be quite effective.  In
+% 64 bit, distance is 18,446,744,073,709,551,615 cm, thus about 184 467 440 737
+% 095 km, which is quite a lot (apparently small/big integer limit is actually
+% 28 bits here).
 %
 % Screen coordinates are expressed in an orthonormal basis too, abscissa
 % increasing onscreen from left to right, ordinate from top to bottom.
@@ -97,8 +98,8 @@
 % coordinates, thus in centimeters. 
 %
 % A zoom factor F is defined. It allows to convert screen distances (pixel
-% offsets, compared to the center of the screen which is the location of the
-% current camera) into virtual-world distances.
+% offsets, compared to the center of the screen, which is always the location of
+% the current camera) into virtual-world distances.
 %
 % It is displayed to the user in pixels per virtual world meter, whereas it is
 % managed internally in pixels per virtual world centimeter.
@@ -117,6 +118,13 @@
 
 % GS identifiers are actually {Id,GsPid}, even if only Id could be stored for
 % each widget.
+
+
+
+% The default zoom factor, expressed in pixels per virtual-world meter.
+% Thus we begin with 1 pixel for 1 meter, i.e. 1 pixel corresponds to 1m.
+-define( default_zoom_factor, 1.0 ).
+
 
 
 % The coefficient, in [0,1], by which the current zoom factor is multiplied or
@@ -199,7 +207,7 @@ construct( State, ?wooper_construct_parameters ) ->
 	% 1 meter:
 	MainCameraPid = class_Camera:new_link( "Default camera", Position,
 		 % get_onscreen_camera_position() not possible, GUI not created yet:
-         {0,0}, _ZoomFactor=100.0, VirtualWorldPid, self() ),
+         {0,0}, _ZoomFactor=?default_zoom_factor, VirtualWorldPid, self() ),
 
 
 	% Then the class-specific attributes:
@@ -292,6 +300,14 @@ enterGUIMainLoop(State) ->
 		{gs,cam_up_double_button,click,[],_} ->
 			enterGUIMainLoop( move_up( State, ?move_offset_double ) );
 
+		{gs,cam_down_single_button,click,[],_} ->
+			enterGUIMainLoop( move_down( State, ?move_offset_single ) );
+
+		{gs,cam_down_double_button,click,[],_} ->
+			enterGUIMainLoop( move_down( State, ?move_offset_double ) );
+
+		{gs,cam_center_button,click,[],_} ->
+			enterGUIMainLoop( center( State ) );
 
 		% Camera zoom section:
 
@@ -302,7 +318,13 @@ enterGUIMainLoop(State) ->
 		{gs,cam_zoom_out,click,[],_} ->
 			enterGUIMainLoop( zoom_out(State) );
 
-
+		{gs,cam_factor,keypress,[],['Return'|_T]} ->
+			enterGUIMainLoop( zoom_define(State) );
+		
+		{gs,cam_factor,keypress,[],_Other} ->
+			% Non-'Return' characters are ignored:
+			enterGUIMainLoop( State );
+		
 		{add_info_message,Message} ->
 			add_info_message( Message ),
 			enterGUIMainLoop( State );
@@ -332,18 +354,62 @@ move_up( State, Value ) ->
 	receive 
 
 		{wooper_result,{Y,NewY}} -> 
+			Distance = NewY-Y,
 			gs:config( cam_y_location, {text,io_lib:format("~B",[NewY])} ),
-			add_info_message( "Moved upward, of ~s.", 
-							  [ text_utils:distance_to_string(NewY-Y) ] ),
+			update_main_view(State),
+			add_info_message( "Moved upward, of about ~s (exactly: ~s).", 
+					   [ text_utils:distance_to_short_string(Distance),
+						text_utils:distance_to_string(Distance) ] ),
+			State
+
+	end.
+	
+
+
+% Moves the camera down by specified value, in pixels.
+% Returns a new state.
+move_down( State, Value ) ->
+
+	CamPid = ?getAttr(current_camera_pid),
+
+	CamPid ! {updateOrdinateWith,-Value,self()},
+
+	receive 
+
+		{wooper_result,{Y,NewY}} -> 
+			Distance = Y-NewY,
+			gs:config( cam_y_location, {text,io_lib:format("~B",[NewY])} ),
+			update_main_view(State),
+			add_info_message( "Moved downward, of about ~s (exactly: ~s).", 
+					   [ text_utils:distance_to_short_string(Distance),
+						text_utils:distance_to_string(Distance) ] ),
 			State
 
 	end.
 				
 	
 
+% Warps the camera to the center of the world.
+center(State) ->
+
+	WorldPid = ?getAttr(virtual_world_pid),
+	WorldPid ! {getCenter,[],self()},
+	receive
+		
+		{wooper_result,Center={Xc,Yc}} ->
+			CamPid = ?getAttr(current_camera_pid),
+			CamPid ! {setPosition,Center},
+			gs:config( cam_x_location, {text,io_lib:format("~B",[Xc])} ),
+			gs:config( cam_y_location, {text,io_lib:format("~B",[Yc])} ),
+			update_main_view(State),			
+			add_info_message( "Warped to the center of the world, at ~p.",
+							 [Center] ),
+			State
+				
+	end.
 
 
-% Camera zoomw section.
+% Camera zoom section.
 
 
 % Manages a zoom-in request.
@@ -354,8 +420,13 @@ zoom_in(State) ->
 	CurrentZoom = receive {wooper_result,Z} -> Z end,
 	NewZoom = CurrentZoom * ( 1 + ?zoom_coefficient ) ,
 	CamPid ! {setZoomFactor,NewZoom},
-	gs:config( cam_factor, {text,io_lib:format("~.2f",[NewZoom])} ),
-	add_info_message( "Zoomed in, to factor x~.2f.", [NewZoom] ),
+	display_cam_factor(NewZoom),
+	update_main_view(State), 
+	add_info_message( 
+		  "Zoomed in, to factor x~.2fpx/m (pixels per virtual-world meter), "
+		  "which means that 1 pixel corresponds now to ~s "
+		  "of the virtual world.", 
+		  [NewZoom,text_utils:distance_to_short_string(1000/NewZoom)] ),
 	State.
 
 
@@ -367,11 +438,55 @@ zoom_out(State) ->
 	CurrentZoom = receive {wooper_result,Z} -> Z end,
 	NewZoom = CurrentZoom / ( 1 + ?zoom_coefficient ),
 	CamPid ! {setZoomFactor,NewZoom},
-	gs:config( cam_factor, {text,io_lib:format("~.2f",[NewZoom])} ),
-	add_info_message( "Zoomed out, to factor x~.2f.", [NewZoom] ),
+	display_cam_factor(NewZoom), 
+	update_main_view(State),
+	add_info_message( 
+		  "Zoomed out, to factor x~.2fpx/m (pixels per virtual-world meter), "
+		  "which means that 1 pixel corresponds now to ~s "
+		  "of the virtual world.", 
+		  [NewZoom,text_utils:distance_to_short_string(1000/NewZoom)] ),
 	State.
-						  
 	
+
+
+% Manages the explicit setting of a new zoom factor.
+% Returns a new state.
+zoom_define(State) ->
+	CamPid = ?getAttr(current_camera_pid),
+	NewZoomText = gs:read( cam_factor, text ),
+	try list_to_float( NewZoomText ) of
+									   
+		NewZoomValue ->
+			CamPid ! {setZoomFactor,NewZoomValue},
+			display_cam_factor(NewZoomValue),
+			update_main_view(State),
+			add_info_message( "Zoom explictly defined to factor x~.2fpx/m "
+				"(pixels per virtual-world meter), which means that "
+				"1 pixel corresponds now to ~s of the virtual world.", 
+				[NewZoomValue,
+				 text_utils:distance_to_short_string(1000/NewZoomValue)] )
+	
+	catch 
+		
+		error:badarg ->
+			CamPid ! {getZoomFactor,[],self()},
+			PreviousZoom = receive {wooper_result,Z} -> Z end,
+			% Probably unnecessary:
+			update_main_view(State),
+			add_info_message( 
+				"Error, incorrect user-defined zoom factor ('~s'), "
+				"resetting to previous zoom factor x~.2fpx/m "
+				"(pixels per virtual-world meter), which means that "
+				"1 pixel corresponds again to ~s of the virtual world.", 
+				[NewZoomText,PreviousZoom,
+				 text_utils:distance_to_short_string(1000/PreviousZoom)] )
+			
+	end,
+	State.
+
+	
+
+
 % Static method section.
 
 
@@ -427,7 +542,7 @@ init_gui( State ) ->
 									 ]),
 
 	% In the main window, canvas is at the top right:
-	CanvasId = gs:create( canvas, packer_win, [ 
+	CanvasId = gs:create( canvas, main_view, packer_win, [ 
 		{pack_xy,{2,1}},
 		{bg,white}, 
 		%{hscroll,bottom}, {vscroll,left},
@@ -443,6 +558,9 @@ init_gui( State ) ->
 	
 	% In the main frame, the information panel is at the bottom right:
 	render_information_panel( _InfoParentId=packer_win, _InfoPosition={2,2} ),
+
+	% In the main frame, the main view panel is at the top right:
+	%render_main_view( _ViewParentId=packer_win, _ViewPosition={2,1} ),
 	
     % Sets the GUI to visible and refreshes to initial size:
 
@@ -565,7 +683,7 @@ render_camera_panel( ParentId, Position,
 	  {text,"x"}}, {justify,right}, {bw,1}, {pack_xy,{5,6}} ] ),
 	
 	gs:create( entry, cam_factor, packer_cam, [
-	  {keypress,true}, {text,io_lib:format("~.2f",[CameraZoomFactor])}, 
+	  {keypress,true}, {text,io_lib:format("~.4f",[CameraZoomFactor])}, 
 	  {pack_xy,{{6,7},6}} ] ),
 
 	CameraResourceDir = "../resources/camera",	
@@ -695,14 +813,14 @@ add_camera(State) ->
 	YText = gs:read( cam_y_location, text ),
 	ZoomText = gs:read( cam_factor, text ),
 
-	io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", 
-			   [Name,XText,YText,ZoomText] ),
+	%io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", 
+	%		   [Name,XText,YText,ZoomText] ),
 	
 	{X,[]} = string:to_integer(XText),
 	{Y,[]} = string:to_integer(YText),
 	{Zoom,[]} = string:to_float(ZoomText),
 	
-	io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", [Name,X,Y,Zoom] ),
+	%io:format( "Name = ~p, X=~w, Y=~w, Zoom=~w.~n", [Name,X,Y,Zoom] ),
 
 	NewCameraPid = class_Camera:new_link( Name, {X,Y},
         get_onscreen_camera_position(), Zoom,
@@ -715,6 +833,7 @@ add_camera(State) ->
 
 % Renders the information panel.	
 render_information_panel( ParentId, Position ) ->
+	
 	gs:frame( packer_info, ParentId, [ 
       {bw,1}, 
 	  {pack_xy,Position},
@@ -729,8 +848,12 @@ render_information_panel( ParentId, Position ) ->
 	gs:editor( info_editor, packer_info, [ {pack_xy,{1,2}}, {width,150},
 		{wrap,word}, {vscroll,right}, {enable,false} ] ).
 		
-			 
-			 
+
+% Renders the main view.		 
+%render_main_view( ParentId, Position ) ->		 
+%	canvas			 
+	
+	
 % Adds specified message to the information panel editor. 
 add_info_message( Message ) ->			 
 
@@ -746,8 +869,8 @@ add_info_message( Message ) ->
 	case RowCount of 
 
 		Count when Count > MaxCount ->
-			io:format( "Removing oldest lines, from ~B to ~B.~n",
-					   [MaxCount,Count] ),
+			%io:format( "Removing oldest lines, from ~B to ~B.~n",
+			%		   [MaxCount,Count] ),
 			gs:config( info_editor, {del, {{MaxCount,0},{Count,lineend} } } );
 		
 		_ ->
@@ -770,3 +893,27 @@ get_onscreen_camera_position() ->
 	H = gs:read( packer_cam, height ),
 	{ round(W/2), round(H/2) }.
 	
+
+display_cam_factor(ZoomFactor) ->
+	gs:config( cam_factor, {text,io_lib:format("~.4f",[ZoomFactor])} ).
+
+
+% Updates the main view.
+update_main_view( State ) ->
+	CamPid = ?getAttr(current_camera_pid),
+	% Computing the radius in pixels of the minimum enclosing circle for the
+	% main view:
+	{HalfWidth,HalfHeight} = get_onscreen_camera_position(),
+	ScreenRadius = erlang:max(HalfWidth,HalfHeight),
+	CamPid ! {selectElementsToRender,ScreenRadius,self()},
+	ToRender = receive
+				   
+				   {wooper_result,Elements} ->
+					   Elements
+						   
+			   end,
+	io:format( "Will render following elements: ~p.~n", [ToRender] ).
+				   
+			  
+	%WorldPid = ?getAttr(virtual_world_pid),
+	%WorldPid ! 
