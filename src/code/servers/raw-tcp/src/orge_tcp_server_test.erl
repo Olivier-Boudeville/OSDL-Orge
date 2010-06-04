@@ -34,7 +34,7 @@
 
 
 % For orge_user_settings:
--include("orge_database_manager.hrl").
+-include("class_DatabaseManager.hrl").
 
 
 % For trace facilities:
