@@ -6,14 +6,14 @@
 -define( wooper_superclasses, [class_TraceEmitter] ).
 
 
-% Parameters taken by the constructor ('construct'). 
--define( wooper_construct_parameters, Name, Position, ScreenPosition, 
+% Parameters taken by the constructor ('construct').
+-define( wooper_construct_parameters, Name, Position, ScreenPosition,
 		 ZoomFactor, VirtualWorldPid, MapSupervisorPid ).
 
 
 % Declaring all variations of WOOPER standard life-cycle operations:
 % (template pasted, two replacements performed to update arities)
--define( wooper_construct_export, new/6, new_link/6, 
+-define( wooper_construct_export, new/6, new_link/6,
 		synchronous_new/6, synchronous_new_link/6,
 		synchronous_timed_new/6, synchronous_timed_new_link/6,
 		remote_new/7, remote_new_link/7, remote_synchronous_new/7,
@@ -22,7 +22,7 @@
 
 
 % Member method declarations.
--define( wooper_method_export, setName/2, 
+-define( wooper_method_export, setName/2,
 		 getPosition/1, setPosition/2, setAbscissa/2, getAbscissa/1,
 		 setOrdinate/2, getOrdinate/1, updateOrdinateWith/2,
 		 setOnscreenPosition/2, getZoomFactor/1, setZoomFactor/2,
@@ -68,8 +68,8 @@
 % pixel per virtual world meter), knowing that zoom factor will always be
 % managed here, internally, as px/cm
 %
-construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor, 
-		   VirtualWorldPid, MapSupervisorPid ) when 
+construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor,
+		   VirtualWorldPid, MapSupervisorPid ) when
 	  is_integer(Xc) andalso is_integer(Yc) andalso is_float(ZoomFactor) ->
 
 	% The attribute of an instance are:
@@ -83,52 +83,52 @@ construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor,
 	% of pixel coordinates)
 	%
 	% - zoom_factor is the current zoom of this camera, in px/cm (float)
-	% 
+	%
 	% - world_pid is the PID of the virtual world this camera represents
 	%
 	% - supervisor_pid is the PID of the map supervisor this camera is linked to
 	%
 	% First the direct mother classes:
 	TraceState = class_TraceEmitter:construct( State, Name ),
-	
+
 	VirtualWorldPid ! {getBoundaries,[],self()},
 	{TopLeft,BottomRight} = receive
-					
+
 					{wooper_result,R} ->
 						R
 
 				end,
-					
+
 	ActualZoom = ZoomFactor / 100,
-	
+
 	% Then the class-specific attributes:
 	SetState = setAttributes( TraceState, [
 		 {position,Position},
 		 {screen_position,ScreenPosition},
 		 {zoom_factor,ActualZoom},
 		 {top_left_point,TopLeft},
-		 {bottom_right_point,BottomRight},						
+		 {bottom_right_point,BottomRight},
 		 {world_pid,VirtualWorldPid},
-		 {supervisor_pid,MapSupervisorPid},					
+		 {supervisor_pid,MapSupervisorPid},
 		 {trace_categorization,
-		  text_utils:string_to_binary(?TraceEmitterCategorization)} 
+		  text_utils:string_to_binary(?TraceEmitterCategorization)}
 							   ] ),
-	
+
 	add_info_message( "Camera '~s' starting at location {~B,~B} "
 					 "with zoom factor x~.2f pixels per meter, which means "
-					 "that 1 pixel corresponds to ~s of the virtual world.", 
+					 "that 1 pixel corresponds to ~s of the virtual world.",
 					 [ Name,Xc,Yc,ZoomFactor,
 					  % Takes millimeters:
-					  text_utils:distance_to_short_string(1000/ZoomFactor)], 
+					  text_utils:distance_to_short_string(1000/ZoomFactor)],
 					 SetState ),
 	SetState.
-	
-	
 
-% Destructor.	
+
+
+% Destructor.
 delete(State) ->
 	State.
-	
+
 
 
 
@@ -139,7 +139,7 @@ delete(State) ->
 %
 % (oneway)
 setName( State, NewName ) ->
-   	?wooper_return_state_only( setAttribute( State, name, 
+	?wooper_return_state_only( setAttribute( State, name,
 							  text_utils:string_to_binary(NewName) ) ).
 
 
@@ -219,7 +219,7 @@ updateOrdinateWith( State, PixelValue ) ->
 %
 % (oneway)
 setOnscreenPosition( State, NewPosition ) ->
-	?wooper_return_state_only( 
+	?wooper_return_state_only(
 	   setAttribute( State, screen_position, NewPosition ) ).
 
 
@@ -239,7 +239,7 @@ getZoomFactor( State ) ->
 % (oneway)
 setZoomFactor( State, NewZoomFactor ) ->
 	% From px/m to px/cm:
-	?wooper_return_state_only( 
+	?wooper_return_state_only(
 			setAttribute( State, zoom_factor, NewZoomFactor / 100 ) ).
 
 
@@ -250,26 +250,28 @@ setZoomFactor( State, NewZoomFactor ) ->
 %
 % (const request)
 getFullStatus( State ) ->
-	?wooper_return_state_result( State, {?getAttr(name), 
+	?wooper_return_state_result( State, {?getAttr(name),
 	   	?getAttr(position), ?getAttr(zoom_factor)* 100} ).
-	
+
 
 
 % Returns the subset of the elements of the virtual world which are in the field
 % of this camera.
-% ScreenRadius is the radius, in pixels, of the minimum enclosing circle
-% (centered on the camera position).
-selectElementsToRender( State, ScreenRadius ) ->
+% SquareScreenRadius is the square of the radius, in pixels, of the minimum
+% enclosing circle corresponding to the camera field (centered on the camera
+% position).
+selectElementsToRender( State, SquareScreenRadius ) ->
 	VirtualWorldPid = ?getAttr(world_pid),
 	Center = ?getAttr(position),
-	% In centimeters:
-	WorldRadius = math_utils:ceiling( ScreenRadius/?getAttr(zoom_factor) ),
-	VirtualWorldPid ! {getElementsInDisc,[Center,WorldRadius],self()},
+	Z = ?getAttr(zoom_factor),
+	% In centimeters; selects preferably too much than too little:
+	SquareWorldRadius = math_utils:ceiling( SquareScreenRadius/(Z*Z) ),
+	VirtualWorldPid ! {getElementsInDisc,[Center,SquareWorldRadius],self()},
 	SelectedElements = receive
-						   
+
 						   {wooper_result,Elements} ->
 							   Elements
-								   
+
 					   end,
 	?wooper_return_state_result( State, SelectedElements ).
 
@@ -282,13 +284,13 @@ selectElementsToRender( State, ScreenRadius ) ->
 
 
 % Requests the map supervisor to display specified message.
-add_info_message( Message, State ) ->	
-	?getAttr(supervisor_pid) ! {add_info_message,Message}.
+add_info_message( Message, State ) ->
+	?getAttr(supervisor_pid) ! {add_info_message,[Message]}.
 
 
 % Requests the map supervisor to display specified message.
-add_info_message( MessageFormat, MessageValue, State ) ->	
-	add_info_message( io_lib:format(  MessageFormat, MessageValue ), State ).
+add_info_message( MessageFormat, MessageValue, State ) ->
+	add_info_message( io_lib:format( MessageFormat, MessageValue ), State ).
 
 
 
@@ -332,5 +334,3 @@ screen_offsets_to_absolute_world_coordinates( {Xsoffset,Ysoffset}, State ) ->
 	{Xworld,Yworld} = ?getAttr(position),
 	Z = ?getAttr(zoom_factor),
 	{ Xworld + Xsoffset/Z, Yworld - Ysoffset/Z }.
-
-
