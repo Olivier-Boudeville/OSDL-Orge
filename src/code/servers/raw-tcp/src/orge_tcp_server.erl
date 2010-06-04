@@ -794,32 +794,38 @@ accepted_connections_to_string( [H|T], Acc, MaxConnectionCount ) ->
 -define( trace_emitter_categorization, "Orge" ).
 
 
-send_fatal( Message ) ->
-	?notify_fatal( Message, ?trace_emitter_name, 
-		?trace_emitter_categorization ).
+send_fatal( _Message ) ->
+	fixme.
+%% 	?notify_fatal( Message, ?trace_emitter_name, 
+%% 		?trace_emitter_categorization ).
 
 	
-send_error( Message ) ->
-	?notify_error( Message, ?trace_emitter_name, 
-		?trace_emitter_categorization ).
+send_error( _Message ) ->
+	fixme.
+%% 	?notify_error( Message, ?trace_emitter_name, 
+%% 		?trace_emitter_categorization ).
 	
 	
-send_warning( Message ) ->
-	?notify_warning( Message, ?trace_emitter_name, 
-		?trace_emitter_categorization ).
+send_warning( _Message ) ->
+	fixme.
+%% 	?notify_warning( Message, ?trace_emitter_name, 
+%% 		?trace_emitter_categorization ).
 	
 	
-send_info( Message ) ->
-	?notify_info( Message, ?trace_emitter_name, 
-		?trace_emitter_categorization ).
+send_info( _Message ) ->
+	fixme.
+%% 	?notify_info( Message, ?trace_emitter_name, 
+%% 		?trace_emitter_categorization ).
 	
 	
-send_trace( Message ) ->
-	?notify_trace( Message, ?trace_emitter_name, 
-		?trace_emitter_categorization ).
+send_trace( _Message ) ->
+	fixme.
+%% 	?notify_trace( Message, ?trace_emitter_name, 
+%% 		?trace_emitter_categorization ).
 	
 	
-send_debug( Message ) ->
-	?notify_debug( Message, ?trace_emitter_name, 
-		?trace_emitter_categorization ).
+send_debug( _Message ) ->
+	fixme.
+%% 	?notify_debug( Message, ?trace_emitter_name, 
+%% 		?trace_emitter_categorization ).
 
