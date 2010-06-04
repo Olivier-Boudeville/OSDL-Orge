@@ -19,7 +19,7 @@
 % If not, see <http://www.gnu.org/licenses/>.
 %
 % Author: Olivier Boudeville (olivier.boudeville@esperide.com)
-% Created on Monday, April 5, 2010. 
+% Created on Monday, April 5, 2010.
 -module(class_VirtualWorld).
 
 
@@ -27,13 +27,13 @@
 -define( wooper_superclasses, [class_TraceEmitter] ).
 
 
-% Parameters taken by the constructor ('construct'). 
+% Parameters taken by the constructor ('construct').
 -define( wooper_construct_parameters, Name, Boundaries ).
 
 
 % Declaring all variations of WOOPER standard life-cycle operations:
 % (template pasted, two replacements performed to update arities)
--define( wooper_construct_export, new/2, new_link/2, 
+-define( wooper_construct_export, new/2, new_link/2,
 		synchronous_new/2, synchronous_new_link/2,
 		synchronous_timed_new/2, synchronous_timed_new_link/2,
 		remote_new/3, remote_new_link/3, remote_synchronous_new/3,
@@ -88,21 +88,21 @@ construct( State, Name, _Boundaries={PTopLeft,PBottomRight} ) ->
 
 	% First the direct mother classes:
 	TraceState = class_TraceEmitter:construct( State, Name ),
-	
+
 	% Then the class-specific attributes:
 	setAttributes( TraceState, [
 		 {top_left_point,PTopLeft},
 		 {bottom_right_point,PBottomRight},
-		 {top_level_elements,[]},					
+		 {top_level_elements,[]},
 		 {trace_categorization,
-		  text_utils:string_to_binary(?TraceEmitterCategorization)} 
+		  text_utils:string_to_binary(?TraceEmitterCategorization)}
 							   ] ).
-	
-	
-	
+
+
+
 delete(State) ->
 	State.
-	
+
 
 
 
@@ -114,7 +114,7 @@ delete(State) ->
 %
 % (const request) (integer coordinates)
 getBoundaries( State ) ->
-	?wooper_return_state_result( State, 
+	?wooper_return_state_result( State,
 			  {?getAttr(top_left_point),?getAttr(bottom_right_point)} ).
 
 
@@ -129,19 +129,19 @@ getCenter( State ) ->
 % Returns all elements of this world that may be included, partially or totally,
 % in the specified disc.
 %
-% The real list may actually be a subset of the returned one, as the selection
+% The exact list may actually be a subset of the returned one, as the selection
 % is based on bounding-boxes.
 %
 % (const request)
-getElementsInDisc( State, _Center, _Radius ) ->
+getElementsInDisc( State, Center, Radius ) ->
+	io:format( "getElementsInDisc: center = ~w, radius = ~w m.~n",
+			 [Center,math:sqrt(Radius)/100] ),
 	TopLevelElements = ?getAttr(top_level_elements),
 	?wooper_return_state_result( State,	TopLevelElements ).
 
 
-	
+
 % Static method section.
 
 
 % Helper functions section.
-
-	
