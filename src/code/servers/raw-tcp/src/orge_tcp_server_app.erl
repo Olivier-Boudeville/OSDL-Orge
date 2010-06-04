@@ -30,21 +30,24 @@
 -define(orge_server_name,orge_tcp_server).
 
 
+-define(Tested_modules,[class_OrgeTCPServer]).
+
+-export( [ exec/0 ] ).
+
 
 % For orge_user_settings:
--include("orge_database_manager.hrl").
+-include("class_DatabaseManager.hrl").
 
 
 % For trace facilities:
 -include("traces.hrl").
 
 
--export( [ exec/0 ] ).
 	
 	
 exec() ->
 
-	?traces_start,
+%	?test_start,
 	
 	?notify_info( "Creating a new Orge tcp_server." ),
 	
@@ -190,7 +193,8 @@ exec() ->
 					?notify_info( "Orge server successfully shutdown." )
 			
 			end,	
-			?traces_stop
+			fixme
+			%?test_stop
 			
 	end.		
 
