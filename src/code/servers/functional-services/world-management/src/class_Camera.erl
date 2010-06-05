@@ -26,7 +26,8 @@
 		 getPosition/1, setPosition/2, setAbscissa/2, getAbscissa/1,
 		 setOrdinate/2, getOrdinate/1, updateOrdinateWith/2,
 		 setOnscreenPosition/2, getZoomFactor/1, setZoomFactor/2,
-		 getFullStatus/1, selectElementsToRender/2 ).
+		 getFullStatus/1, selectElementsToRender/2, convertToScreen/2,
+		 convertWorldCoordinatesToScreen/2 ).
 
 
 % FIXME, for debugging only:
@@ -50,6 +51,9 @@
 % Allows to use macros for trace sending:
 -include("class_TraceEmitter.hrl").
 
+
+% For records like point:
+-include("class_VirtualWorld.hrl").
 
 
 % Constructs a new map camera.
@@ -119,7 +123,7 @@ construct( State, Name, Position={Xc,Yc}, ScreenPosition, ZoomFactor,
 					 "that 1 pixel corresponds to ~s of the virtual world.",
 					 [ Name,Xc,Yc,ZoomFactor,
 					  % Takes millimeters:
-					  text_utils:distance_to_short_string(1000/ZoomFactor)],
+					  text_utils:distance_to_short_string(1000/ZoomFactor) ],
 					 SetState ),
 	SetState.
 
@@ -251,12 +255,13 @@ setZoomFactor( State, NewZoomFactor ) ->
 % (const request)
 getFullStatus( State ) ->
 	?wooper_return_state_result( State, {?getAttr(name),
-	   	?getAttr(position), ?getAttr(zoom_factor)* 100} ).
+	   ?getAttr(position), ?getAttr(zoom_factor)* 100} ).
 
 
 
 % Returns the subset of the elements of the virtual world which are in the field
 % of this camera.
+%
 % SquareScreenRadius is the square of the radius, in pixels, of the minimum
 % enclosing circle corresponding to the camera field (centered on the camera
 % position).
@@ -275,6 +280,57 @@ selectElementsToRender( State, SquareScreenRadius ) ->
 					   end,
 	?wooper_return_state_result( State, SelectedElements ).
 
+
+% Converts specified element so that its in-world coordinates become on-screen
+% coordinates.
+%
+% (const request)
+convertToScreen( State, P=#point{ abscissa=Xw, ordinate=Yw} ) ->
+	CamWorldCoord = ?getAttr(position),
+	CamScreenCoord = ?getAttr(screen_position),
+	Z = ?getAttr(zoom_factor),
+	{Xs,Ys} = convert_to_screen( {Xw,Yw}, {CamWorldCoord,CamScreenCoord}, Z ),
+	P#point{ abscissa=Xs, ordinate=Ys };
+
+convertToScreen( _State, Other ) ->
+	throw( {unable_to_convert_to_screen,Other} ).
+
+
+
+% Converts specified in-world coordinates P={Xw,Yw}, into on-screen ones.
+%
+% Returns a pair made of the corresponding on-screen coordinates.
+%
+% (const request)
+convertWorldCoordinatesToScreen( State, P ) ->
+	?wooper_return_state_result( State, convert_to_screen( P, State ) ).
+
+
+% Converts specified in-world coordinates P={Xw,Yw}, into on-screen ones.
+%
+% Returns a pair made of the corresponding on-screen coordinates.
+%
+% (const helper function)
+convert_to_screen( P, State ) ->
+	CamWorldCoord = ?getAttr(position),
+	CamScreenCoord = ?getAttr(screen_position),
+	Z = ?getAttr(zoom_factor),
+	convert_to_screen( P, {CamWorldCoord,CamScreenCoord}, Z ).
+
+
+% Converts specified in-world coordinates (Xw,Yw), into on-screen ones,
+% knowing that {Xcw,Ycw} are the in-world camera coordinates and that {Xcs,Ycs}
+% are the on-screen camera coordinates.
+%
+% Returns a pair made of the corresponding on-screen coordinates.
+%
+% (const helper function)
+convert_to_screen( {Xw,Yw}, { _CamWorldCoord={Xcw,Ycw}, _CamScreenCoord={Xcs,Ycs} },
+				   _ZoomFactor=Z ) ->
+   	Xs = (Xw-Xcw)*Z + Xcs,
+	% Y-axis increasing oppositely:
+	Ys = (Ycw-Yw)*Z + Ycs,
+	{Xs,Ys}.
 
 
 % Static method section.
