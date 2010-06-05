@@ -62,6 +62,8 @@
 -include("class_TraceEmitter.hrl").
 
 
+% For point_edge_length and al:
+-include("class_VirtualWorld.hrl").
 
 
 % Implementation notes.
@@ -219,7 +221,7 @@ construct( State, ?wooper_construct_parameters ) ->
 		 {gs_pid,undefined},
 		 {gs_id,undefined},
 		 {main_win_id,undefined},
-		 {canvas_id,undefined},
+		 %{canvas_id,undefined},
 		 {trace_categorization,
 		  text_utils:string_to_binary(?TraceEmitterCategorization)}
 							   ] ),
@@ -237,8 +239,7 @@ construct( State, ?wooper_construct_parameters ) ->
 
 	add_info_message( "Setting the default camera to the center of the world."),
 
-	% Triggers initial rendering:
-	update_main_view(GuiState),
+	% Not need to trigger an initial rendering.
 
 	GuiState.
 
@@ -265,17 +266,19 @@ enterGUIMainLoop(State) ->
 	receive
 
 		{gs,_Id,destroy,_Data,[]} ->
-			%io:format( "Destroyed!" ),
+			io:format( "Destroyed!" ),
 			self() ! delete,
 			?wooper_return_state_only(State);
 
-		{gs,_Id,configure,_Data,[W,H|_]} ->
+		{gs,main_win,configure,_Data,[W,H|_]} ->
 			% Repacks what needs to (ex: packer_win and other packers)
-			%io:format( "Configuring ~w!~n", [Id] ),
 			gs:config( packer_win, [{width,W},{height,H}] ),
 			% Updates as well the camera center, needed for screen/world
-			% conversions:
-			?getAttr(current_camera_pid) ! {setOnscreenPosition,{W,H}},
+			% conversions (the center of the main view is by convention the
+			% camera location):
+			NewCamX = gs:read( main_view, width ) div 2,
+			NewCamY = gs:read( main_view, height ) div 2,
+			?getAttr(current_camera_pid) ! {setOnscreenPosition,{NewCamX,NewCamY}},
 			update_main_view(State),
 			enterGUIMainLoop(State);
 
@@ -528,7 +531,7 @@ init_gui( State ) ->
 
 	Title = class_TraceEmitter:get_plain_name(State),
 
-	MainWinId = gs:window( GsId, WindowSize ++ [
+	MainWinId = gs:create( window, main_win, GsId, WindowSize ++ [
 								{title,Title},
 								{bg,gui:get_color(grey)},
 								{configure,true}
@@ -546,7 +549,7 @@ init_gui( State ) ->
 									 ]),
 
 	% In the main window, canvas is at the top right:
-	CanvasId = gs:create( canvas, main_view, packer_win, [
+	gs:create( canvas, main_view, packer_win, [
 		{pack_xy,{2,1}},
 		{bg,white},
 		%{hscroll,bottom}, {vscroll,left},
@@ -577,8 +580,8 @@ init_gui( State ) ->
 
 	setAttributes( State, [
 						   {gs_id,GsId},
-						   {main_win_id,MainWinId},
-						   {canvas_id,CanvasId}
+						   {main_win_id,MainWinId}
+						   %{canvas_id,CanvasId}
 						   ] ).
 
 
@@ -902,9 +905,53 @@ display_cam_factor(ZoomFactor) ->
 	gs:config( cam_factor, {text,io_lib:format("~.4f",[ZoomFactor])} ).
 
 
+% Renders all known graphical elements.
+%
+% (const helper function)
+render( #point{ abscissa=X, ordinate=Y, label=Label, color=Color },
+	  CamPid ) ->
+	CamPid ! {convertWorldCoordinatesToScreen,{X,Y},self()},
+	ScreenLocation = receive
+						 {wooper_result,ScreenLoc} ->
+							 linear_2D:roundify(ScreenLoc)
+					 end,
+
+	io:format( "Rendering point at in-world location ~w, with label ~s, "
+			   "to on-screen location ~w.~n",
+			   [{X,Y},Label,ScreenLocation] ),
+	gui:draw_labelled_cross( ScreenLocation, ?point_edge_length, Color,
+							 Label, main_view );
+
+render( Other, _CamPid ) ->
+	throw( {no_rendering_defined_for,Other} ).
+
+
+
 % Updates the main view.
 % Does not return anything useful.
 update_main_view( State ) ->
+
+	% Here we destroy the canvas and recreate it at each update.  This allows to
+	% delete all child (graphical) objects and define newer ones from scratch
+	% (as told by the camera).
+
+	gs:config( packer_win, {map,false} ),
+
+	W = gs:read( packer_win, width ),
+	H = gs:read( packer_win, height ),
+
+	gs:destroy(main_view),
+
+	gs:create( _Type=canvas, _Name=main_view, _Parent=packer_win, [
+		{pack_xy,{2,1}},
+		{bg,white},
+		%{hscroll,bottom}, {vscroll,left},
+		{width,get_canvas_width()},
+		{height,get_canvas_height()}
+		%{scrollregion, {100,200,30,200}}
+												] ),
+	gs:config( packer_win, [ {width,W}, {height,H} ] ),
+
 	CamPid = ?getAttr(current_camera_pid),
 	% Computing the radius in pixels of the minimum enclosing circle for the
 	% main view:
@@ -917,8 +964,6 @@ update_main_view( State ) ->
 					   Elements
 
 			   end,
-	io:format( "Will render following elements: ~p.~n", [ToRender] ).
-
-
-	%WorldPid = ?getAttr(virtual_world_pid),
-	%WorldPid !
+	io:format( "Will render following elements: ~p.~n", [ToRender] ),
+	[ render(E,CamPid) || E <- ToRender ],
+	gs:config( packer_win, {map,true} ).
