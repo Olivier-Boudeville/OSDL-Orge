@@ -23,17 +23,17 @@
 
 % Member method declarations.
 -define( wooper_method_export, setName/2,
-		 getPosition/1, setPosition/2, setAbscissa/2, getAbscissa/1,
-		 setOrdinate/2, getOrdinate/1, updateOrdinateWith/2,
-		 setOnscreenPosition/2, getZoomFactor/1, setZoomFactor/2,
-		 getFullStatus/1, selectElementsToRender/2, convertToScreen/2,
-		 convertWorldCoordinatesToScreen/2 ).
+		getPosition/1, setPosition/2, setAbscissa/2, getAbscissa/1,
+		setOrdinate/2, getOrdinate/1, updateOrdinateWith/2,
+		setOnscreenPosition/2, getZoomFactor/1, setZoomFactor/2,
+		getFullStatus/1, selectElementsToRender/2, convertToScreen/2,
+		convertWorldCoordinatesToScreen/2 ).
 
 
 % FIXME, for debugging only:
 -export([ screen_offset_to_absolute_world_abscissa/2,
-		 screen_offset_to_absolute_world_ordinate/2,
-		 screen_offsets_to_absolute_world_coordinates/2 ]).
+		screen_offset_to_absolute_world_ordinate/2,
+		screen_offsets_to_absolute_world_coordinates/2 ]).
 
 
 % Static method declarations.
@@ -53,7 +53,7 @@
 
 
 % For records like point:
--include("class_VirtualWorld.hrl").
+-include("gui.hrl").
 
 
 % Constructs a new map camera.
@@ -285,7 +285,7 @@ selectElementsToRender( State, SquareScreenRadius ) ->
 % coordinates.
 %
 % (const request)
-convertToScreen( State, P=#point{ abscissa=Xw, ordinate=Yw} ) ->
+convertToScreen( State, P=#point{ abscissa=Xw, ordinate=Yw } ) ->
 	CamWorldCoord = ?getAttr(position),
 	CamScreenCoord = ?getAttr(screen_position),
 	Z = ?getAttr(zoom_factor),
