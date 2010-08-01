@@ -61,9 +61,8 @@
 % Allows to use macros for trace sending:
 -include("class_TraceEmitter.hrl").
 
-
-% For point_edge_length and al:
--include("class_VirtualWorld.hrl").
+% For point record and al:
+-include("gui.hrl").
 
 
 % Implementation notes.
@@ -919,8 +918,7 @@ render( #point{ abscissa=X, ordinate=Y, label=Label, color=Color },
 	io:format( "Rendering point at in-world location ~w, with label ~s, "
 			   "to on-screen location ~w.~n",
 			   [{X,Y},Label,ScreenLocation] ),
-	gui:draw_labelled_cross( ScreenLocation, ?point_edge_length, Color,
-							 Label, main_view );
+	gui:draw_labelled_cross( ScreenLocation, Color, Label, main_view );
 
 render( Other, _CamPid ) ->
 	throw( {no_rendering_defined_for,Other} ).
