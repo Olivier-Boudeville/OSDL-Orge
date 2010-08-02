@@ -1092,7 +1092,7 @@ How To Check Which Orge Ports And Services Are Open
 
 From outside the server, ``nmap`` can be used to check the default Orge port. If the Orge server is running you will have something similar to::
 
-  > nmap -p 9512 -PN orge-testing.esperide.com
+  $ nmap -p 9512 -PN orge-testing.esperide.com
 
   Starting Nmap 4.62 ( http://nmap.org ) at 2009-08-30 18:40 CEST
   Interesting ports on orge-testing.esperide.com (XX.XX.XX.XX):
@@ -1105,7 +1105,7 @@ From outside the server, ``nmap`` can be used to check the default Orge port. If
 
 Whereas if it is not running you will have::
 
-  >  nmap -p 9512 -PN orge-testing.esperide.com
+  $  nmap -p 9512 -PN orge-testing.esperide.com
 
   Starting Nmap 4.76 ( http://nmap.org ) at 2009-12-28 14:46 CET
   Interesting ports on orge-testing.esperide.com (92.243.4.77):
@@ -1118,7 +1118,7 @@ Whereas if it is not running you will have::
 
 From a shell on the Orge server, one can use::
 
-  > orge-testing:/home/orge# netstat -an
+  $ orge-testing:/home/orge# netstat -an
 
 
 
