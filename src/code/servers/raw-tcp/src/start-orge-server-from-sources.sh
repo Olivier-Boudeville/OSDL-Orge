@@ -7,7 +7,7 @@ epmd_port=4269
 USAGE="  Usage: "`basename $0`" [ -d | --debug ]
   Launches an Orge server.
   Options are:
-     -d or --debug: run in debug mode (not in the background), instead of in the default production mode
+	 -d or --debug: run in debug mode (not in the background), instead of in the default production mode
 "
 
 
