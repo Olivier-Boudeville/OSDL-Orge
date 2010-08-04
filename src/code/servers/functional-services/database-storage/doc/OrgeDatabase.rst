@@ -1,18 +1,15 @@
-
-
-:raw-latex:`\pagebreak`
-
-
 .. role:: raw-html(raw)
    :format: html
-   
+
 .. role:: raw-latex(raw)
    :format: latex
 
 
-.. _orge_database_manager.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/orge_database_manager.hrl?view=markup
+:raw-latex:`\pagebreak`
 
-.. _orge_database_manager.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/orge_database_manager.erl?view=markup
+.. _class_OrgeDatabaseManager.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/class_OrgeDatabaseManager.hrl?view=markup
+
+.. _class_OrgeDatabaseManager.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/class_OrgeDatabaseManager.erl?view=markup
 
 
 .. _Orge database:
@@ -22,31 +19,35 @@
 Orge Database
 =============
 
-.. contents:: 
+.. contents::
 	:local:
 
 
 Overview
 --------
 
-The Orge database contains the various informations about:
- 
- * each Orge user
- * the simulation state
- * the monitored events, including each connection to the Orge server 
+The Orge database contains the various information about:
+
+ - each Orge user
+ - the simulation state
+ - the monitored events, including each connection to the Orge server
 
 
- 
-Most tables of the database are expected to be in memory (RAM) only, for efficiency reasons (soft real-time needed). Regular disk snapshots will be performed nevertheless.
 
-Some tables, too large and/or less frequently requested, will be stored directly on disc.  
+Some tables of the database are expected to be in memory (RAM) only, for efficiency reasons (soft real-time needed). Regular disk snapshots are to be performed nevertheless.
 
-The Orge database is based on Mnesia.  
+Some other tables, too large and/or less frequently requested, will be stored directly on disc.
+
+However the majority of tables will be stored both on disc (for write persistence) *and* in RAM (for fast read accesses).
+
+The Orge database is based on Mnesia.
 
 
-To inspect the data in the tables of the Orge database, one just has to launch, for example from the Orge server shell::
+To inspect the data in the tables of the Orge database, one just has to run, for example from the Orge server shell, supposing Mnesia is already running (``mnesia:start().``)::
 
  > tv:start().
+
+Hitting CTRL-M allows then to browse the various tables.
 
 
 Conventions
@@ -55,16 +56,15 @@ Conventions
 Each table field has to respect a specified datatype. A datatype can define base constraints, that will be enforced at all times, between transactions.
 
 Per-field additional constraints can be defined as well. This includes:
- 
+
  - mandatory: the field has to be set (this is the default)
- - optional: the field may be not set
+ - optional: the field may or may not be set
 
 
 Identifiers
 ...........
 
-
-All main informations are identified by an intentionally meaningless number, to allow all related informations to be changed while preserving the links between entries.
+Main information are identified by an intentionally meaningless number, to allow all related information to be changed while preserving the links between entries.
 
 This number, the information identifier, is implemented by a simple unsigned integer counter, starting at 1, and incremented for each new entry. The related type/format is named ``OrgeIdentifier``.
 
@@ -75,7 +75,6 @@ The identifiers of Orge users are set by the Orge Database, whereas the identifi
 
 Strings
 .......
-
 
 A string is a list of characters (including alphanumerical and accentued ones) with punctuation marks.
 
@@ -88,10 +87,10 @@ Time
 It is a pair made of a date and a time, like in ``{{2008,7,11},{17,21,43}}`` for July 11, 2008, at 17:21:43.
 
 
-Schema For Simulation Users
----------------------------
+Schema For Orge Simulation Users
+--------------------------------
 
-Orge user informations are stored in a table named ``orge_user``.
+Orge user information are stored in a table named ``orge_user``.
 
 An Orge user is described by the following fields:
 
@@ -143,10 +142,10 @@ An Orge user is described by the following fields:
 
 The field ``Controlled Characters`` lists the simulated characters that the Orge user can control. This field can contain only one character identifier, or a fixed-sized tuple, or a list containing character identifiers, depending on the chosen account settings for that Orge instance.
 
-The corresponding Erlang ``record`` is defined in orge_database_manager.erl_.
- 
- 
- 
+The corresponding Erlang ``record`` is defined in class_OrgeDatabaseManager.erl_.
+
+
+
 Schema For Simulation State
 ---------------------------
 
@@ -157,41 +156,40 @@ All connections to an Orge server are stored in a table named ``orge_connection`
 
 A connection is described by the following fields:
 
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Field Name             | Format/Datatype                   | Default     | Additional               |
-|                        |                                   | Value       | Constraints              |
-+========================+===================================+=============+==========================+
-| Identifier             | OrgeIdentifier                    | N/A         | Incremented from 1.      |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Login Status           | In: [ ``not_tried_yet``,          | None        | None                     |
-|                        | ``access_granted``, ``bad_login`` |             |                          |
-|                        | ``bad_password``, ``timeout``,    |             |                          |
-|                        | ``marshalling_failed``,           |             |                          |
-|                        | ``already_connected``,            |             |                          |
-|                        | ``account_not_active``].          |             |                          |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| User Identifier        | OrgeIdentifier                    | N/A         | Optional                 |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Sent Login             | String[15]                        | None        | Optional                 |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Sent Password          | String[15]                        | None        | Optional                 |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Peer IP address        | IPV4Address                       | None        | None                     |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Peer TCP port          | Port                              | None        | None                     |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Connection Start Time  | Time                              | None        | None                     |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Connection Stop Time   | Time                              | None        | Optional                 |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Geolocated Country     | String                            | None        | None                     |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Geolocated Region      | String                            | None        | None                     |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Geolocated City        | String                            | None        | None                     |
-+------------------------+-----------------------------------+-------------+--------------------------+
-| Geolocated Postal Code | String                            | None        | None                     |
-+------------------------+-----------------------------------+-------------+--------------------------+
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Field Name                | Format/Datatype                   | Default     | Additional               |
+|                           |                                   | Value       | Constraints              |
++===========================+===================================+=============+==========================+
+| Identifier                | OrgeIdentifier                    | N/A         | Incremented from 1.      |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Login Status              | In: [ ``not_tried_yet``,          | None        | None                     |
+|                           | ``access_granted``, ``bad_login`` |             |                          |
+|                           | ``bad_password``, ``timeout``,    |             |                          |
+|                           | ``marshalling_failed``,           |             |                          |
+|                           | ``already_connected``,            |             |                          |
+|                           | ``account_not_active``].          |             |                          |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| User Identifier           | OrgeIdentifier                    | N/A         | Optional                 |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Sent Login                | String[15]                        | None        | Optional                 |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Hash of the Sent Password | String[20] (with sha)             | None        | Optional                 |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Peer IP Address           | IPV4Address                       | None        | None                     |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Peer TCP Port             | Port                              | None        | None                     |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Connection Start Time     | Time                              | None        | None                     |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Connection Stop Time      | Time                              | None        | Optional                 |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Geolocated Country        | String                            | None        | None                     |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Geolocated Region         | String                            | None        | None                     |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Geolocated City           | String                            | None        | None                     |
++---------------------------+-----------------------------------+-------------+--------------------------+
+| Geolocated Postal Code    | String                            | None        | None                     |
++---------------------------+-----------------------------------+-------------+--------------------------+
 
 A connection is geolocated from its IP address, see `Geolocation`_ for more details.
-
