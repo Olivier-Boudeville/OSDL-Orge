@@ -1,4 +1,3 @@
-
 # This is the file that all Orge GNUmakefiles, and only them, should include.
 
 # Prerequisite: ORGE_TOP must be set.
@@ -19,4 +18,3 @@ include $(ORGE_TOP)/GNUmakerules.inc
 include $(TRACES_TOP)/GNUmakerules.inc
 include $(WOOPER_TOP)/GNUmakerules.inc
 include $(COMMON_TOP)/GNUmakerules.inc
-
