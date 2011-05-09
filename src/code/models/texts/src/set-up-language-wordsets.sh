@@ -12,7 +12,7 @@ retrieve()
 {
 
 	remote_file="$1"
-	
+
 	if [ -n "$2" ] ; then
 		result_file="$2.txt"
 	else
@@ -22,14 +22,14 @@ retrieve()
 	echo "    Retrieving $result_file (from $remote_file)"
 	wget $remote_file --output-document $result_file --quiet --wait=1 --random-wait 1>/dev/null 2>&1
 	res=$?
-	
+
 	if [ ! $res -eq 0 ] ; then
-	
+
 		echo "### Error, download of $remote_file failed." 1>&2
 		exit $res
-		
+
 	fi
-	
+
 }
 
 
@@ -39,9 +39,9 @@ retrieve_from_pound()
 
 	source_file="$chris_pound_base_url/$1"
 	target_file="$2"
-	
+
 	retrieve $source_file $target_file
-	
+
 }
 
 
@@ -265,7 +265,7 @@ retrieve_from_pound spanish-s spanish-surnames
 retrieve_from_pound swahili
 
 
-# Tamil (words): 
+# Tamil (words):
 retrieve_from_pound tamil
 
 
@@ -360,9 +360,3 @@ retrieve_from_pound jorune
 
 # Annoying with the numerous '?':
 retrieve_from_pound tsolyani
-
-
-
-
-
-
