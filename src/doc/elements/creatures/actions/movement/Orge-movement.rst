@@ -1,10 +1,9 @@
-
 Movement
 ========
 
 Movements of creatures are free and dynamically evaluated: there are no precomputed paths.
 
-Creatures will be constrained not to wander outside the limits of the overall game world thanks to impassable obstacles completely surrounding the allowed area (ex: water, mountain, etc.). 
+Creatures will be constrained not to wander outside the limits of the overall game world thanks to impassable obstacles completely surrounding the allowed area (ex: water, mountain, etc.).
 
 Le joueur sera empêché de sortir de cette zone par des obstacles intégrés dans le monde du jeu, notamment physiques (ex: mer, montagne, etc.)
 
@@ -20,23 +19,23 @@ In this case the speed of a creature for a movement type is determined by:
  - the state of the creature, including its physical fatigue, itself modulated notably by the carried weight and by its health and wounds, and its mental fatigue
 
 After a movement, the fields of perception of the creature are updated.
-  
+
 
 Types of Movement
 -----------------
 
 The supported Movement Types are:
- 
+
  - Ground movements: Walking and Running (no Jogging)
  - Water movements: Swimming
  - Air movements: Flying
 
-Some creature have different `gaits <http://en.wikipedia.org/wiki/Gait>`_. 
+Some creature have different `gaits <http://en.wikipedia.org/wiki/Gait>`_.
 For example, horses have for Ground movements: Walk, Trotting, Cantering, Galloping.
 
 A special case of movement is the performing of jumps.
- 
- 
+
+
 Movement Rate
 -------------
 
@@ -93,20 +92,20 @@ Moreover, on a per-species basis, it:
 
  - offers a defensive bonus
  - affects the creature speed, for the supported movement types
- 
+
 Terrain modifiers should not be confused with the more global `Environment Modifiers`_, which are associated to full area, knowing that both modifiers apply when evaluating a movement.
- 
- 
- 
+
+
+
 Urban-related Terrains
 ______________________
-   
+
 
 Humans, Dwarves, Halflings, Goblins and Orcs are quite adapted to artificial environments.
 Elves and Gnomes are less comfortable with these terrains.
-  
-   
-   
+
+
+
 In Building Terrain
 *******************
 
@@ -117,7 +116,7 @@ Urban species can defend well and move fast here.
 +------------------------+-----------+
 | Allows Water movement  | no        |
 +------------------------+-----------+
-| Allows Air movement    | yes       |  
+| Allows Air movement    | yes       |
 +------------------------+-----------+
 | Blocks Visibility      | no        |
 +------------------------+-----------+
@@ -158,7 +157,7 @@ This is quite poor for defense, but generally the most suitable terrain for grou
 +------------------------+-----------+
 | Allows Water movement  | no        |
 +------------------------+-----------+
-| Allows Air movement    | yes       |  
+| Allows Air movement    | yes       |
 +------------------------+-----------+
 | Blocks Visibility      | no        |
 +------------------------+-----------+
@@ -202,7 +201,7 @@ Good for defense, intermediate for movement.
 +------------------------+-----------+
 | Allows Water movement  | no        |
 +------------------------+-----------+
-| Allows Air movement    | yes       |  
+| Allows Air movement    | yes       |
 +------------------------+-----------+
 | Blocks Visibility      | yes       |
 +------------------------+-----------+
@@ -321,7 +320,7 @@ Indoor walls blocks everything (creatures, sight, missiles) but may reveal hidde
 +------------------------+-----------+
 | Allows Water movement  | no        |
 +------------------------+-----------+
-| Allows Air movement    | no        |  
+| Allows Air movement    | no        |
 +------------------------+-----------+
 | Blocks Visibility      | yes       |
 +------------------------+-----------+
@@ -358,7 +357,7 @@ Unless specific measures are taken (use of map, compass, magical item, mapping s
 As there are basically no auto-mapper, the player has to rely on its sense of direction and/or its own mapping onto graph paper.
 
 Should an auto-mapper be provided, it would have to include a "fog of war" feature.
- 
+
 
 
 Scenery Elements
@@ -367,7 +366,7 @@ Scenery Elements
 They form a second layer on top of the terrain layer, to determine the traversable locations.
 
 The state of a scenery element includes these attributes:
-  
+
   - Allows Ground movement: yes/no
   - Allows Water movement: yes/no
   - Allows Air movement: yes/no
@@ -400,7 +399,7 @@ Walls
 +------------------------+----------------+
 | Allows Water movement  | no             |
 +------------------------+----------------+
-| Allows Air movement    | no             |  
+| Allows Air movement    | no             |
 +------------------------+----------------+
 | Blocks Visibility      | yes            |
 +------------------------+----------------+
@@ -426,7 +425,7 @@ Doors
 +------------------------+----------------+
 | Allows Water movement  | no             |
 +------------------------+----------------+
-| Allows Air movement    | no             |  
+| Allows Air movement    | no             |
 +------------------------+----------------+
 | Blocks Visibility      | yes            |
 +------------------------+----------------+
@@ -454,7 +453,7 @@ Furnitures
 +------------------------+----------------+
 | Allows Water movement  | no             |
 +------------------------+----------------+
-| Allows Air movement    | no             |  
+| Allows Air movement    | no             |
 +------------------------+----------------+
 | Blocks Visibility      | no             |
 +------------------------+----------------+
@@ -483,7 +482,7 @@ Stairs
 +------------------------+----------------+
 | Allows Water movement  | no             |
 +------------------------+----------------+
-| Allows Air movement    | yes            |  
+| Allows Air movement    | yes            |
 +------------------------+----------------+
 | Blocks Visibility      | yes            |
 +------------------------+----------------+
@@ -507,7 +506,7 @@ Portals
 +------------------------+----------------+
 | Allows Water movement  | yes            |
 +------------------------+----------------+
-| Allows Air movement    | yes            |  
+| Allows Air movement    | yes            |
 +------------------------+----------------+
 | Blocks Visibility      | yes            |
 +------------------------+----------------+
@@ -522,7 +521,7 @@ Portals
 
 Portals can be created by magic, and thus may exist dynamically in non-predetermined places.
 
-Pits, shafts, wells can be seen as portals which may kill creatures falling in them, or make them arrive into new places, etc.). 
+Pits, shafts, wells can be seen as portals which may kill creatures falling in them, or make them arrive into new places, etc.).
 
 
 Windows
@@ -534,5 +533,3 @@ They include:
 
  - classical windows
  - loopholes
- 
- 

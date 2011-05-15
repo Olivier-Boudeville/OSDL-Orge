@@ -9,7 +9,7 @@ Damages correspond to harm to creatures or objects.
 There are different types of damage, with various durations and zone of effects.
 
 All damages have at least a type (see below) and an intensity, which is expressed in Damage Points (DP).
- 
+
 
 Damage Types
 ............
@@ -74,7 +74,7 @@ Damage Durations
 ................
 
 Regarding time, damages can be:
- 
+
  - punctual, like a knife stab
  - repeated (damage over time), like a poison
 
@@ -82,7 +82,7 @@ Unless specified otherwise, damages are punctual.
 
 
 Repeated damages are defined by:
- 
+
  - the number N of damage surges inflicted (ex: 5)
  - the duration D between two surges (ex: 2 seconds)
 
@@ -94,22 +94,17 @@ Damage Zone of Effects
 ......................
 
 
-To each damage inflicted, a center point, describing its actual location, is associated. 
+To each damage inflicted, a center point, describing its actual location, is associated.
 
 Regarding space, damages can be:
- 
+
  - local, i.e. affecting one target, at the damage center point. Example: a knife stab
  - zonal, area-based, i.e. potentially affecting multiple targets, with a zone of effects described by a length L, in meters. Unless specified otherwise, this zone is a sphere whose center is the damage center point and whose radius is the associated length. Example: a *Rain of Knives* spell might affect all creatures in a 2-meter area around the target
- 
+
 
 Unless specified otherwise, damages are local.
- 
+
 So a local damage of type Slashing, intensity 17, will be noted as ``Slashing: 17DP``, whereas a zonal damage of type Sonic, intensity 10 DP, length (radius) 2.2 meters, will be noted as ``Sonic: 10 DP-L2.2``.
 
 
 Finally, a repeated zonal damage of type Fire, intensity 12, surge count 50, surge inter-duration 0.1 second, length (radius) 0.2 meters, will be noted as ``Fire: 12 DP-N50-D0.1-L0.2``: only a Troll could have decided to sit in a barbecue.
-
-
-
-
-

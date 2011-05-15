@@ -20,7 +20,8 @@ Orge Database
 =============
 
 .. contents::
-	:local:
+
+.. :local:
 
 
 Overview

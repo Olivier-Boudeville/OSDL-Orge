@@ -7,16 +7,16 @@ All built-in Orge skills are listed here alphabetically.
 
 .. Skill Template::
 
-______
+.. ______
 
-The * Skill* .
+.. The * Skill* .
 
-Increasing this skill allows to:
+.. Increasing this skill allows to:
 
- - 
+..  -
 
-Parent skill: ``_.
-Specialized skills: ``_, ``_, ``_, ``_, ``_, ``_. 
+.. Parent skill: ``_.
+.. Specialized skills: ``_, ``_, ``_, ``_, ``_, ``_.
 
 
 
@@ -34,10 +34,10 @@ Increasing this skill allows to:
  - perform more Priesthood
 
 Parent skill: ``_.
-Specialized skills: `Magery`_, `Priesthood`_. 
- 
- 
- 
+Specialized skills: `Magery`_, `Priesthood`_.
+
+
+
 Arcane Lore
 ___________
 
@@ -51,9 +51,9 @@ Increasing this skill allows to:
  - perform more Priesthood
 
 Parent skill: `Lore`_.
-Specialized skills: `Magery`_, `Priesthood`_. 
- 
- 
+Specialized skills: `Magery`_, `Priesthood`_.
+
+
 
 Arts
 ____
@@ -65,9 +65,9 @@ Increasing this skill allows to:
 
  - better judge artwork
  - create more easily all forms of arts
- 
+
 Parent skill: `Talent`_.
-Specialized skills: `Music`_, `Drawing`_, `Singing`_, `Dancing`_, `Calligraphy`_. 
+Specialized skills: `Music`_, `Drawing`_, `Singing`_, `Dancing`_, `Calligraphy`_.
 
 
 Backstab
@@ -81,21 +81,21 @@ Increasing this skill allows to:
  - increase the inflicted damages
 
 Parent skill: ``_.
-Specialized skills: ``_, ``_, ``_, ``_, ``_, ``_. 
+Specialized skills: ``_, ``_, ``_, ``_, ``_, ``_.
 
 
 
 Combat
 ______
 
-The *Combat Skill* corresponds to the training in all kinds of martial arts, in order to take advantage when fighting opponents. It results in having more chances to hit, and to deal increased damages. 
+The *Combat Skill* corresponds to the training in all kinds of martial arts, in order to take advantage when fighting opponents. It results in having more chances to hit, and to deal increased damages.
 
 Increasing this skill allows to:
 
  - progress slightly in all combat skills (+1% per level of `Combat Skill`)
 
 Parent skill: ``_.
-Specialized skills: `Melee Combat`_, `Ranged Combat`_, `Combat Technics`_. 
+Specialized skills: `Melee Combat`_, `Ranged Combat`_, `Combat Technics`_.
 
 
 
@@ -107,10 +107,10 @@ The *Craftsmanship Skill* reflects the skill in an occupation or trade.
 
 Increasing this skill allows to:
 
- - 
+ -
 
 Parent skill: Talent.
-Specialized skills: ``_, ``_, ``_, ``_, ``_, ``_. 
+Specialized skills: ``_, ``_, ``_, ``_, ``_, ``_.
 
 
 
@@ -124,9 +124,9 @@ Increasing this skill allows to:
 
  - calm more easily hostile animals (+15%)
  - resist more to some animal venoms, notably snake (+10%), scorpions (+15%), bees (+5%), spider (+5%)
- 
+
 Parent skill: `Nature Lore`_.
-Specialized skills: `Taming`_. 
+Specialized skills: `Taming`_.
 
 
 
@@ -142,7 +142,7 @@ Increasing this skill allows to:
  - be able to tame dragons
 
 Parent skill: `Taming`_.
-Specialized skills: none. 
+Specialized skills: none.
 
 
 
@@ -155,10 +155,10 @@ Increasing this skill allows to:
 
  - restore some health
  - reduce bleeding
- - resorb some wounds 
+ - resorb some wounds
 
 Parent skill: `Craftsmanship`_.
-Specialized skills: none. 
+Specialized skills: none.
 
 
 Gymnastics
@@ -173,7 +173,7 @@ Increasing this skill allows to:
  - be better at dodging blows
 
 Parent skill: `Physical Development`_.
-Specialized skills: none. 
+Specialized skills: none.
 
 
 Lore
@@ -186,13 +186,13 @@ Increasing this skill allows to:
  - have at one's disposal more keys of understanding and interacting with foreign elements
  - be more familiar with all kinds of cultures
  - recognize all kinds of creatures, locations, objects, events
- 
+
 Parent skill: `Talent`_.
-Specialized skills: `Folk Lore`_, `Arcane Lore`_, `Nature Lore`_. 
+Specialized skills: `Folk Lore`_, `Arcane Lore`_, `Nature Lore`_.
 
 
 
- 
+
 Magery
 ______
 
@@ -205,14 +205,14 @@ Increasing this skill allows to:
  - cast more complex (advanced) Mage spells
 
 Parent skill: `Arcane`_.
-Specialized skills: `Summoning`_, `Battle Spells`_. 
- 
+Specialized skills: `Summoning`_, `Battle Spells`_.
+
 
 Nature Lore
 ___________
 
 
-The *Nature Lore Skill* gathers all kinds of knowledge and practise regarding life in wilderness.  
+The *Nature Lore Skill* gathers all kinds of knowledge and practise regarding life in wilderness.
 
 
 Increasing this skill allows to:
@@ -222,7 +222,7 @@ Increasing this skill allows to:
  - resist some vegetal poisons (toxins): +15%
 
 Parent skill: `Lore`_.
-Specialized skills: `Creature\nLore`_, `Vegetal\nLore`_. 
+Specialized skills: `Creature Lore`_, `Vegetal Lore`_.
 
 
 Physical Development
@@ -235,9 +235,9 @@ Increasing this skill allows to:
 
  - perform better in all kinds of physical challenges
  - better withstand demanding physical challenges
- 
+
 Parent skill: `Talent`_.
-Specialized skills: `Mount Riding`_, `Swimming`_, `Climbing`_, `Gymnastics`_, `Athletics`_. 
+Specialized skills: `Mount Riding`_, `Swimming`_, `Climbing`_, `Gymnastics`_, `Athletics`_.
 
 
 Physical Hardening
@@ -248,7 +248,7 @@ The *Physical Hardening Skill* allows to increase the hardiness of the creature 
 Increasing this skill allows to better resist to Slashing, Piercing and Bludgeoning damages.
 
 Parent skill: `Resistance Improvement`_.
-Specialized skills: none. 
+Specialized skills: none.
 
 
 
@@ -265,7 +265,7 @@ Increasing this skill allows to:
  - cast more complex (advanced) Priest spells
 
 Parent skill: ``_.
-Specialized skills: ``_, ``_. 
+Specialized skills: ``_, ``_.
 
 
 
@@ -278,7 +278,7 @@ The *Talent Skill* reflects the overall skill in accomplishing; this is a specia
 Increasing this skill allows to progress (slightly) in each and every skill.
 
 Parent skill: none (root of all skills).
-Specialized skills: `Craftsmanship`_, `Arts`_, `Lore`_, `Physical Development`_, `Combat`_, `Arcane`_. 
+Specialized skills: `Craftsmanship`_, `Arts`_, `Lore`_, `Physical Development`_, `Combat`_, `Arcane`_.
 
 
 Taming
@@ -292,5 +292,94 @@ Increasing this skill allows to:
  - further enhance the ability to calm hostile animals
 
 Parent skill: `Creature Lore`_.
-Specialized skills: `Bird Taming`_, `Dog Taming`_, `Wolf Taming`_, `Horse Taming`_, `Dragon Taming`_. 
+Specialized skills: `Bird Taming`_, `Dog Taming`_, `Wolf Taming`_, `Horse Taming`_, `Dragon Taming`_.
 
+
+Music
+_____
+
+
+Drawing
+_______
+
+
+Singing
+_______
+
+
+Dancing
+_______
+
+
+Calligraphy
+___________
+
+
+Melee Combat
+____________
+
+
+Ranged Combat
+_____________
+
+
+Combat Technics
+_______________
+
+
+Folk Lore
+_________
+
+
+Summoning
+_________
+
+
+Battle Spells
+_____________
+
+
+
+Vegetal Lore
+____________
+
+
+
+.. _`Initiative Skill`:
+
+Initiative
+__________
+
+Some combat schools concentrates on the very first moments of a conflict. For example in order to draw a short katana and behead the opponent in the same movement.
+
+
+Swimming
+________
+
+
+Climbing
+________
+
+
+Athletics
+_________
+
+
+Resistance Improvement
+______________________
+
+
+Bird Taming
+___________
+
+
+Dog Taming
+__________
+
+
+Wolf Taming
+___________
+
+
+Horse Taming
+____________

@@ -1,4 +1,3 @@
-
 Ammunitions
 ...........
 
@@ -25,18 +24,20 @@ Following attributes are used:
   - Associated Weapons: list of the weapons that can use that kind of ammunition
   - Inflicted Damages: list of all the damage types and intensities (in Damage Points) inflicted (see `Damage Types`_)
   - Weight: the weight of the ammunition itself (no magazine not taken into account here)
-  - Base Value: base value, in credits (no magazine not taken into account here)
+  - Base Value: base value, in credits (no magazine taken into account here)
 
 
 Arrow
 *****
 
+
 Hunt Arrow
 ::::::::::
 
+
 +----------------------+------------------------------------+
-| Hunt Arrow           |                                    |
-| Characteristics      |                                    |
+| Hunt Arrow           | Characteristics                    |
+|                      |                                    |
 +======================+====================================+
 | Associated           | Bows                               |
 | Weapons              |                                    |
@@ -49,12 +50,14 @@ Hunt Arrow
 +----------------------+------------------------------------+
 
 
+
 War Arrow
 :::::::::
 
+
 +----------------------+------------------------------------+
-| War Arrow            |                                    |
-| Characteristics      |                                    |
+| War Arrow            | Characteristics                    |
+|                      |                                    |
 +======================+====================================+
 | Associated           | Bows                               |
 | Weapons              |                                    |
@@ -75,8 +78,8 @@ Regular Bolt
 ::::::::::::
 
 +----------------------+------------------------------------+
-| Regular Bolt         |                                    |
-| Characteristics      |                                    |
+| Regular Bolt         | Characteristics                    |
+|                      |                                    |
 +======================+====================================+
 | Associated           | Crossbows                          |
 | Weapons              |                                    |
@@ -96,8 +99,8 @@ Regular Dart
 ::::::::::::
 
 +----------------------+------------------------------------+
-| Regular Dart         |                                    |
-| Characteristics      |                                    |
+| Regular Dart         | Characteristics                    |
+|                      |                                    |
 +======================+====================================+
 | Associated           | Blow-pipes                         |
 | Weapons              |                                    |
@@ -114,8 +117,8 @@ Regular Poisoned Dart
 :::::::::::::::::::::
 
 +----------------------+------------------------------------+
-| Regular Poisoned Dart|                                    |
-| Characteristics      |                                    |
+| Regular Poisoned Dart| Characteristics                    |
+|                      |                                    |
 +======================+====================================+
 | Associated           | Blow-pipes                         |
 | Weapons              |                                    |
@@ -138,8 +141,8 @@ Random Small Stones
 :::::::::::::::::::
 
 +----------------------+------------------------------------+
-| Small Stones         |                                    |
-| Characteristics      |                                    |
+| Small Stones         | Characteristics                    |
+|                      |                                    |
 +======================+====================================+
 | Associated           | Crossbows                          |
 | Weapons              |                                    |
@@ -176,7 +179,7 @@ Magazine attributes are:
   - Weight: the weight of the magazine when empty
   - Bulkiness: the bulkiness factor induced by the magazine
   - Base Value: base value, in credits
-  
+
 
 Magazine Repository
 ___________________
@@ -191,47 +194,48 @@ A magazines for all sorts of arrows.
 Hunt Quiver
 :::::::::::
 
++----------------+------------------+
+| Hunt Quiver    | Characteristics  |
+|                |                  |
++================+==================+
+| Associated     |                  |
+| Ammunitions    |                  |
++----------------+                  +
+| Capacity       | 10               |
++----------------+------------------+
+| Switch Duration| 1.2 second       |
++----------------+------------------+
+| Weight (empty) | 0.2 kg           |
++----------------+------------------+
+| Bulkiness      | +3%              |
++----------------+------------------+
+| Base Value     | 10 credits       |
++----------------+------------------+
 
-+----------------+------------+
-| Hunt Quiver    |            |
-| Characteristics|            |
-+================+============+
-| Associated     | Arrows     |
-| Ammunitions    |            |
-+----------------+------------+
-| Capacity       | 10         |
-+----------------+------------+
-| Switch Duration| 1.2 second |
-+----------------+------------+
-| Weight (empty) | 0.2 kg     |
-+----------------+------------+
-| Bulkiness      | +3%        |
-+----------------+------------+
-| Base Value     | 10 credits |
-+----------------+------------+
 
 
 War Quiver
 ::::::::::
 
++----------------+-----------------+
+| War Quiver     | Characteristics |
+|                |                 |
++================+=================+
+| Associated     | Arrows          |
+| Ammunitions    |                 |
++----------------+-----------------+
+| Capacity       | 20              |
++----------------+-----------------+
+| Switch Duration| 2 second        |
++----------------+-----------------+
+| Weight (empty) | 0.6 kg          |
++----------------+-----------------+
+| Bulkiness      | +5%             |
++----------------+-----------------+
+| Base Value     | 50 credits      |
++----------------+-----------------+
 
-+----------------+------------+
-| War Quiver     |            |
-| Characteristics|            |
-+================+============+
-| Associated     | Arrows     |
-| Ammunitions    |            |
-+----------------+------------+
-| Capacity       | 20         |
-+----------------+------------+
-| Switch Duration| 2 second   |
-+----------------+------------+
-| Weight (empty) | 0.6 kg     |
-+----------------+------------+
-| Bulkiness      | +5%        |
-+----------------+------------+
-| Base Value     | 50 credits |
-+----------------+------------+
+
 
 
 Sling Pouch
@@ -245,24 +249,25 @@ Gnome Sling Pouch
 
 Specifically designed for young Gnomes, allows a tremendous rate of fire.
 
-+----------------+------------+
-| Gnome          |            |
-| Sling Pouch    |            |
-| Characteristics|            |
-+================+============+
-| Associated     | Small      |
-| Ammunitions    | Stones     |
-+----------------+------------+
-| Capacity       | 15         |
-+----------------+------------+
-| Switch Duration| 0.4 second |
-+----------------+------------+
-| Weight (empty) | 0.1 kg     |
-+----------------+------------+
-| Bulkiness      | +1%        |
-+----------------+------------+
-| Base Value     | 1 credits  |
-+----------------+------------+
+
++----------------+-----------------+
+| Gnome          | Characteristics |
+| Sling Pouch    |                 |
+|                |                 |
++================+=================+
+| Associated     | Small           |
+| Ammunitions    | Stones          |
++----------------+-----------------+
+| Capacity       | 15              |
++----------------+-----------------+
+| Switch Duration| 0.4 second      |
++----------------+-----------------+
+| Weight (empty) | 0.1 kg          |
++----------------+-----------------+
+| Bulkiness      | +1%             |
++----------------+-----------------+
+| Base Value     | 1 credits       |
++----------------+-----------------+
 
 
 
@@ -272,23 +277,21 @@ Large Sling Pouch
 
 For all human-sized species. Black model for increased stealth.
 
-
-+----------------+------------+
-| Larger         |            |
-| Sling Pouch    |            |
-| Characteristics|            |
-+================+============+
-| Associated     | Small      |
-| Ammunitions    | Stones     |
-+----------------+------------+
-| Capacity       | 35         |
-+----------------+------------+
-| Switch Duration| 1 second   |
-+----------------+------------+
-| Weight (empty) | 0.1 kg     |
-+----------------+------------+
-| Bulkiness      | +2%        |
-+----------------+------------+
-| Base Value     | 3 credits  |
-+----------------+------------+
-
++----------------+-----------------+
+| Larger         | Characteristics |
+| Sling Pouch    |                 |
+|                |                 |
++================+=================+
+| Associated     | Small           |
+| Ammunitions    | Stones          |
++----------------+-----------------+
+| Capacity       | 35              |
++----------------+-----------------+
+| Switch Duration| 1 second        |
++----------------+-----------------+
+| Weight (empty) | 0.1 kg          |
++----------------+-----------------+
+| Bulkiness      | +2%             |
++----------------+-----------------+
+| Base Value     | 3 credits       |
++----------------+-----------------+

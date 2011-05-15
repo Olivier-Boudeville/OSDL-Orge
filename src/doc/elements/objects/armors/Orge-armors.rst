@@ -1,4 +1,3 @@
-
 :raw-latex:`\pagebreak`
 
 
@@ -34,7 +33,7 @@ Almost waterproof.
 
 
 Stealth Cloak
-************* 
+*************
 
 Improves camouflage.
 
@@ -86,8 +85,8 @@ Cloth
 
 
 +----------------+------------+
-| Armor          |            |
-| Characteristics|            |
+| Armor          | Defense    |
+| Characteristics| Modifier   |
 +================+============+
 | Weight         | 0.2 kg     |
 +----------------+------------+
@@ -231,4 +230,3 @@ Rings
 _____
 
 They offer some (small) physical protection, and in some cases a magical one as well.
-

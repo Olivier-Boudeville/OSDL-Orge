@@ -1,7 +1,6 @@
-
 .. role:: raw-html(raw)
    :format: html
-   
+
 .. role:: raw-latex(raw)
    :format: latex
 
@@ -9,7 +8,8 @@
 
 .. contents:: List of appendices
 	:depth: 1
-    :local:
+
+..	:local:
 
 
 Overview
@@ -48,4 +48,3 @@ This is the Orge technical manual.
 :raw-latex:`\pagebreak`
 
 .. include:: Orge-user-generated-content.rst
-

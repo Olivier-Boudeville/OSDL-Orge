@@ -1,6 +1,6 @@
-========================
-Orge Language Management
-========================
+=========================
+Orge Languages Management
+=========================
 
 .. role:: raw-html(raw)
    :format: html

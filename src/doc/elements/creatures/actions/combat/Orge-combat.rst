@@ -1,4 +1,3 @@
-
 :raw-latex:`\pagebreak`
 
 
@@ -16,12 +15,12 @@ One concern is to avoid that experienced characters based on fighting skills (ba
 The solution used in Orge is to put the stress on the tactical combat, and to offer a wide range of actions for non-arcane users as well, thanks to various kinds of Close Combat (Unarmed, or with Melee or Pole Weapons) and Ranged Combat, and also thanks to Specialized Combat Technics, which includes many sorts of Defenses, Combat Maneuvers, Non Lethal Combat Technics, Battle Disciplines, Special Attacks, and Group Combat Technics.
 
 
-Combats are expected to be finely driven by the players: for example, instead of just designating a target, the player is able to choose the weapon, the kind of attack, the attack/defense ratio, if not playing on a system allowing to accumulate power until unleashing it thanks to powerful blows. Of course spells can be cast, objects be used (ex: grenade-like).  
+Combats are expected to be finely driven by the players: for example, instead of just designating a target, the player is able to choose the weapon, the kind of attack, the attack/defense ratio, if not playing on a system allowing to accumulate power until unleashing it thanks to powerful blows. Of course spells can be cast, objects be used (ex: grenade-like).
 
 Combats seek a certain level of realism. For example, sword blows can be attempted even if no opponent is in range. In that case the attacking character just performs a fruitless movement.
 
 But if an ally happen to be in the attack range, this unfortunate ally might be hurt: *friendly fire* can occur, since the game engine just simulates the attack and, based on its range, determines which creature(s) is/are affected, regardless of the intention of the attacker. In Orge like in the real world, only the acts matter.
-  
+
 
 Regarding time, a combat is made of a series of rounds, each round being further divided in a series of phases. As for all interactions, combat rounds are affected by `Time Bubbles`.
 
@@ -82,7 +81,7 @@ During its turn, as long as its action points allow it, a creature may perform a
  - Use Special Combat Technics
  	- Use Group Combat Technics
  	- Use Non Lethal Combat Technics
- - Charge   
+ - Charge
  - Reload
  - Communicate
  - Take item from bag
@@ -96,11 +95,11 @@ During its turn, as long as its action points allow it, a creature may perform a
 
 
 .. Note** A careful character should spare action and fatigue points during its action phase, in order to be still able to defend itself until its next action phase comes, since all its opponents will act inbetween.
- 
- 
+
+
 Therefore the saved action points is a means of choosing the attack/defense ratio for a character. For instance, Bersekers are renown for having all-out attacks, and thus for almost never spending action points in defensive actions, in the hope their foe will be dead before being able to retaliate.
- 
- 
+
+
 Action: Move
 ____________
 
@@ -117,7 +116,7 @@ Costs action points.
 
 
 Action: Aim
-___________ 
+___________
 
 Before attacking with a ranged weapon, it is advisable for a character to aim its target, in order to increase its chances of hitting:
 
@@ -142,7 +141,7 @@ Costs action points.
 
 
 Action: Improve Defense
-_______________________ 
+_______________________
 
 Spending action points to prepare defense allows the character to defend itself more effectively during its turn.
 
@@ -152,7 +151,7 @@ Costs action points.
 
 
 Action: Select Combat Manoeuver
-_______________________________ 
+_______________________________
 
 
 Costs action points.
@@ -160,7 +159,7 @@ Costs action points.
 
 
 Action: Activate Battle Discipline
-__________________________________ 
+__________________________________
 
 
 Costs action points.
@@ -168,20 +167,20 @@ Costs action points.
 
 
 Action: Attack
-_______________ 
+_______________
 
 The general process is, for each creature than happens to be targeted, to determine:
 
- #. its reaction (see the `Reactions` general section), quite often 
+ #. its reaction (see the `Reactions` general section), quite often
  #. whether the attack succeeded
- #. what are the consequences, including damages inflicted 
- 
- 
+ #. what are the consequences, including damages inflicted
+
+
 Classical Attack
 ****************
 
 These can be either `Close Combat Attacks`_ or `Ranged Combat Attacks`_.
- 
+
 In both cases the opponent must be in range.
 
 
@@ -195,7 +194,7 @@ Costs action points.
 
 
 Action: Use Special Combat Technics
-___________________________________ 
+___________________________________
 
 
 Use Group Combat Technics
@@ -209,7 +208,7 @@ Costs action points.
 
 
 Action: Charge
-______________ 
+______________
 
 Charging corresponds to running on a straight line to an opponent and engage an opponent in close-combat immediately afterwards.
 
@@ -220,7 +219,7 @@ Costs action points.
 
 
 Action: Reload
-_______________ 
+_______________
 
 
 Costs action points.
@@ -228,7 +227,7 @@ Costs action points.
 
 
 Action: Communicate
-___________________ 
+___________________
 
 
 Costs action points.
@@ -252,7 +251,7 @@ Costs action points.
 
 
 Action: Use item
-________________ 
+________________
 
 This item must be already held in hand.
 This includes lighting a lamp, quaffing a potion, blowing a horn, etc.
@@ -263,7 +262,7 @@ Costs action points.
 
 
 Action: Drop item
-_________________ 
+_________________
 
 The held item will be dropped on the ground.
 
@@ -292,7 +291,7 @@ Costs action points.
 
 
 Action: Rest
-____________ 
+____________
 
 The character does not do anything, but this will cost no action point this round, and the character will be relieved a bit from its physical fatigue.
 
@@ -301,7 +300,7 @@ Costs no action point.
 
 
 Action: Cast spell
-__________________ 
+__________________
 
 
 Costs action points.
@@ -377,7 +376,7 @@ The Attack Rate depends on:
 
 When a range weapon is fired (ex: a bow throws an arrow), the first element in the trajectory of the missile will be hit. There is therefore a risk of friendly fire, and an advantage at being sheltered by scenery elements.
 
- 
+
 The Hit Bonus depends on:
 
  - when attacking with Hand-to-hand, Melee or Pole Weapons: first Strength, then Agility, modulated by mental fatigue
@@ -468,7 +467,7 @@ For example, the same target area of 1m², when being twice closer to the sniper 
 
 The maximum range of a missile is determined from the kind of missile (ex: war arrows) and, for thrown missiles, also from the strength of the thrower.
 
-Damages inflicted by a missile depend on the fraction of the maximum range that had to be covered by the missile before hitting its target: 
+Damages inflicted by a missile depend on the fraction of the maximum range that had to be covered by the missile before hitting its target:
 
 +------------------+-----------------+
 | Range Percentage | Damage Modifier |
@@ -499,7 +498,7 @@ In general, to an attack several reactions could be chosen, in:
  - parrying
  - blocking
  - resisting spell
- 
+
 
 Defensive actions come at a cost for a character, spent in action and fatigue points. Otherwise a character could be attacked by any number of opponents without suffering from penalties.
 
@@ -525,10 +524,9 @@ The protection results from the character itself (its own damage resistances) an
 An attack - successful or not - is resolved utimately to changes in:
 
  - physical and mental fatigue, experienced by the attacker and the defender
- 
+
  - skill progress, experienced by both as well (ex: chop for the attacker, parry for the defender)
- 
+
  - hit points, experienced by both as well (ex: defender is hurt, and attacker drained life or performed a critical failure)
 
 See also: `Damage Resistance`_.
-

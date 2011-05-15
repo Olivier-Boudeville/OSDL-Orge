@@ -1,4 +1,3 @@
-
 .. comment Included from Orge-objects.rst
 
 
@@ -11,9 +10,9 @@ Note that some objects are listed in a dedicated repository:
  - `Ammunition Repository`_
  - `Magazine Repository`_
  - `Armor Repository`_
- 
- 
- 
+
+
+
 Everyday objects
 ................
 
@@ -33,10 +32,10 @@ Food
  - meat
  - vegetables
  - mushrooms
- 
+
 Drinks are to be described together with their container (ex: wine bottle). There are a lot of different alcohols and spirits.
 
-	
+
 Kitchen Utensils
 ****************
 
@@ -45,8 +44,8 @@ Kitchen Utensils
  - fork
  - knife
  - dish
-   
- 
+
+
 Light Emitters
 **************
 
@@ -57,8 +56,8 @@ Light Emitters
  - candlestick
  - candle
  - oil lamp
- 
- 
+
+
 Health-related Objects
 **********************
 
@@ -66,8 +65,8 @@ They are used to restore some health and/or to cure diseases, poisons, etc.:
 
  - bandage
  - ointments
- 
- 
+
+
 Cosmetic-related Objects
 ************************
 
@@ -78,12 +77,12 @@ Using them generally improves charisma, and they often deal with hygiene as well
  - soap
 
 
- 
+
 Craft-related Objects
 *********************
 
-These tools are not usable as weapons: 
- 
+These tools are not usable as weapons:
+
  - bucket
  - crowbar, nail claw: helps opening locked containers
  - hammer
@@ -97,8 +96,8 @@ These tools are not usable as weapons:
  - string: stronger and heavier rope
  - weapon and armor oil: to preserve them
  - whetstone
- 
- 
+
+
 Travel Objects
 **************
 
@@ -106,8 +105,8 @@ Travel Objects
  - blanket: for a better sleep in low temperatures
  - riding equipment (including saddle): priceless with a mount
  - tent: when comfort matters
- 
- 
+
+
 Valuable Objects
 ****************
 
@@ -115,8 +114,8 @@ Valuable Objects
  - jewel
  - gemstones: precious or semi-precious stones like aquamarines, diamonds, emeralds, opals, pearl, ruby, sapphires, spinels anf topaz
  - money
- 
- 
+
+
 Writing Objects
 ***************
 
@@ -134,6 +133,8 @@ Kindling Objects
  - lens, mirror: to play with light
  - tinderbox
 
+
+.. _Containers:
 
 Container Objects
 *****************
@@ -173,15 +174,15 @@ Liturgical Objects
  - flagon
  - lavabo
  - thurible
- 
- 
+
+
 Random Objects
 **************
 
  - stones
- - bones 
- 
- 
+ - bones
+
+
 
 List of Furnitures
 __________________
@@ -195,8 +196,8 @@ __________________
  - table
  - throne
  - wardrobe
- 
- 
+
+
 Vehicles
 ________
 
@@ -228,7 +229,7 @@ They include:
  - carpet (fabric or fur)
  - chair, armchair
  - crack on a wall or on the ground
- - fire-place, with or without a fire 
+ - fire-place, with or without a fire
  - fountain
  - hung beast skin and leather
  - loophole (*meurtrière*, in French)
@@ -248,7 +249,7 @@ They include:
  - well, shaft, pit
  - window
 
- 
+
 Special Objects
 ...............
 
@@ -266,7 +267,7 @@ They include:
  - bells, which may trigger (generally nasty) events
  - maps
  - horns, when blown various creatures can awake
- - fountains, whose liquids can have different effects 
+ - fountains, whose liquids can have different effects
  - holy symbol: may help communicating with a deity
  - lever, to trigger mechanisms
  - manuals, that teach interesting matters (improve skills) or not
@@ -276,7 +277,7 @@ They include:
  - paving stone with an invisible pressure-sensitive mechanism, which can trigger various systems that can teleport or make any creature standing on it rotate immediately (either of a U-turn or of a quarter turn)
  - scrolls, that describe spells
  - sign, notice
- - springs, whose liquids can have different effects 
+ - springs, whose liquids can have different effects
  - staircase, going downstairs or upstairs, right or helical
  - teleporter (see portal)
  - thrones, they may have random effects on players willing to experiment with them
@@ -285,16 +286,15 @@ They include:
 
 Decoration
 ..........
-	
+
  - hanging, curtain, kakemono
  - inscriptions (often enigmatic, sometimes sensible)
- - painted pentagram  
+ - painted pentagram
  - paintings
  - plate, slab
  - trophies
  - weapons hung on the wall
- 
+
 .. include:: Orge-weapons.rst
 .. include:: Orge-ammunitions.rst
 .. include:: Orge-armors.rst
-

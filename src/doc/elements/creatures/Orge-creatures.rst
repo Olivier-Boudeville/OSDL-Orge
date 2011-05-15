@@ -1,7 +1,6 @@
-
 :raw-latex:`\pagebreak`
 
- 
+
 Orge Creatures
 ==============
 
@@ -24,4 +23,3 @@ Orge Creatures
 .. include:: Orge-actions.rst
 
 .. include:: Orge-bestiary.rst
-

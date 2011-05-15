@@ -1,8 +1,7 @@
-
 Video Games versus Table-top Games
 ----------------------------------
 
-Orge is a game system primarily dedicated to video games. 
+Orge is a game system primarily dedicated to video games.
 
 However it can be used as well for table-top games, since most computations remain simple thanks to the  abacuses (simplified precomputations to be used graphically).
 
@@ -17,7 +16,7 @@ Life itself is in real-time, and the turn-based approach raises issues in a mult
 At the very least, each turn should be bounded in strict time limits, so that combat time do not drift too much from the game time.
 
 For example, all the players involved in a combat would decide privately and concurrently of their actions, which would be triggered automatically by Orge only at the end of the turn. If a player takes too much time to decide his actions, the game automatically skips to the next turn.
- 
+
 Orge uses this kind of "relaxed" real-time system. Beware to bathroom breaks!
 
 
@@ -28,7 +27,7 @@ We chose to introduce some randomness when resolving actions, as it creates a ki
 
 Regarding game content, having it generated based on randomness might be a bit hazardous: roaming through endless self-similar dungeons is not deemed fun enough. Better have a few well-crafted dungeons, authored by real-life designers, rather than infinite dull ones.
 
-Same reasoning applies to random-generated quests, too many "fetch the orb from evil Wizard X" quests would kill most of the fun. 
+Same reasoning applies to random-generated quests, too many "fetch the orb from evil Wizard X" quests would kill most of the fun.
 
 One relevant area for randomness in game content is the terrain generation: well chosen fractal algorithms lead to realistic landscapes, on which human-generated content can be settled down for the better of both worlds.
 
@@ -52,7 +51,7 @@ Tragedy versus Comedy
 ---------------------
 
 We preferred letting the game system be, as much as possible, tone-agnostic: the choice of the mode of fiction is left to the scenario writer. See also: `Place of Death`_.
- 
+
 
 Medieval, Contemporary, Futuristic, etc.
 ----------------------------------------
@@ -81,7 +80,7 @@ Each and every game system, after dozens of pages involving equations and algori
 
 
 
-It is a corner stone of a successful online RPG. 
+It is a corner stone of a successful online RPG.
 
 To help the development of roleplay, players are encouraged to customize their characters, notably thanks to a textual description.
 
@@ -90,19 +89,19 @@ Role-play should not be confused with social interactions, since there is a diff
 Some game facilities are provided for that:
 
   - real-time IRC-like internal chat system, for interlocutors able to speak directly (in hearing range)
-  
+
   - bulletin board systems, post, for asynchronous unreliable long-distance communication (couriers are expensive, and can be intercepted or dishonest)
 
   - a guild system, to structure the social exchanges
- 
-  - a stage direction system, allowing the player to specify attitudes and actions that cannot be expressed by the game system, a bit like e-motes. For instance: *Gurg leans on the bar, exhausted*.
-  
-An additional way of promoting roleplay is to delegate it, at least partially, to a real-life game master, whose role is to better adapt the game's reactions to the acting effort of players, for instance by awarding experience bonuses for good roleplay or by improving the NPC behaviours in the face of dialogs. 
 
-This requires the Orge system to support, beyond the player role, the game master role, and to provide specific tools for it, like the ability for a game master to take control of one or more creatures (NPC, monsters, etc.). 
+  - a stage direction system, allowing the player to specify attitudes and actions that cannot be expressed by the game system, a bit like e-motes. For instance: *Gurg leans on the bar, exhausted*.
+
+An additional way of promoting roleplay is to delegate it, at least partially, to a real-life game master, whose role is to better adapt the game's reactions to the acting effort of players, for instance by awarding experience bonuses for good roleplay or by improving the NPC behaviours in the face of dialogs.
+
+This requires the Orge system to support, beyond the player role, the game master role, and to provide specific tools for it, like the ability for a game master to take control of one or more creatures (NPC, monsters, etc.).
 
 Other measures can be taken to further enhance the roleplay, like making mandatory the formation of groups of players, in the face of adversity, either because the opponents are too strong or because the challenges require specialized complementary skills (ex: detector, tank, damage dealer, healer, buffer, etc.). Group spells (ex: team buffs) help there too.
-  
+
 
 Ending
 ------
@@ -126,6 +125,3 @@ Passage of time
 This is another major game element, directly linked to the `Place of Death`_, to `Aging`_ and, to a lesser extent, to `Object Wear`_. The time cannot be stopped, and flows quite fast.
 
 The game world is persistant, but most beings are relatively short-lived, and a trade-off must be found between youth and experience.
-
-
-

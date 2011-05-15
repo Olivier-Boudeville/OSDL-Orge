@@ -1,4 +1,3 @@
-
 .. comment Included from Orge-creature-behaviours.rst
 
 
@@ -48,15 +47,16 @@ See `A Focus on Conflicts & Combats`_.
 Fleeing
 _______
 
-A creature having accumulated too much mental fatigue or being overwhelmed by fear will try to flee, i.e. to try to escape from known threats at maximum speed and with little planning. 
+A creature having accumulated too much mental fatigue or being overwhelmed by fear will try to flee, i.e. to try to escape from known threats at maximum speed and with little planning.
 
-The flee can be interrupted if the creature succeeds a `Resisting Fear`_ action. Strong willpower and the Leadership y
+The flee can be interrupted if the creature succeeds a `Resisting Fear`_ action. Strong willpower and the Leadership trait allow to better resist fear.
+
 
 
 Frightening
 ___________
 
-Some monsters are so disturbing lifeforms for a non-accustomed observer that she may be paralysed or even, in the case of abnormal abominations (Cthulu-like creatures), be scared to madness or to instant death. 
+Some monsters are so disturbing lifeforms for a non-accustomed observer that she may be paralysed or even, in the case of abnormal abominations (Cthulu-like creatures), be scared to madness or to instant death.
 
 
 Hiding
@@ -64,7 +64,7 @@ ______
 
 Hiding consists on trying to escape from the perception fields of other creatures.
 
-The success depends mainly on: 
+The success depends mainly on:
 
  - the type of environment and local setting, that can help or hinder hiding
  - the species of the hiding creature(s); some are bigger and stealthier than others
@@ -73,7 +73,7 @@ The success depends mainly on:
  - the acuteness of the perception of other creatures
  - if they are performing scouting/recon, i.e. trying specifically to search for concealed creatures
 
-Generally hiding will fail for the whole group as soon as one of the other creatures detects one hidden creature. 
+Generally hiding will fail for the whole group as soon as one of the other creatures detects one hidden creature.
 
 An ambush corresponds to a party hiding themselves and waiting for others to come at range. If these creatures are caught by surprise, they will loose their Initiative phase, and thus be unable to act during the first combat round. Moreover they may have to draw and ready their weapons before being able to defend themselves efficiently.
 
@@ -95,7 +95,7 @@ A creature may inspect a specific place or object. It will spend time in doing s
 Lighting a fire
 _______________
 
-The success of this actions depends a lot on the character having `Kindling Objects`_, or Fire Spells, or the creature having some Breathing Fire ability. Without any of them, little chances would remain. 
+The success of this actions depends a lot on the character having `Kindling Objects`_, or Fire Spells, or the creature having some Breathing Fire ability. Without any of them, little chances would remain.
 
 
 Manage Inventory
@@ -181,14 +181,14 @@ This may be useful to reach places that otherwise would be too high for the crea
 Taking an Object Offered by a Creature
 ______________________________________
 
-A creature may accept to grasp an object given by another creature. 
+A creature may accept to grasp an object given by another creature.
 See `Giving an Object to a Creature`_.
 
 
 Taking an Object on the Ground
 ______________________________
 
-A creature may pick up an object from the ground and then hold it, sometimes before putting it in a bag (inventory). 
+A creature may pick up an object from the ground and then hold it, sometimes before putting it in a bag (inventory).
 
 
 Using an Object
@@ -212,4 +212,3 @@ Most objects held in hand(s) can be thrown by a creature, as a weapon, or to tri
 
 .. include:: Orge-reactions.rst
 .. include:: Orge-damages.rst
-

@@ -1,4 +1,3 @@
- 
 :raw-latex:`\pagebreak`
 
 
@@ -8,7 +7,8 @@ Appendices
 
 .. contents:: List of appendices
 	:depth: 1
-    :local:
+
+..	:local:
 
 
 
@@ -33,4 +33,3 @@ Appendices
 :raw-latex:`\pagebreak`
 
 .. include:: Orge-technical-manual.rst
-

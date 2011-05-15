@@ -1,5 +1,3 @@
-
-
 Characteristics
 ---------------
 
@@ -13,17 +11,17 @@ The characteristics of a creature are split in following attribute sets:
  #. Abilities & Traits
  #. Skills
 
- 
-All characteristics are declared in class_Creature.hrl_.
- 
- 
+
+All characteristics are declared in ``class_Creature.hrl``.
+
+
 
 Primary Attributes
 ..................
 
-The core potential of a creature is described by following *primary attributes*:
- 
- 
+The core potential of a creature is described by following nine *primary attributes*:
+
+
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Name of the | Meaning and Use [#]_                      | Abbreviation      | Usual Synonyms    |
 | Primary     |                                           |                   | and Close Terms   |
@@ -32,41 +30,43 @@ The core potential of a creature is described by following *primary attributes*:
 | Strength    | Physical force, vigor, power.             | STR               |                   |
 |             | Affects the damages inflicted (notably in |                   |                   |
 |             | melee), the weight that can be carried,   |                   |                   |
-|             | etc.                                      |                   |                   |
+|             | the force that can be exerted, etc.       |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Agility     | Power of moving the limbs quickly and     | AGL               | Dexterity,        |
 |             | easily; nimbleness.                       |                   | Accuracy,         |
-|             | Affects the character's defense (notably  |                   | Stamina           |
+|             | Affects the character's defense (notably  |                   |                   |
 |             | its ability to dodge attacks), its ranged |                   |                   |
-|             | attacks, etc.                             |                   |                   |
+|             | attacks, the precision of its moves, etc. |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Constitution| Ability to withstand fatigue, disease,    | CST               | Endurance,        |
-|             | deprivation, etc., and continue working.  |                   | Hardiness         |
-|             | Affects most resistances (notably to      |                   |                   |
-|             | poison), physical fatigue, etc.           |                   |                   |
+|             | deprivation, etc., and continue working.  |                   | Hardiness,        |
+|             | Affects most resistances (notably to      |                   | Stamina           |
+|             | poison), physical fatigue, withstanding   |                   |                   |
+|             | of injuries and sufferings, etc.          |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Intelligence| Readiness of comprehension.               | INT               | I.Q.              |
 |             | Affects most Arcane aptitudes (notably    |                   |                   |
 |             | Mage ones), decoding and languages skills,|                   |                   |
-|             | etc.                                      |                   |                   |
+|             | easiness of interpretation, etc.          |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Wisdom      | Knowledge, and the capacity to make due   | WIS               | Discernment,      |
 |             | of it.                                    |                   | judgment          |
 |             | Affects notably checks involving          |                   |                   |
 |             | shrewdness, links with divinities and     |                   |                   |
-|             | undead, etc.                              |                   |                   |
+|             | undead, clarity of judgement, etc.        |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Willpower   | Power of the mind by which we decide to do| WLP               | Will,             |
 |             | or not to do.                             |                   | Self-control,     |
 |             | Affects notably mental fatigue,           |                   | Courage           |
 |             | concentration, resistance to mental       |                   |                   |
-|             | arcane powers, etc.                       |                   |                   |
+|             | arcane powers, tenacity, resolution, etc. |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Charisma    | Personal attractiveness that enables      | CHR               | Appeal,           |
 |             | to influence others.                      |                   | Attractiveness    |
 |             | Affects notably the loyalty of allies,    |                   | Authority, Charm, |
 |             | the respect of foes, the ability to       |                   | Leadership,       |
-|             | convince others, etc.                     |                   | Suggestion        |
+|             | convince others, the natural              |                   | Suggestion        |
+|             | leadership, etc.                          |                   | Suggestion        |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Quickness   | Rapidity of action (speed) and wit        | QCK               | Speed, Sagacity,  |
 |             | (mental alertness).                       |                   | Initiative,       |
@@ -74,16 +74,17 @@ The core potential of a creature is described by following *primary attributes*:
 |             | ability to reload ranged weapons, etc.    |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 | Longevity   | Expected length of life.                  | LGV               | Lifespan          |
-|             | Affect the latest possible death of the   |                   |                   |
-|             | character.                                |                   |                   |
+|             | Affects the latest possible death of the  |                   |                   |
+|             | character (maximum ageing).               |                   |                   |
 |             |                                           |                   |                   |
 +-------------+-------------------------------------------+-------------------+-------------------+
 
 
 .. [#] Most definitions are taken from various dictionaries, like the Webster.
 
-All primary attributes are positive integers. All, except Longevity, are in the 0-100 range. For the average male adult, each attribute would be roughly equal to 15, which is defined as the ``NeutralPrimaryAttributeValue``.
+All primary attributes are positive integers. All, except Longevity, are in the 0-100 range. For the average human male adult, each of these attributes would be roughly equal to 15, which is defined as the ``NeutralPrimaryAttributeValue``.
 
+Following modifiers are to be applied for the seven built-in main species:
 
 
 +-----------+----------+---------+--------------+--------------+--------+
@@ -139,9 +140,10 @@ These primary attributes can be dispatched into *physical* ones (Strength, Agili
 Primary attributes are first-order ones, as they are the true original values from which secondary attributes will be computed.
 
 They are intrinsic, characteristic of a character. The primary attributes can increase during the life of the character (ex: stronger character after training) or decrease (ex: a character suffers from permanent wounds).
-Age modifiers apply as well.
 
-At character creation, the player may be given a total number of points to distribute among these primary attributes, or they might be drawn according to a random law. In either case, no primary attribute is allowed be below 10 or above 60. See also: `Character Creation`_.
+Gender and age modifiers apply as well.
+
+At character creation, the player may be given a total number of points to distribute among these primary attributes, or they might be drawn according to a random law. In either case, for PC generally no primary attribute is allowed be below 5 or above 30. See also: `Character Creation`_.
 
 
 
@@ -151,27 +153,30 @@ Other attributes that were not retained here were:
 | Name of the | Rejection Reason                          |
 | Attribute   |                                           |
 +=============+===========================================+
-| Piety       | Should be roleplayed                      |
+| Piety       | Should be roleplayed.                     |
 +-------------+-------------------------------------------+
-| Vitality    | Too close to stamina                      |
+| Vitality    | Too close to constitution.                |
 +-------------+-------------------------------------------+
-| Luck        | Does not exist as such                    |
+| Luck        | Does not exist as such.                   |
 +-------------+-------------------------------------------+
-| Cunning     | Should be roleplayed                      |
+| Cunning     | Should be roleplayed.                     |
 +-------------+-------------------------------------------+
-| Valour      | Not relevant                              |
+| Valour      | Not relevant.                             |
 +-------------+-------------------------------------------+
 
 
 
- 
+
 
 Gender Attribute Modifiers
 ..........................
 
-Gender is associated to primary attributes.
+Gender is associated to primary attributes [#]_.
 
-These *Gender Attribute Modifiers* apply independently from the species.
+.. [#] No sexism is meant here. Indeed, it is a fact that, for example, the fastest running men outperform consistently their female counterparts. So a reasonable opinion is not to deny these differences, but to consider they have little impact, or do not matter.
+
+
+These *Gender Attribute Modifiers* currently apply independently from the species.
 
 
 +-------------+---------------+-----------------+
@@ -205,7 +210,7 @@ Secondary Attributes
 ....................
 
 
-Each creature will have following *secondary attributes*, determined at least partly from primary ones:
+Each creature will have following six *secondary attributes*, determined at least partly from primary ones:
 
 +-------------+-------------------------------------------+-------------------+
 | Name of the | Meaning and Use [#]_                      | Formula           |
@@ -235,13 +240,10 @@ Each creature will have following *secondary attributes*, determined at least pa
 +-------------+-------------------------------------------+-------------------+
 | Radius      | The average distance, in meters, between  | Species           |
 |             | the center of gravity of this creature and|                   |
-|             | each part of its body.|                   |                   |
+|             | each part of its body.                    |                   |
 +-------------+-------------------------------------------+-------------------+
 
 
 The "size" of a creature is determined from its ``Height`` and ``Radius``: ``Size = Height*Radius``.
 
 The size allows to compute notably the solid angle when targeted by a ranged weapon.
-
-
-

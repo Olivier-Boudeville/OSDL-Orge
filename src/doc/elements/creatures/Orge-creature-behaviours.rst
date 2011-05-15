@@ -1,4 +1,3 @@
-
 Creature Behaviours
 -------------------
 
@@ -8,7 +7,7 @@ Pets
 ----
 
 Some species tend to be tamable by correctly trained characters (see the Taming_ skill), notably:
- 
+
  - rats
  - dogs
  - wolves
@@ -19,7 +18,7 @@ Some species tend to be tamable by correctly trained characters (see the Taming_
 Non-Player Characters (NPC)
 ---------------------------
 
-NPC have generally their own agenda: by default, they will live their lives regardless of players.
+NPC have generally their own agenda: by default, they will live their lives, regardless of players.
 
 
 Creature Relationships
@@ -30,9 +29,9 @@ Affinities
 ..........
 
 
-There are latent friendship or animosity between species. Affinity corresponds mostly to a priori trust and empathy.
+There are latent friendship or animosity between species. Affinity corresponds mostly to trust and empathy that are felt *a priori*, based on cultural learnings.
 
-To evaluate to what extent a creature of species X likes a priori a creature of species Y, select X in the table columns, and find the row corresponding to Y:
+To evaluate to what extent a creature of species X likes a priori a creature of species Y, select X in the table columns ("point of view of X"), and find the row corresponding to Y ("towards Y"):
 
 
 +---------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+
@@ -67,10 +66,9 @@ Note that affinities are not symmetrical: for example, X may like Y, whereas Y m
 
 The point of view of a creature on its own species may be not neutral.
 
-Animosities result in species-specific charisma modifiers during interactions, equal to the corresponding Inter-species Affinity Modifier.
+Animosities result in species-specific charisma modifiers during interactions, equal to this corresponding *Inter-species Affinity Modifier*.
 
 
 The behaviour of a creature may be at least partly dictated by its environment (ex: hunting during the night).
 
 See also: `Reputation`_.
-

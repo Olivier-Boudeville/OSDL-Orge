@@ -32,11 +32,11 @@
 
 
 
-.. _orge_database_manager.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/orge_database_manager.hrl?view=markup
+.. _class_DatabaseManager.hrl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/class_DatabaseManager.hrl?view=markup
 
-.. _orge_database_manager.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/orge_database_manager.erl?view=markup
+.. _class_DatabaseManager.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/class_DatabaseManager.erl?view=markup
 
-.. _orge_database_manager_test.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/orge_database_manager_test.erl?view=markup
+.. _class_DatabaseManager_test.erl: http://osdl.svn.sourceforge.net/viewvc/osdl/Orge/trunk/src/code/servers/functional-services/database-storage/src/class_DatabaseManager_test.erl?view=markup
 
 
 
@@ -52,7 +52,9 @@ Orge Servers
 ============
 
 .. contents::
-	:local:
+
+
+.. :local:
 
 
 

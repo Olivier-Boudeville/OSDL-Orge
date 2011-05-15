@@ -1,15 +1,16 @@
-
 :raw-latex:`\pagebreak`
 
 
 Abilities & Traits
 ------------------
 
-Some characters are able to perform specific actions due to their nature. This includes for instance telepathy, or the ability of destroying armor by mere contact. This corresponds to *abilities*. 
+Some characters are able to perform specific actions due to their nature. This includes for instance telepathy, or the ability of destroying armor by mere contact. This corresponds to *abilities*.
 
 *Traits* are distinguishing features, peculiarities that can either advantage or disavantage a character. Of course such features are compensated (they have respectively a positive or negative cost), otherwise everyone would select all advantaging traits and no disavantaging one for one's character.
 
 The vast majority of abilities and traits are innate, they are natural to a character, and are to be determined at character creation time.
+
+.. _Leadership:
 
 
 +----------------------+-----------------------------------------------+------------------------------------+-------+
@@ -62,6 +63,11 @@ The vast majority of abilities and traits are innate, they are natural to a char
 +----------------------+-----------------------------------------------+------------------------------------+-------+
 
 
+.. _Stuttering:
+
+.. _Dyslexia:
+
+
 +----------------------+-----------------------------------------------+------------------------------------+-------+
 | Negative Abilities   | Description                                   | Effect                             | Cost  |
 | and Traits           |                                               |                                    |       |
@@ -98,7 +104,6 @@ The vast majority of abilities and traits are innate, they are natural to a char
 +----------------------+-----------------------------------------------+------------------------------------+-------+
 
 
-  
+
 
 .. [#] See for example "gelatinous cubes" in some games.
-
