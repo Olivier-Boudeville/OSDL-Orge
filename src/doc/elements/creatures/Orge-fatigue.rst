@@ -119,5 +119,3 @@ Fatigue Due To Actions
 ......................
 
 Each action (ex: wielding a sword, climbing a wall, casting a spell, etc.) incurs fatigue.
-
-
