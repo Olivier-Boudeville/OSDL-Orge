@@ -1,4 +1,4 @@
-% Copyright (C) 2003-2011 Olivier Boudeville
+% Copyright (C) 2003-2013 Olivier Boudeville
 %
 % This file is part of the Orge library.
 %
