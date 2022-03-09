@@ -1,375 +1,578 @@
-/*
-:Author: Olivier Boudeville
-:Contact: olivier.boudeville at esperide.com
-:Copyright: This stylesheet has been placed in the public domain.
-
-Stylesheet for use with Docutils.  
-See: http://docutils.sourceforge.net/docs/howto/html-stylesheets.html
-
-Note: This is an exact copy of the OSDL-docutils.css version.
-
-*/
-
-@import url(html4css1.css);
+/* This document is a part of the Ceylan-Myriad Project */
+/* Standard Cascading Style Sheet File */
 
 
+/* Created: 24 May 2003 */
 
-/* Copied verbatim from OSDL.css, with the correct tags. */
-
-
-
-/* Main titles */
-
+/* Author: Olivier Boudeville */
+/* (olivier (dot) boudeville (at) esperide (dot) com) */
+/* Updated: Michal Guerquin (michalg@gmail.com) */
 
 
-h1.title {
-  color: #ec8b23;
-  background: transparent;
-  font-size: 50px;
-  font-weight: bold;
-  font-family: Verdana, serif;
-  margin-top: 5%;
-  margin-bottom: 0;
-  margin-left: 2%;
-  margin-right: 2%;
-  text-align: center;
+pre.code {
+	margin-left: 3%;
+	background: #151520;
+	text-indent: 0%;
 }
 
 
+td .literal {
+	color: #dfdfff;
+	font-weight: bold;
+}
 
-h2.subtitle {
-  color: #8aa0d2 ;
-  font-size: 40px;
-  margin-top: 2%;
-  margin-bottom: 6%;
-  text-align: center;
+.literal {
+	color: #9999cc;
+	font-weight: bold;
+}
+
+/* For command printouts: */
+.literal-block {
+	background: #151520;
+	margin-left: 2%;
 }
 
 
-
-
-
-
-/* In-text titles */
-
-
-div.section h1 {
-  color: #ec8b23;
-  font-size: 30px;
-  background: transparent;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 7%;
-  margin-bottom: 5%;
-  margin-left: 2%;
-  margin-right: 2%;
+div.box {
+	color: #FF0000;
+	background: #FFFFFF;
+	border: solid;
+	padding: 5px;
+	border-width: thin;
+	text-align: left;
 }
 
 
-div.section h2 {
-  color: #4da04b ;
-  font-size: 27px;
-  background: transparent;
-  text-align: left;
-  margin-top: 5%;
-  margin-bottom: 2%;
-}
-
-
-div.section h3 {
-  color: #af38c9;
-  font-size: 22px;
-  background: transparent;
-  margin-top: 5%;
-  margin-bottom: 3%;
-  margin-left: 7%;
-  margin-right: 4%;
-}
-
-
-div.section h4 {
-  color: #8aa0d2;
-  font-size: 21px;
-  margin-left: 10%;
-  margin-right: 7%;
-  font-weight: normal;
-}
-
-
-div.section h5 {
-  color: #ec8b23;
-  font-size: 16px;
-  margin-left: 15%;
-  margin-right: 15%;
-  font-weight: bold;
-  margin-top: 3%;
-  margin-bottom: 2%;
-}
-
-
-div.section h6 {
-  color: #3da03b;
-  font-size: 15px;
-  margin-left: 30%;
-  margin-right: 5%;
-  font-weight: bold;
-  margin-top: 3%;
-  margin-bottom: 2%;
-}
-
-
-div.section h7 {
-  color: #888888;
-  font-size: 15px;
-  margin-left: 10%;
-  margin-right: 5%;
-  font-weight: bold;
-  margin-top: 2%;
-  margin-bottom: 2%;
-}
-
-
-
-
-/* Violet */
-div.dedication p.topic-title {
-  color: #bf48d9
-}
-
-
-/* Violet */
-div.abstract p.topic-title {
-  font-weight: bold;
-  color: #bf48d9
-}
-
-
-/* Lightgrey on Black */
-body {
-  color: #DFDFDF;
-  margin-left: 2%;
-  background: #000000;
-}
-
-
-
-/* Sidebar */
-
-
-/* Dark gray */
-div.sidebar {
-  background-color: #333333 ;
-  color: #74716e
-}
-
-
-div.sidebar p {
-  color: #bbbbbb
-}
-
-
-/* Softer Orange */
-div.sidebar p.sidebar-title {
-  color: #ec8b23
-}
-
-
-/* Blue */
-div.sidebar p.sidebar-subtitle {
-  color: #8aa0d2
-}
-
-
-
-
-
-/* Red Bordeaux */
-div.system-messages h1 {
-  color: #cc470c 
-}
-
-
-/* Red Bordeaux */
-div.system-message p.system-message-title {
-  color: red ;
-  font-weight: cc470c
-}
-
-  
-  
-/* Black */ 
-p.rubric {
-  color: #000000 
-}
-  
-  
-/* Dark grey */ 
-pre.literal-block, pre.doctest-block {
-  background-color: #444444 
-}
-
-
-
-/* Red Bordeaux */
-span.problematic {
-  color: red 
-}
-
-  
-/* Dark grey */ 
-tt.docutils {
-  background-color: #666666
-}
-  
-
-/* Blue */  
-a:link {
-  text-decoration:none;
-  color: #8aa0d2
-}
-
-
-a:visited {
-  color: #7a8ebc
-}
-
-
-a:active {
-  color: #8aa0d2
-}
-
-
-a:hover { 
-  color:#8aa0d2 
+div.centered {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 
 div.contents {
-	margin-left: 30%
+	border: solid;
+	border-width: thin;
 }
 
 
-div.contents a.reference {
-  text-decoration: none;
-  list-style-type: none
+body {
+	color: #ffffff;
+	/*background: #FFFFFF;*/
+	background: #000000;
+	font-family: arial, helvetica, sans-serif;
+	font-size: 15px;
+	text-align: left;
+	margin-left: 2%;
+	margin-right: 1%;
+	margin-top: 2%;
+	margin-bottom: 2%;
 }
 
 
-div.contents a:hover.reference { 
-  text-decoration: underline;
-  color:#FFFFFF 
+/* At least most titles are hyperlinks, thus changing for example colors in h1,
+   h2, etc. is often useless.
+ */
+
+
+h1.Huge {
+	color: #00FF00;
+	background: transparent;
+	font-size: 70px;
+	font-weight: bold;
+	font-family: Verdana, serif;
+	margin-top: 0%;
+	margin-bottom: 0;
+	margin-left: 2%;
+	margin-right: 2%;
+	text-align: center;
 }
 
 
-a.section-title { 
-  text-decoration: none
+h1.Big {
+	color: #00FF00;
+	font-family: "Lucida Sans Unicode", serif;
+	font-size: 40px;
 }
 
 
-/* Softer orange */  
-a.toc-backref { 
-  color: #ec8b23; 
-  text-decoration: none
+h1 {
+	color: #ccccff;
+	font-size: 35px;
+	background: transparent;
+	font-weight: bold;
+	text-align: center;
+	margin-top: 3%;
+	margin-bottom: 1%;
+	margin-left: 2%;
+	margin-right: 2%;
 }
 
 
-h1 a.toc-backref { 
-  color: #ec8b23
+h2 {
+	color: #00FF00;
+	font-size: 27px;
+	background: transparent;
+	text-align: left;
+	margin-top: 3%;
+	margin-bottom: 1%;
 }
 
 
-h2 a.toc-backref { 
-  color: #06b1dc
-}
-
-h3 a.toc-backref { 
-  color: #4da04b
-}
-
-
-div.warning p.admonition-title {
-  color: #ec9523
+h3 {
+	color: #444444;
+	font-size: 22px;
+	background: transparent;
+	margin-top: 2%;
+	margin-bottom: 1%;
+	margin-left: 7%;
+	margin-right: 4%;
 }
 
 
-/* Orange */  
-div.attention p.admonition-title {
-  color: #e6841b }
-
-/* Orange */  
-div.caution p.admonition-title {
-  color: #e6841b }
-
-/* Red Bordeaux */  
-div.danger p.admonition-title {
-  color: #cc470c }
-
-/* Red Bordeaux */  
-div.error p.admonition-title {
-  color: #cc470c }
-
-/* Green */  
-div.hint p.admonition-title {
-  color: #4da04b }
-
-/* Blue */  
-div.important p.admonition-title {
-  color: #06b1dc }
-
-/* Violet */  
-div.note p.admonition-title {
-  color: #bf48d9 }
-
-/* Green */  
-div.tip p.admonition-title {
-  color: #4da04b }
-
-
-div.contents p.topic-title {
-  text-decoration: none;
-  color: #bf48d9;
-  font-weight: bold
+h4 {
+	color: #3161fc;
+	font-size: 20px;
+	margin-left: 10%;
+	margin-right: 7%;
+	margin-top: 2%;
+	margin-bottom: 1%;
+	font-weight: bold;
 }
 
 
-/* Violet */
-a.footnote-reference {
-  text-decoration: none;
-  color: #bf48d9
+h5 {
+	color: #1c3071;
+	font-size: 16px;
+	margin-left: 15%;
+	margin-right: 15%;
+	font-weight: bold;
+	margin-top: 2%;
+	margin-bottom: 1%;
 }
 
 
-td.label {
-	color: green
+h6 {
+	color: #4455dd;
+	font-size: 15px;
+	margin-left: 30%;
+	margin-right: 5%;
+	font-weight: bold;
+	margin-top: 2%;
+	margin-bottom: 1%;
 }
 
 
-/* Green */
-a.citation-reference {
-  text-decoration: none;
-  color: #4da04b
+h7 {
+	color: #555555;
+	font-size: 15px;
+	margin-left: 10%;
+	margin-right: 5%;
+	font-weight: bold;
+	margin-top: 2%;
+	margin-bottom: 1%;
+}
+
+
+div.Visited {
+	color: #CCCCCC;
+	font-size: 20px;
 }
 
 
 dl {
-  margin-left: 3%
+	color: #000000;
+	margin-top: 1%;
+	margin-bottom: 1%;
+	font-size: 16px;
+	margin-left: 8%;
+	margin-right: 2%;
+	text-align: left;
+	font-weight: bold;
 }
 
 
 dt {
-  color: #EFEFEF;
-  background: #5E5E5E;
-  margin-top: 1%;
-  font-weight: bold
+	color: #000000;
+	background: #10057e;
+	font-weight: bold;
+	text-indent: 5px;
+	line-height: 1.3;
+	margin-left: 0%;
+	margin-right: 0%;
+	margin-top: 1%;
+	margin-bottom: 1%;
 }
 
 
-strong {
- color: #8aa0d2 ;
- font-weight: bold
+dd {
+	font-size: 16px;
+	font-weight: normal;
+	margin-top: 0%;
+	margin-bottom: 2%;
 }
 
-em {
- color: #4da04b ;
- font-weight: bold
+
+p {
+	margin-top: 1%;
+	margin-bottom: 2px;
+	margin-left: 0%;
+	margin-right: 3%;
+	text-align: justify;
+	text-indent: 1%;
 }
+
+
+ul {
+	/*color: #353535;*/
+	margin-top: 0%;
+	margin-bottom: 0%;
+	margin-left: 1%;
+	text-align: left;
+	list-style: square;
+	margin-right: 0%;
+}
+
+
+ol {
+	/*color: #353535;*/
+	margin-top: 0%;
+	margin-bottom: 0%;
+	margin-left: 1%;
+	text-align: left;
+	list-style: decimal;
+	margin-right: 0%;
+}
+
+
+ul li {
+	/*color: #333333;*/
+	margin-top: 0%;
+	margin-bottom: 4px;
+	margin-left: 0%;
+	margin-right: 0%;
+}
+
+
+ol li {
+	/*color: #333333;*/
+	margin-top: 0%;
+	margin-bottom: 4px;
+	margin-left: 0%;
+	margin-right: 0%;
+}
+
+
+ul li ul {
+	list-style: circle;
+	margin-left: 0%;
+}
+
+
+ul ul ul li {
+	list-style: disc;
+}
+
+
+pre {
+	font-family: monospace, serif;
+}
+
+
+table {
+	/*color: #000000;*/
+	color: #ccccff;
+	margin: 5px;
+	margin-top: 1%;
+	margin-bottom: 2%;
+	border: solid;
+	border-width: thin;
+	border-collapse: separate;
+	border-spacing: 5pt;
+}
+
+
+table caption {
+	font-size: 15px;
+	caption-side: bottom;
+	text-align: center;
+	font-style: italic;
+}
+
+
+table p, table dl, ol p, ul p, dl p, blockquote p, .note p, .note ul, .note ol, .note dl, li pre, dd pre {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+	margin: 2em ;
+	border: medium outset ;
+	padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+	font-weight: bold ;
+	font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title, .code .error {
+	color: red ;
+	font-weight: bold ;
+	font-family: sans-serif }
+
+div.dedication {
+	margin: 2em 5em ;
+	text-align: center ;
+	font-style: italic }
+
+div.dedication p.topic-title {
+	font-weight: bold ;
+	font-style: normal }
+
+div.figure {
+	margin-left: 2em ;
+	margin-right: 2em }
+
+div.footer, div.header {
+	clear: both;
+	font-size: smaller }
+
+div.line-block {
+	display: block ;
+	margin-top: 1em ;
+	margin-bottom: 1em }
+
+div.line-block div.line-block {
+	margin-top: 0 ;
+	margin-bottom: 0 ;
+	margin-left: 1.5em }
+
+div.sidebar {
+	margin: 0 0 0.5em 1em ;
+	border: medium outset ;
+	padding: 1em ;
+	background-color: #ffffee ;
+	width: 40% ;
+	float: right ;
+	clear: right }
+
+
+tr {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 15px;
+	border: thin;
+}
+
+
+th {
+	color: #aaaaaa;
+	font-family: arial, helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 19px;
+	text-align: center;
+}
+
+
+td {
+	background: #101d33;
+	font-size: 14px;
+}
+
+
+p.top {
+	background: #00FF00;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
+
+blockquote {
+	margin-left: 8%;
+	margin-right: 8%;
+	border: thin ridge #DDDDDD;
+}
+
+
+blockquote pre {
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
+
+/* For code snippets in blockquotes: */
+
+.line {
+	font-family: monospace, serif;
+}
+
+
+.line-block {
+	font-family: monospace, serif;
+	font-size: 14px;
+}
+
+
+
+#responsive-image-full {
+	width: 95%;
+	height: auto;
+}
+
+
+#responsive-image-large {
+	width: 70%;
+	height: auto;
+}
+
+
+#responsive-image-intermediate {
+	width: 55%;
+	height: auto;
+}
+
+
+#responsive-image-medium {
+	width: 40%;
+	height: auto;
+}
+
+
+#responsive-image-reduced {
+	width: 32%;
+	height: auto;
+}
+
+
+#responsive-image-small {
+	width: 25%;
+	height: auto;
+}
+
+
+#responsive-image-tiny {
+	width: 15%;
+	height: auto;
+}
+
+
+#responsive-image-xsmall {
+	width: 10%;
+	height: auto;
+}
+
+
+a img {
+	border: none;
+	border-color: #000000;
+}
+
+
+dt a:link {
+	font-weight: bold;
+	color: #ededed;
+}
+
+
+dt a:visited {
+	font-weight: bold;
+	color: #dddddd;
+	margin-top: .8em;
+}
+
+
+td a {
+	font-weight: bold;
+	font-size: 15px;
+}
+
+
+a:link {
+	color:#759CDA;
+	background: transparent;
+	font-weight: bold;
+	text-decoration: none;
+	/*font-size: 110%;    */
+}
+
+
+a:visited {
+	color: #95CAFA;
+	background: transparent;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+
+a:hover {
+	text-decoration: underline;
+}
+
+
+
+code {
+	color: #FF0000;
+	font-size: 17px;
+	font-weight: normal;
+	font-family: Courier, serif;
+	/* disabled:
+	background: #00FF00;
+	border-left-style: solid;
+	border-left-width: 3px;
+	border-right-style: none;
+	border-top-style: none;
+	border-bottom-style: none;
+	*/
+}
+
+
+b {
+	color: #000000;
+	font-size: 17px;
+	font-weight: bold;
+}
+
+
+/* Taken from http://www.w3.org/Style/Examples/007/menus.html */
+
+div.banner {
+	/*background: #00FF00;*/
+	margin: 0;
+	font-size: 65%;
+	font-weight: bold;
+	line-height: 1.0;
+	text-align: center;
+	position: fixed;
+	top: 1em;
+	left: auto;
+	width: 11em;
+	right: 1em;
+}
+
+
+div.banner p {
+	/*color: #00FF00;*/
+	background: #33488a;
+	margin-left: 0em;
+	padding: 0em;
+	font-family: Arial, sans-serif;
+	border: thin outset #000000;
+	margin-top: 0%;
+	margin-bottom: 0%;
+	margin-left: 0%;
+	margin-right: 0%;
+}
+
+
+div.banner a, div.banner em { display: block; margin-top: 1px; margin-bottom: 1px; }
+div.banner a, div.banner em { border-top: 1px groove #EEEEEE; text-indent: 10px; } /* separator */
+div.banner a:first-child { border-top: none; }
+div.banner em { color: #FFFFFF; font-weight: bold; } /* head of column */
+
+div.banner a:link { color: #EEEEEE; text-decoration: none; }
+div.banner a:visited { color: #CCCCCC; text-decoration: none; }
+div.banner a:hover { color: #000000; background: #FFFFFF; }

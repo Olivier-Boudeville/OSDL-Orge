@@ -6,7 +6,7 @@ endif
 
 # PROJECT_VERSION should be defined on a per-project basis.
 ifndef PROJECT_VERSION
-	PROJECT_VERSION = 0.2
+	PROJECT_VERSION = 0.3
 endif
 
 
@@ -67,7 +67,7 @@ ORGE_DEV_TOP := $(ORGE_TOP)/src/code
 
 
 # Must always be found from the current directory (thanks to symlink for ex):
-PROJECT_CSS = Orge.css
+PROJECT_CSS = pygments-default.css,orge.css
 
 
 
