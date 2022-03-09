@@ -1,10 +1,5 @@
 ORGE_TOP = ..
 
+MODULES_DIRS = clients models ruleset servers
+
 include $(ORGE_TOP)/GNUmakesettings.inc
-
-MODULES_DIRS = code conf doc
-
-
-# Documentation must be generated and installed from Orge/trunk/doc.	
-
-

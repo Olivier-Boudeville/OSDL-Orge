@@ -1,0 +1,1 @@
+../src/models/texts/set-up-language-wordsets.sh

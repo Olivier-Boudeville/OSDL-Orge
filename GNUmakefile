@@ -7,14 +7,15 @@ MODULES_DIRS = doc src test tools
 
 # No trace supervisor or graphical output wanted when running all tests from the
 # root (batch mode vs interactive one):
+#
 CMD_LINE_OPT="--batch"
 
 
 all:
 	@echo "   Building all, in parallel over $(CORE_COUNT) core(s), from "$(PWD) #`basename $(PWD)`
-	@for m in $(MODULES_DIRS); do if ! ( if [ -d $$m ] ; then cd $$m &&  \
-	$(MAKE) -s all-recurse -j $(CORE_COUNT) && cd .. ; else echo "     (directory $$m skipped)" ; \
-	fi ) ; then exit 1; fi ; done
+	@for m in $(MODULES_DIRS); do if ! (if [ -d $$m ]; then cd $$m && \
+	$(MAKE) -s all-recurse -j $(CORE_COUNT) && cd ..; else echo "     (directory $$m skipped)"; \
+	fi); then exit 1; fi; done
 
 
 include $(ORGE_TOP)/GNUmakesettings.inc
@@ -56,14 +57,6 @@ install-hook:
 install-prod-hook:
 	@cd $(ORGE_TOP)/src/code/servers/raw-tcp/src && $(MAKE) install-prod INSTALLATION_PREFIX="$(INSTALLATION_PREFIX)"
 	@cd $(ORGE_TOP)/src/code/servers/monitoring && $(MAKE) install-prod INSTALLATION_PREFIX="$(INSTALLATION_PREFIX)"
-
-
-
-clean: clean-local
-
-
-clean-local:
-	@find . \( -name '*.dia~' -o -name 'svn-commit.tmp' \) -exec /bin/rm -f '{}' ';'
 
 
 info-local:

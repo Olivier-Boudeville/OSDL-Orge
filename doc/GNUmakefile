@@ -22,7 +22,7 @@ generate-html-main-doc:
 
 generate-html-modules-doc:
 	@echo "  Generating HTML documentation from following modules: $(MODULES_DOCUMENT_DIRS)"
-	@for m in $(MODULES_DOCUMENT_DIRS) ; do ( cd $$m/doc ; $(MAKE) -s generate-html-doc ) ; done
+	@for m in $(MODULES_DOCUMENT_DIRS); do (cd $$m/doc; $(MAKE) -s generate-html-doc); done
 
 
 
@@ -38,4 +38,4 @@ install: install-html-doc
 install-html-doc: generate-html-doc
 	@echo "  Copying Orge documentation from following modules: $(MODULES_DOCUMENT_DIRS), targeting $(ORGE_WEB_INSTALL_DIR)"
 	@/bin/cp -f -L Orge.css $(ORGE_WEB_INSTALL_DIR)
-	@for m in $(MODULES_DOCUMENT_DIRS) ; do ( cd $$m/doc ; $(MAKE) -s install-html-doc ) ; done
+	@for m in $(MODULES_DOCUMENT_DIRS); do (cd $$m/doc; $(MAKE) -s install-html-doc); done

@@ -1,4 +1,3 @@
-
 # PROJECT_NAME should be defined on a per-project basis.
 ifndef PROJECT_NAME
 	PROJECT_NAME = Orge
@@ -7,7 +6,7 @@ endif
 
 # PROJECT_VERSION should be defined on a per-project basis.
 ifndef PROJECT_VERSION
-	PROJECT_VERSION = 0.1
+	PROJECT_VERSION = 0.2
 endif
 
 
@@ -55,7 +54,7 @@ CEYLAN_ERLANG_TOP := $(LOANI_REPOSITORY_ROOT)/Ceylan-Erlang
 # Will define COMMON_TOP and WOOPER_TOP:
 TRACES_TOP = $(CEYLAN_ERLANG_TOP)/traces
 
-	
+
 # Non-Orge OSDL:
 OSDL_ROOT := $(ORGE_TOP)/../../OSDL/trunk/src/doc/web/main/documentation/OSDL/Orge
 
@@ -68,7 +67,7 @@ ORGE_DEV_TOP := $(ORGE_TOP)/src/code
 
 
 # Must always be found from the current directory (thanks to symlink for ex):
-PROJECT_CSS = Orge.css 
+PROJECT_CSS = Orge.css
 
 
 
@@ -141,8 +140,8 @@ INC += $(TCP_CLIENTS_INC) $(UDP_CLIENTS_INC)                \
    $(CREATURES_INC) $(OBJECTS_INC) $(PLACES_INC) $(SOCIETY_INC) $(TEXTS_INC) \
    $(TCP_SERVERS_INC) $(UDP_SERVERS_INC)                    \
    $(CLIENT_MANAGEMENT_INC) $(DATABASE_STORAGE_INC)
-	    
-		             
+
+
 
 # BEAM path section.
 
@@ -170,7 +169,7 @@ DATABASE_STORAGE_BEAM  := $(DATABASE_STORAGE_SRC)
 BEAM_DIRS += \
 	$(TCP_CLIENTS_BEAM) $(UDP_CLIENTS_BEAM)                                \
 	$(CREATURES_BEAM) $(OBJECTS_BEAM) $(PLACES_BEAM) $(TEXTS_BEAM)        \
-    $(SOCIETY_BEAM)                      \
+	$(SOCIETY_BEAM)                      \
 	$(SERVERS_BEAM) $(TCP_SERVERS_BEAM) $(UDP_SERVERS_BEAM)                \
 	$(FUNCTIONAL_BEAM) $(CLIENT_MANAGEMENT_BEAM) $(DATABASE_STORAGE_BEAM)  \
 	$(EGEOIP_ROOT)/ebin
@@ -197,3 +196,36 @@ OVERRIDDEN_OPT := $(OVERRIDDEN_OPT) $(TCP_FIREWALL_OPT) $(EPMD_PORT_OPT)
 
 ORGE_WEB_INSTALL_DIR = $(LOANI_INSTALLATIONS_ROOT)/OSDL-$(OSDL_TARGET_VERSION)/share/OSDL/doc/web/main/documentation/OSDL/Orge
 
+
+# We define the path to the Traces layer (possibly available as a symbolic
+# link).
+#
+# For the sake of these build-related makefiles, Ceylan dependencies will be
+# searched (in that order, the one enforced in otp_utils) in a local _checkouts
+# child directory (if checkout directories are used and if the top-level package
+# of interest is the current one), otherwise in sibling directories (i.e. whose
+# build root is at the same level as this one).
+#
+# This last case happens notably if not using checkout directories, or if using
+# them and if all the packages mentioned here are themselves dependencies (in
+# which case they are all sitting together in the _checkouts child directory).
+#
+# Note also we rely on the names of build roots (ex: myriad) as opposed to
+# project/repository names (ex: Ceylan-Myriad):
+#
+# First priority is an existing checkout directory:
+ifneq ($(wildcard $(ORGE_TOP)/_checkouts/traces/.),)
+	TRACES_TOP = $(ORGE_TOP)/_checkouts/traces
+else
+	# Second, a sibling one is searched for:
+	ifneq ($(wildcard $(ORGE_TOP)/../traces/.),)
+		TRACES_TOP = $(ORGE_TOP)/../traces
+   else
+		# Otherwise most probably in a 'rebar3 compile' context:
+		ifneq ($(wildcard $(ORGE_TOP)/_build/default/lib/traces/.),)
+			TRACES_TOP = $(ORGE_TOP)/_build/default/lib/traces
+		else
+			FORCE_EVAL := $(error Unable to find the build root of Ceylan-Traces from '$(realpath .)')
+		endif
+	endif
+endif
